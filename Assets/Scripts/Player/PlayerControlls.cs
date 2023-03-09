@@ -26,6 +26,8 @@ public class PlayerControlls : MonoBehaviour
     
     private PlayerWeapon weapon;
 
+    private Coroutine RegenerationOfAmmunition;
+
     void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -66,11 +68,24 @@ public class PlayerControlls : MonoBehaviour
     {
         if(context.started)
         {
-            weapon.Shooting = true;
-            StartCoroutine(ShootFrequency());
+            if (weapon.CanShoot())
+            {
+                if(RegenerationOfAmmunition!= null)
+                {
+                    StopCoroutine(RegenerationOfAmmunition);
+                }
+                weapon.Shooting = true;
+                //weapon.Shoot();
+                StartCoroutine(ShootFrequency());
+            }
+            else
+            {
+                Debug.Log(weapon.CurrentConfiguration.CurrentAmmunition);
+            }
         }else if(context.canceled)
         {
-            weapon.Shooting = false;    
+            weapon.Shooting = false;
+            RegenerationOfAmmunition = StartCoroutine(RegenerateAmunition());
         }
 
     }
@@ -79,10 +94,20 @@ public class PlayerControlls : MonoBehaviour
 
         while (weapon.Shooting)
         {
-            weapon.setRangeVariables();
             weapon.Shoot();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(weapon.CurrentConfiguration.CurrentCooldownBetweenBullets);
         }
+    }
+    public IEnumerator RegenerateAmunition()
+    {
+        yield return new WaitForSeconds(1.5f);
+        Debug.Log("StartRegenerating");
+        while (!weapon.AmmunitionEmpty())
+        {
+            weapon.RegenerateAmmunition();
+            yield return new WaitForSeconds(0.01f);
+        }
+        Debug.Log("EndRegeneration");
     }
 
     /**

@@ -13,9 +13,13 @@ MonoBehaviour:
   m_Name: Slot1
   m_EditorClassIdentifier: 
   Power: 1
-  Accuracy: 0.001
+  Accuracy: 1
   Frequency: 1
   MaxRange: 20
-  MaxForce: 200
+  MaxForce: 700
   MaxNumOfBulletsPerBurst: 20
+  MaxCooldownBetweenBullets: 0
+  MaxAmmunition: 100
+  RegenerationValueAmmunition: 0
+  MaxWasteOfAmmunitionValue: 100
   DamageBaseWeapon: 100
