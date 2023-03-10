@@ -9,9 +9,10 @@ public class PlayerWeapon : MonoBehaviour
     //######################## STATES ########################
     
     public bool Shooting;
+    public bool Regeneration;
 
     //######################## CAMERA ########################
-    
+
     [Header("")]
     [Header("Others")]
     [SerializeField]
@@ -35,10 +36,14 @@ public class PlayerWeapon : MonoBehaviour
         CurrentConfiguration.LoadConfigurationOfWeapon();
         Shooting = false;
     }
-    
+    private void Start()
+    {
+        Debug.Log(CurrentConfiguration.ToString());
+    }
+
     public void Shoot()
     {
-        if (CurrentConfiguration.CurrentAmmunition != 0)
+        if (CurrentConfiguration.CurrentAmmunition > 0)
         {
             CalculateAccuracy();
             CheckIfAmmunition();
@@ -66,13 +71,14 @@ public class PlayerWeapon : MonoBehaviour
     }
     public void CheckIfAmmunition()
     {
-        if(CurrentConfiguration.CurrentAmmunition <= 0)
+        if(CurrentConfiguration.CurrentAmmunition <= 0 || !CanShoot())
         {
             this.Shooting = false;  
         }
     }
     public void CalculateAccuracy()
     {
+        Debug.Log("aaaaaaaaaaaa");
         if (CurrentConfiguration.Accuracy == 1)
         {
             RayCastTo(camera.transform.forward);
@@ -88,7 +94,8 @@ public class PlayerWeapon : MonoBehaviour
     private void RayCastTo(Vector3 v)
     {
         CurrentConfiguration.CurrentAmmunition -= CurrentConfiguration.CurrentWasteOfAmmunitionPerBullet;
-        if(CurrentConfiguration.CurrentAmmunition<=0) Debug.Log("Tonto que no tienes más");
+        //if (CurrentConfiguration.CurrentAmmunition <= 0) Debug.Log("Tonto que no tienes más");
+        //else Debug.Log("aaaaaaaa");
         RaycastHit hit;
         if (Physics.Raycast(camera.transform.position, v, out hit, CurrentConfiguration.MaxRange * CurrentConfiguration.Power))
         {

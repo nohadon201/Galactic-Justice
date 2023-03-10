@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -8,49 +9,53 @@ public class PlayerControlls : MonoBehaviour
 {
     //      Controls Variables
     [Header("Configs")]
-    
+
     [SerializeField]
     private float playerVelocity;
-    
+
     [SerializeField]
     private float Sensibility;
 
     [SerializeField]
     private GameObject CameraTarget;
-    
+
     private Vector2 directionMovement, directionRotationOfCamera;
-    
+
     private Rigidbody rb;
-    
+
     private float cameraRotation;
-    
+
     private PlayerWeapon weapon;
 
     private Coroutine RegenerationOfAmmunition;
 
+    private bool Jump1, Jump2;
+
     void Awake()
     {
+        Jump1 = false;
+        Jump2 = false;
         Cursor.lockState = CursorLockMode.Locked;
-       
-        rb = GetComponent<Rigidbody>();
-        
-        weapon = GetComponent<PlayerWeapon>();   
 
-        if(playerVelocity == 0)
+        rb = GetComponent<Rigidbody>();
+
+        weapon = GetComponent<PlayerWeapon>();
+
+        if (playerVelocity == 0)
         {
             playerVelocity = 3f;
         }
 
-        if(CameraTarget == null)
+        if (CameraTarget == null)
         {
             CameraTarget = transform.GetChild(0).gameObject;
         }
-        
+
     }
 
     private void Update()
     {
-        
+
     }
     void LateUpdate()
     {
@@ -66,11 +71,11 @@ public class PlayerControlls : MonoBehaviour
 
     public void OnClick(InputAction.CallbackContext context)
     {
-        if(context.started)
+        if (context.started)
         {
             if (weapon.CanShoot())
             {
-                if(RegenerationOfAmmunition!= null)
+                if (weapon.Regeneration)
                 {
                     StopCoroutine(RegenerationOfAmmunition);
                 }
@@ -82,7 +87,8 @@ public class PlayerControlls : MonoBehaviour
             {
                 Debug.Log(weapon.CurrentConfiguration.CurrentAmmunition);
             }
-        }else if(context.canceled)
+        }
+        else if (context.canceled && !weapon.Regeneration)
         {
             weapon.Shooting = false;
             RegenerationOfAmmunition = StartCoroutine(RegenerateAmunition());
@@ -91,7 +97,6 @@ public class PlayerControlls : MonoBehaviour
     }
     private IEnumerator ShootFrequency()
     {
-
         while (weapon.Shooting)
         {
             weapon.Shoot();
@@ -100,14 +105,16 @@ public class PlayerControlls : MonoBehaviour
     }
     public IEnumerator RegenerateAmunition()
     {
+        weapon.Regeneration = true;
         yield return new WaitForSeconds(1.5f);
-        Debug.Log("StartRegenerating");
+        //Debug.Log("StartRegenerating");
         while (!weapon.AmmunitionEmpty())
         {
             weapon.RegenerateAmmunition();
             yield return new WaitForSeconds(0.01f);
         }
-        Debug.Log("EndRegeneration");
+        weapon.Regeneration = false;
+        //Debug.Log("EndRegeneration");
     }
 
     /**
@@ -128,15 +135,16 @@ public class PlayerControlls : MonoBehaviour
     {
         //      X 
         Vector3 velocity;
-        if(directionMovement.x > 0)
+        if (directionMovement.x > 0)
         {
-            rb.velocity = new Vector3(transform.right.x * playerVelocity, rb.velocity.y, transform.right.z * playerVelocity);   
+            rb.velocity = new Vector3(transform.right.x * playerVelocity, rb.velocity.y, transform.right.z * playerVelocity);
         }
         else if (directionMovement.x < 0)
         {
             rb.velocity = new Vector3(-transform.right.x * playerVelocity, rb.velocity.y, -transform.right.z * playerVelocity);
         }
-        else {
+        else
+        {
             rb.velocity = new Vector3(0, rb.velocity.y, 0);
         }
 
@@ -144,13 +152,13 @@ public class PlayerControlls : MonoBehaviour
 
         if (directionMovement.y > 0)
         {
-            rb.velocity += new Vector3(transform.forward.x,0, transform.forward.z) * playerVelocity;
+            rb.velocity += new Vector3(transform.forward.x, 0, transform.forward.z) * playerVelocity;
         }
         else if (directionMovement.y < 0)
         {
-            rb.velocity += new Vector3(-transform.forward.x,0, -transform.forward.z) * playerVelocity;
+            rb.velocity += new Vector3(-transform.forward.x, 0, -transform.forward.z) * playerVelocity;
         }
-        
+
 
     }
 
@@ -170,19 +178,45 @@ public class PlayerControlls : MonoBehaviour
     {
         try
         {
-            Vector2 v2 = context.ReadValue<Vector2>();  
-            directionMovement = v2; 
-        }catch(System.Exception e) {
-            
+            Vector2 v2 = context.ReadValue<Vector2>();
+            directionMovement = v2;
+        }
+        catch (System.Exception e)
+        {
+
         }
     }
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
-            Debug.Log("ª");
-            rb.AddForce(transform.up * 300f);
+            //Debug.Log("ª");
+            if(!Jump1 && !Jump2)
+            {
+                Jump1 = true;
+                rb.AddForce(transform.up * 300f);
+            }
+            else if (!Jump2)
+            {
+                Jump2 = true;
+                rb.AddForce(transform.up * 300f);
+            }
+            
         }
 
+    }
+    public void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("aa");
+        if (collision.transform.tag == "Floor")
+        {
+            Debug.Log("aaa");
+            TouchFloor();
+        }
+    }
+    public void TouchFloor()
+    {
+        Jump1 = false;   
+        Jump2 = false;
     }
 }

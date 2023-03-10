@@ -66,14 +66,14 @@ public class SlotOfMemory : ScriptableObject
         Power = Power == 0 ? 1f : Power;
         Accuracy = Accuracy == 0 ? 1f : Accuracy;
         Frequency = Frequency == 0 ? 1f : Frequency;
-        
+
         DamageBaseWeapon = DamageBaseWeapon == 0 ? 100 : DamageBaseWeapon;
-        MaxNumOfBulletsPerBurst = MaxNumOfBulletsPerBurst == 0 ? 20 : MaxNumOfBulletsPerBurst; 
+        MaxNumOfBulletsPerBurst = MaxNumOfBulletsPerBurst == 0 ? 20 : MaxNumOfBulletsPerBurst;
         MaxAmmunition = MaxAmmunition == 0 ? 100f : MaxAmmunition;
         MaxWasteOfAmmunitionValue = MaxWasteOfAmmunitionValue == 0 ? 100f : MaxWasteOfAmmunitionValue;
         CurrentAmmunition = MaxAmmunition;
-        MaxCooldownBetweenBullets = MaxCooldownBetweenBullets == 0 ? 0.95f : MaxCooldownBetweenBullets; 
-        RegenerationValueAmmunition = RegenerationValueAmmunition == 0 ? 1 : RegenerationValueAmmunition;
+        MaxCooldownBetweenBullets = MaxCooldownBetweenBullets == 0 ? 2f : MaxCooldownBetweenBullets;
+        RegenerationValueAmmunition = RegenerationValueAmmunition == 0 ? 0.1f : RegenerationValueAmmunition;
     }
     public void DispersionValues()
     {
@@ -110,16 +110,16 @@ public class SlotOfMemory : ScriptableObject
             (MaxForce * Power) / CurrentNumOfBulletsPerBurst
             :
             ((MaxForce * Power) / 8) / CurrentNumOfBulletsPerBurst;
-        
+
         CurrentWasteOfAmmunitionPerBullet = Accuracy == 1 ?
             (MaxWasteOfAmmunitionValue * Power) / CurrentNumOfBulletsPerBurst
             :
-            ( (MaxWasteOfAmmunitionValue * Power) / 8 ) / CurrentNumOfBulletsPerBurst;
+            ((MaxWasteOfAmmunitionValue * Power) / 8) / CurrentNumOfBulletsPerBurst;
 
         CurrentCooldownBetweenBullets = Accuracy == 1 ?
             (MaxCooldownBetweenBullets * Power) / CurrentNumOfBulletsPerBurst
             :
-            ((MaxCooldownBetweenBullets                                                                                                                                                                                                                                    * Power) / 8) / CurrentNumOfBulletsPerBurst;
+            ((MaxCooldownBetweenBullets * Power) / 8) / CurrentNumOfBulletsPerBurst;
 
 
         for (int a = 0; a < MaxDispersion.Length; a++)

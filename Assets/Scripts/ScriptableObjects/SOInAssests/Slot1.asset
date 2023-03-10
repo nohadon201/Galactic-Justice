@@ -18,8 +18,8 @@ MonoBehaviour:
   MaxRange: 20
   MaxForce: 700
   MaxNumOfBulletsPerBurst: 20
-  MaxCooldownBetweenBullets: 0
+  MaxCooldownBetweenBullets: 2
   MaxAmmunition: 100
-  RegenerationValueAmmunition: 0
+  RegenerationValueAmmunition: 0.1
   MaxWasteOfAmmunitionValue: 100
   DamageBaseWeapon: 100
