@@ -16,24 +16,32 @@ public class PlayerWeapon : MonoBehaviour
     [Header("")]
     [Header("Others")]
     [SerializeField]
-    private Camera camera;
+    protected Camera camera;
 
     //######################## CONFIGURATIONS ########################
 
-    [SerializeField]
     public SlotOfMemory CurrentConfiguration;
     [SerializeField]
-    public List<SlotOfMemory> WeaponConfigurations; 
+    public List<SlotOfMemory> WeaponConfigurations;
 
+    public int IndexCurrentConfiguration;
     
     //      Functions that executes only at Start
     void Awake()
     {
         
         if(camera == null) camera = Object.FindObjectOfType<Camera>();
-        CurrentConfiguration.defaultValues();
-        CurrentConfiguration.DispersionValues();
-        CurrentConfiguration.LoadConfigurationOfWeapon();
+        IndexCurrentConfiguration = 0;
+        CurrentConfiguration = WeaponConfigurations[IndexCurrentConfiguration];
+        for(int i = 0; i < WeaponConfigurations.Count; i++) { 
+            
+            WeaponConfigurations[i].defaultValues(); 
+            
+            WeaponConfigurations[i].DispersionValues(); 
+            
+            WeaponConfigurations[i].LoadConfigurationOfWeapon(); 
+        
+        }
         Shooting = false;
     }
     private void Start()
@@ -60,10 +68,11 @@ public class PlayerWeapon : MonoBehaviour
             return CurrentConfiguration.CurrentAmmunition - (CurrentConfiguration.CurrentWasteOfAmmunitionPerBullet * 8 ) >= 0;
         }
     }
-    public void RegenerateAmmunition()
+    
+    public void RegenerateAmmunition(float RegenerationValue)
     {
         Debug.Log("Regenerating: " + CurrentConfiguration.CurrentAmmunition);
-        CurrentConfiguration.CurrentAmmunition += CurrentConfiguration.RegenerationValueAmmunition;
+        CurrentConfiguration.CurrentAmmunition += RegenerationValue;
     }
     public bool AmmunitionEmpty()
     {
@@ -76,9 +85,10 @@ public class PlayerWeapon : MonoBehaviour
             this.Shooting = false;  
         }
     }
+    
     public void CalculateAccuracy()
     {
-        Debug.Log("aaaaaaaaaaaa");
+        //Debug.Log("aaaaaaaaaaaa");
         if (CurrentConfiguration.Accuracy == 1)
         {
             RayCastTo(camera.transform.forward);
@@ -91,6 +101,7 @@ public class PlayerWeapon : MonoBehaviour
             }
         }
     }
+    
     private void RayCastTo(Vector3 v)
     {
         CurrentConfiguration.CurrentAmmunition -= CurrentConfiguration.CurrentWasteOfAmmunitionPerBullet;

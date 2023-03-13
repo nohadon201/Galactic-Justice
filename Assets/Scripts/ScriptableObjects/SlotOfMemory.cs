@@ -72,7 +72,7 @@ public class SlotOfMemory : ScriptableObject
         MaxAmmunition = MaxAmmunition == 0 ? 100f : MaxAmmunition;
         MaxWasteOfAmmunitionValue = MaxWasteOfAmmunitionValue == 0 ? 100f : MaxWasteOfAmmunitionValue;
         CurrentAmmunition = MaxAmmunition;
-        MaxCooldownBetweenBullets = MaxCooldownBetweenBullets == 0 ? 2f : MaxCooldownBetweenBullets;
+        MaxCooldownBetweenBullets = MaxCooldownBetweenBullets == 0 ? 5f : MaxCooldownBetweenBullets;
         RegenerationValueAmmunition = RegenerationValueAmmunition == 0 ? 0.1f : RegenerationValueAmmunition;
     }
     public void DispersionValues()
@@ -106,16 +106,19 @@ public class SlotOfMemory : ScriptableObject
             :
             ((DamageBaseWeapon * Power) / 8) / CurrentNumOfBulletsPerBurst;
 
+        
         CurrentForce = Accuracy == 1 ?
             (MaxForce * Power) / CurrentNumOfBulletsPerBurst
             :
             ((MaxForce * Power) / 8) / CurrentNumOfBulletsPerBurst;
 
+        
         CurrentWasteOfAmmunitionPerBullet = Accuracy == 1 ?
             (MaxWasteOfAmmunitionValue * Power) / CurrentNumOfBulletsPerBurst
             :
             ((MaxWasteOfAmmunitionValue * Power) / 8) / CurrentNumOfBulletsPerBurst;
 
+        
         CurrentCooldownBetweenBullets = Accuracy == 1 ?
             (MaxCooldownBetweenBullets * Power) / CurrentNumOfBulletsPerBurst
             :

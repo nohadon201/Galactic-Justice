@@ -12,10 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05a11cb1819c3d44abab26c4bb8e0e7, type: 3}
   m_Name: Slot2
   m_EditorClassIdentifier: 
-  Power: 0
-  Accuracy: 0
-  Frequency: 0
-  MaxRange: 0
-  MaxForce: 0
+  Power: 1
+  Accuracy: 0.546
+  Frequency: 0.419
+  MaxRange: 20
+  MaxForce: 700
   MaxNumOfBulletsPerBurst: 20
-  DamageBaseWeapon: 0
+  MaxCooldownBetweenBullets: 2
+  MaxAmmunition: 100
+  RegenerationValueAmmunition: 0.1
+  MaxWasteOfAmmunitionValue: 100
+  DamageBaseWeapon: 100

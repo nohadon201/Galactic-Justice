@@ -25,22 +25,35 @@ public class PlayerControlls : MonoBehaviour
 
     private float cameraRotation;
 
+    private float dashForce,dashingTime,dashCooldown;
+
     private PlayerWeapon weapon;
 
-    private Coroutine RegenerationOfAmmunition;
+    private Coroutine RegenerationOfAmmunition,RegenerationShieldCoroutine;
 
-    private bool Jump1, Jump2;
+    private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield;
+
+    private PlayerInfo OwnInfo;
 
     void Awake()
     {
+        DefaultValues();
+
+    }
+    public void DefaultValues()
+    {
         Jump1 = false;
         Jump2 = false;
+        CanDash = true;
+        Dashing = false;
+        RegenerationShield = false;
+        dashForce = 24f;
+        dashCooldown = 1f;
+        dashingTime = 0.3f;
         Cursor.lockState = CursorLockMode.Locked;
-
         rb = GetComponent<Rigidbody>();
-
         weapon = GetComponent<PlayerWeapon>();
-
+        
         if (playerVelocity == 0)
         {
             playerVelocity = 3f;
@@ -50,12 +63,14 @@ public class PlayerControlls : MonoBehaviour
         {
             CameraTarget = transform.GetChild(0).gameObject;
         }
-
     }
-
-    private void Update()
+    private void FixedUpdate()
     {
-
+        if(Dashing)
+        {
+            rb.velocity = transform.forward * dashForce;
+            Debug.Log(rb.velocity);
+        }
     }
     void LateUpdate()
     {
@@ -71,6 +86,7 @@ public class PlayerControlls : MonoBehaviour
 
     public void OnClick(InputAction.CallbackContext context)
     {
+        if (Dashing) return;
         if (context.started)
         {
             if (weapon.CanShoot())
@@ -78,9 +94,9 @@ public class PlayerControlls : MonoBehaviour
                 if (weapon.Regeneration)
                 {
                     StopCoroutine(RegenerationOfAmmunition);
+                    weapon.Regeneration = false;    
                 }
                 weapon.Shooting = true;
-                //weapon.Shoot();
                 StartCoroutine(ShootFrequency());
             }
             else
@@ -106,15 +122,14 @@ public class PlayerControlls : MonoBehaviour
     public IEnumerator RegenerateAmunition()
     {
         weapon.Regeneration = true;
+        float regeneration_value = weapon.CurrentConfiguration.RegenerationValueAmmunition;
         yield return new WaitForSeconds(1.5f);
-        //Debug.Log("StartRegenerating");
         while (!weapon.AmmunitionEmpty())
         {
-            weapon.RegenerateAmmunition();
-            yield return new WaitForSeconds(0.01f);
+            weapon.RegenerateAmmunition(regeneration_value);
+            yield return new WaitForSeconds(weapon.CurrentConfiguration.CurrentCooldownBetweenBullets);
         }
         weapon.Regeneration = false;
-        //Debug.Log("EndRegeneration");
     }
 
     /**
@@ -122,6 +137,7 @@ public class PlayerControlls : MonoBehaviour
      */
     public void CameraRotation()
     {
+        
         transform.Rotate(Vector3.up * directionRotationOfCamera.x * Sensibility);
 
         cameraRotation += (-directionRotationOfCamera.y * Sensibility);
@@ -161,9 +177,27 @@ public class PlayerControlls : MonoBehaviour
 
 
     }
-
+    public IEnumerator Dash()
+    {
+        CanDash = false;
+        rb.useGravity = false;
+        Dashing = true;
+        yield return new WaitForSeconds(dashingTime);
+        Dashing = false;
+        rb.useGravity = true;
+        yield return new WaitForSeconds(dashCooldown);
+        CanDash = true;
+    }
+    public void OnDashing(InputAction.CallbackContext context)
+    {
+        if(CanDash)
+        {
+            StartCoroutine(Dash());
+        }
+    }
     public void OnCameraRotate(InputAction.CallbackContext context)
     {
+        if (Dashing) return;
         try
         {
             Vector2 v2 = context.ReadValue<Vector2>();
@@ -176,6 +210,7 @@ public class PlayerControlls : MonoBehaviour
     }
     public void OnPlayerMove(InputAction.CallbackContext context)
     {
+        if (Dashing) return;
         try
         {
             Vector2 v2 = context.ReadValue<Vector2>();
@@ -188,9 +223,9 @@ public class PlayerControlls : MonoBehaviour
     }
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (Dashing) return;
         if (context.performed)
         {
-            //Debug.Log("ª");
             if(!Jump1 && !Jump2)
             {
                 Jump1 = true;
@@ -205,18 +240,112 @@ public class PlayerControlls : MonoBehaviour
         }
 
     }
-    public void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("aa");
-        if (collision.transform.tag == "Floor")
-        {
-            Debug.Log("aaa");
-            TouchFloor();
-        }
-    }
     public void TouchFloor()
     {
         Jump1 = false;   
         Jump2 = false;
     }
+
+    /**
+     * ############################ Slots of Memory ########################################### 
+     */
+
+    public void OnRightSlot(InputAction.CallbackContext context)
+    {
+
+        if(context.performed && !weapon.Regeneration)
+        {
+            weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration + 1 == weapon.WeaponConfigurations.Count ? 0 : weapon.IndexCurrentConfiguration + 1;
+            weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
+            weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
+        }else if(context.performed && weapon.Regeneration)
+        {
+            StopCoroutine(RegenerationOfAmmunition);
+            weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration + 1 == weapon.WeaponConfigurations.Count ? 0 : weapon.IndexCurrentConfiguration + 1;
+            weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
+            weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
+            weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
+            RegenerationOfAmmunition = StartCoroutine(RegenerateAmunition());
+        }
+
+    }
+    public void OnLeftSlot(InputAction.CallbackContext context)
+    {
+        if(context.performed && !weapon.Regeneration)
+        {
+            weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration - 1 < 0 ? weapon.WeaponConfigurations.Count - 1 : weapon.IndexCurrentConfiguration - 1;
+            weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
+            weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
+        }
+        else if (context.performed && weapon.Regeneration)
+        {
+            StopCoroutine(RegenerationOfAmmunition);
+            weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration - 1 < 0 ? weapon.WeaponConfigurations.Count - 1 : weapon.IndexCurrentConfiguration - 1;
+            weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
+            weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
+            weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
+            RegenerationOfAmmunition = StartCoroutine(RegenerateAmunition());
+        }
+
+    }
+
+
+    /**
+     * ############################ Health and shield ########################################### 
+     */
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.tag == "Floor")
+        {
+            TouchFloor();
+        }
+    }
+    
+    public void Damage(float damage)
+    {
+        if (OwnInfo.playersCurrentShield > 0)
+        {
+            if (RegenerationShield)
+            {
+                StopCoroutine(RegenerationShieldCoroutine);
+            }
+            OwnInfo.playersCurrentShield -= damage; 
+            RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
+        }
+        else
+        {
+            if (RegenerationShield)
+            {
+                StopCoroutine(RegenerationShieldCoroutine);
+            }
+            OwnInfo.playersCurrentHealth -= damage;
+            RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
+        }
+    }
+
+    public IEnumerator RegenerationOfShield()
+    {
+        RegenerationShield = true;
+        yield return new WaitForSeconds(1.5f);
+        while (ShieldNotFull())
+        {
+            RegenerationShieldSum();
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+    public bool ShieldNotFull()
+    {
+        if (OwnInfo.playersCurrentShield > OwnInfo.playersMaxShield)
+        {
+            OwnInfo.playersCurrentShield = OwnInfo.playersMaxShield;
+        }
+        return OwnInfo.playersCurrentShield != OwnInfo.playersMaxShield;
+    }
+    public void RegenerationShieldSum()
+    {
+        OwnInfo.playersCurrentShield += OwnInfo.RegenerationShieldValue;
+        Debug.Log("ShieldRegenerating: "+OwnInfo.playersCurrentShield);
+    }
+
 }
