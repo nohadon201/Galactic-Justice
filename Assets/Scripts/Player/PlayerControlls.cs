@@ -127,7 +127,7 @@ public class PlayerControlls : MonoBehaviour
         while (!weapon.AmmunitionEmpty())
         {
             weapon.RegenerateAmmunition(regeneration_value);
-            yield return new WaitForSeconds(weapon.CurrentConfiguration.CurrentCooldownBetweenBullets);
+            yield return new WaitForSeconds(weapon.CurrentConfiguration.CurrentCooldownBetweenBullets * Time.deltaTime);
         }
         weapon.Regeneration = false;
     }
@@ -256,6 +256,7 @@ public class PlayerControlls : MonoBehaviour
         if(context.performed && !weapon.Regeneration)
         {
             weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration + 1 == weapon.WeaponConfigurations.Count ? 0 : weapon.IndexCurrentConfiguration + 1;
+            weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
             weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
             weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
         }else if(context.performed && weapon.Regeneration)
@@ -274,6 +275,7 @@ public class PlayerControlls : MonoBehaviour
         if(context.performed && !weapon.Regeneration)
         {
             weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration - 1 < 0 ? weapon.WeaponConfigurations.Count - 1 : weapon.IndexCurrentConfiguration - 1;
+            weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
             weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
             weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
         }
@@ -333,6 +335,7 @@ public class PlayerControlls : MonoBehaviour
             RegenerationShieldSum();
             yield return new WaitForSeconds(0.1f);
         }
+        RegenerationShield = false;
     }
     public bool ShieldNotFull()
     {
