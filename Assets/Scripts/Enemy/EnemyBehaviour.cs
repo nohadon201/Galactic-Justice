@@ -3,9 +3,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyBehaviour : MonoBehaviour
 {
+    //      StateMachine and Basic Stats
     [SerializeField]
     protected GameObject parentOfPoints;
     protected float damagePerImpact;
@@ -14,12 +16,17 @@ public class EnemyBehaviour : MonoBehaviour
     protected StateOfEnemy currentState;
     protected List<Vector3> randomPositions = new List<Vector3>();
     protected float RangeAttack;
+    protected float velocity;
+    
+    //      Pathfinding
+    protected Rigidbody rb; 
+    protected NavMeshPath currentPath;
+    protected int navmeshIndexPosition;
 
-    //Enemy vision
+    //      Enemy vision
     [SerializeField]
     [Range(0f, 360f)]
     public float angle;
-
     protected Transform playerRef;
     protected int indexCurrentPointAlert;
     [SerializeField]
@@ -31,7 +38,16 @@ public class EnemyBehaviour : MonoBehaviour
 
     protected void SetRandomPostions()
     {
-        for(int a  = 0; a < parentOfPoints.transform.childCount; a++) { 
+        if(targetMask == null)
+        {
+            targetMask |= (1 << LayerMask.NameToLayer("Target"));
+        }
+        if (obstructionMask == null)
+        {
+            obstructionMask |= (1 << LayerMask.NameToLayer("Target"));
+            obstructionMask |= (1 << LayerMask.NameToLayer("Obstruction"));
+        }
+        for (int a  = 0; a < parentOfPoints.transform.childCount; a++) { 
             randomPositions.Add(parentOfPoints.transform.GetChild(a).position);
         }
     }
@@ -56,7 +72,7 @@ public class EnemyBehaviour : MonoBehaviour
     {
         if (!check)
         {
-            Debug.Log(other.transform.name);
+            //Debug.Log(other.transform.name);
             StartCoroutine(FOVRoutine(other.transform));
         }
         
@@ -87,5 +103,5 @@ public class EnemyBehaviour : MonoBehaviour
 
 public enum StateOfEnemy
 {
-    ALERT, ATTACK, FOLLOWING
+    PATROL, ATTACK, FOLLOWING
 }

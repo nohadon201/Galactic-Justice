@@ -18,7 +18,7 @@ public class Thraaxian : EnemyBehaviour
         RangeAttack = 10;
         //  Generic Enemy default values
         SetRandomPostions();
-        currentState = StateOfEnemy.ALERT;
+        currentState = StateOfEnemy.PATROL;
         Attacking = false;
         check = false;
         canSeePlayer = false;
@@ -30,7 +30,7 @@ public class Thraaxian : EnemyBehaviour
 
     void Update()
     {
-        if(currentState == StateOfEnemy.ALERT) {
+        if(currentState == StateOfEnemy.PATROL) {
             KeepGoingAlertPoint();
             GetComponent<NavMeshAgent>().destination = randomPositions[indexCurrentPointAlert];
         }else if(currentState == StateOfEnemy.FOLLOWING)
