@@ -38,36 +38,23 @@ public class Quiraxian : EnemyBehaviour
      */
     void Update()
     {
-        if(currentState == StateOfEnemy.FOLLOWING)
-        {
-            Debug.Log("Velocity: " + rb.velocity);
-        }
-        
-        //if(currentState == StateOfEnemy.ALERT) {
-        //    KeepGoingAlertPoint();
-        //    GetComponent<NavMeshAgent>().destination = randomPositions[indexCurrentPointAlert];
-        //}else if(currentState == StateOfEnemy.FOLLOWING)
+        //if(currentState == StateOfEnemy.FOLLOWING)
         //{
-            
-            
-        //    if (CheckIfItsClose())
-        //    {
-        //        currentState = StateOfEnemy.ATTACK;
-        //        StartCoroutine(AttackingCoroutine());
-        //        GetComponent<NavMeshAgent>().destination = transform.position;
-        //    }
-        //    else
-        //    {
-        //        GetComponent<NavMeshAgent>().destination = playerRef.transform.position;
-        //    }
-                
-        //}else if(currentState == StateOfEnemy.ATTACK)
-        //{
-        //    if(CheckIfItsFarAway()) { 
-        //        currentState = StateOfEnemy.FOLLOWING;
-        //        Attacking = false;
-        //    }
+        //    Debug.Log("Velocity: " + rb.velocity);
         //}
+
+        switch(currentState) {
+            case StateOfEnemy.PATROL:
+                Vector3 forward = randomPositions[indexCurrentPointAlert] - transform.position;
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(forward), 0.2f );    
+                break;
+            case StateOfEnemy.FOLLOWING:
+            case StateOfEnemy.ATTACK:
+                Vector3 forward2 = playerRef.position - transform.position;
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(forward2),0.2f);
+                break;
+        }
+
     }
     private void FixedUpdate()
     {
@@ -152,16 +139,6 @@ public class Quiraxian : EnemyBehaviour
         }
         navmeshIndexPosition = 0;
     }
-    //private void checkIfDestiny()
-    //{
-    //    if(currentState == StateOfEnemy.PATROL)
-    //    {
-    //        if (KeepGoingPatrolPoint())
-    //        {
-    //            CalculatePath(randomPositions[indexCurrentPointAlert]); 
-    //        }
-    //    }
-    //}
     private bool KeepGoingPatrolPoint()
     {
         Vector3 v = (randomPositions[indexCurrentPointAlert] - transform.position);
