@@ -13,7 +13,7 @@ public class PyrognathianEditor : Editor
 
         Vector3 viewAngle01 = DirectionFromAngle(fov.transform.eulerAngles.y, -fov.angle / 2);
         Vector3 viewAngle02 = DirectionFromAngle(fov.transform.eulerAngles.y, fov.angle / 2);
-        if (fov.canSeePlayer)
+        if (fov)
         {
             Handles.color = Color.blue;
         }

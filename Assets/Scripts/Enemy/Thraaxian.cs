@@ -18,10 +18,6 @@ public class Thraaxian : EnemyBehaviour
         RangeAttack = 10;
         //  Generic Enemy default values
         SetRandomPostions();
-        currentState = StateOfEnemy.PATROL;
-        Attacking = false;
-        check = false;
-        canSeePlayer = false;
     }
     private void Start()
     {
@@ -50,15 +46,15 @@ public class Thraaxian : EnemyBehaviour
         {
             if(CheckIfItsFarAway()) { 
                 currentState = StateOfEnemy.FOLLOWING;
-                Attacking = false;
+                //Attacking = false;
             }
         }
     }
 
     private IEnumerator AttackingCoroutine()
     {
-        Attacking = true;
-        while (Attacking)
+        //Attacking = true;
+        while (true)
         {
             Shoot(playerRef.transform.position);
             yield return new WaitForSeconds(1);
@@ -110,6 +106,74 @@ public class Thraaxian : EnemyBehaviour
     {
         
     }
-    
-    
+
+    protected override void OnPlayerSeen()
+    {
+        ChangeState(StateOfEnemy.FOLLOWING);
+    }
+
+    protected override void InitStatePatrol()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStatePatrol()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStatePatrol()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStatePatrol()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void InitStateFollowing()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStateFollowing()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStateFollowing()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStateFollowing()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void InitStateAttack()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStateAttack()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStateAttack()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStateAttack()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override IEnumerator FindPlayer()
+    {
+        throw new System.NotImplementedException();
+    }
 }
