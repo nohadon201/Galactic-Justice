@@ -16,7 +16,7 @@ public class PlayerControlls : MonoBehaviour
     [SerializeField]
     private float Sensibility;
 
-    [SerializeField]
+    
     private GameObject CameraTarget;
 
     private Vector2 directionMovement, directionRotationOfCamera;
@@ -32,13 +32,15 @@ public class PlayerControlls : MonoBehaviour
     private Coroutine RegenerationOfAmmunition,RegenerationShieldCoroutine;
 
     private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield;
-
+    
     private PlayerInfo OwnInfo;
+
+    public List<AbilityActivator> abilities = new List<AbilityActivator>();
 
     void Awake()
     {
         DefaultValues();
-
+         
     }
     public void DefaultValues()
     {
@@ -53,11 +55,11 @@ public class PlayerControlls : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         rb = GetComponent<Rigidbody>();
         weapon = GetComponent<PlayerWeapon>();
+           
+        //te falta un comentario
         
-        if (playerVelocity == 0)
-        {
-            playerVelocity = 3f;
-        }
+        playerVelocity = 10f;
+          
 
         if (CameraTarget == null)
         {
@@ -69,11 +71,14 @@ public class PlayerControlls : MonoBehaviour
         if(Dashing)
         {
             rb.velocity = transform.forward * dashForce;
-            Debug.Log(rb.velocity);
         }
     }
     void LateUpdate()
     {
+        if(Input.GetKeyDown(KeyCode.Alpha1)) {
+            CoreScriptAbilities.Instance.ActivateAbility(abilities[0].id, OwnInfo, gameObject);
+
+        }
         // Velocity of the player
         PlayerMovement();
 

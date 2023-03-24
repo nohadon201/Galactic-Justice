@@ -8,7 +8,7 @@ public class GeneralPool : MonoBehaviour
     private static GeneralPool instance;
     public static GeneralPool Instance { get { return instance; } }
     public GameObject poolThraaxian;
-    public GameObject poolZorgonian;
+    public GameObject poolQuiraxian;
 
     private void Awake()
     {
@@ -22,6 +22,6 @@ public class GeneralPool : MonoBehaviour
         }
         DontDestroyOnLoad(this.gameObject);   
         poolThraaxian = transform.GetChild(0).gameObject;
-        poolZorgonian = transform.GetChild(1).gameObject;
+        poolQuiraxian = transform.GetChild(1).gameObject;
     }
 }

@@ -15,7 +15,7 @@ public class Quiraxian : EnemyBehaviour
         damagePerImpact = 20f;
         maxHealth = 20;
         currentHealth = maxHealth;
-        RangeAttack = 10;
+        RangeAttack = 9;
         //  Generic Enemy default values
         SetRandomPostions();
         navmeshIndexPosition = 0;
@@ -56,35 +56,14 @@ public class Quiraxian : EnemyBehaviour
     private void CalculatePath(Vector3 position)
     {
         currentPath.ClearCorners();
-        Debug.Log(position);
         if (!NavMesh.CalculatePath(transform.position, position, filter, currentPath))
         {
             Debug.Log("No Path finded");
         }
         navmeshIndexPosition = 0;
     }
-    private bool KeepGoingPatrolPoint()
-    {
-        Vector3 v = (randomPositions[indexCurrentPointAlert] - transform.position);
-        if (Mathf.Abs(v.x) <= .1 && Mathf.Abs(v.z) <= .1)
-        {
-            int a = indexCurrentPointAlert;
-            while (a == indexCurrentPointAlert)
-            {
-                a = Random.Range(0, randomPositions.Count);
-            }
-            indexCurrentPointAlert = a;
-            return true;
-        }
-        return false;
-    }
-    private Vector3 setTheVelocity()
-    {
-        float x = currentPath.corners[navmeshIndexPosition].x - transform.position.x;
-        float z = currentPath.corners[navmeshIndexPosition].z - transform.position.z;
-        Vector3 direction = new Vector3(x, 0, z);
-        return direction.normalized * velocity;
-    }
+    
+    
     /*
      * ################################### Attack ##############################################
      */
@@ -93,21 +72,21 @@ public class Quiraxian : EnemyBehaviour
         while (true)
         {
             Shoot(playerRef.transform.position);
-            yield return new WaitForSeconds(2.5f);
+            yield return new WaitForSeconds(1f);
         }
         
     }
     public void Shoot(Vector3 v)
     {
-        GameObject pool = GeneralPool.Instance.poolThraaxian;
+        GameObject pool = GeneralPool.Instance.poolQuiraxian;
         for (int a = 0; a < pool.transform.childCount; a++)
         {
             if (!pool.transform.GetChild(a).gameObject.activeSelf)
             {
-                Vector3 diff = (v - transform.position).normalized;
-                Vector3 position = transform.position + (transform.forward * 3);
+                Vector3 position = transform.position + (transform.forward * 2);
+                Vector3 diff = (v - position).normalized;
                 pool.transform.GetChild(a).gameObject.SetActive(true);
-                pool.transform.GetChild(a).gameObject.GetComponent<Projectile>().ShootBullet(position, diff, 7, damagePerImpact);
+                pool.transform.GetChild(a).gameObject.GetComponent<Projectile>().ShootBullet(position, diff, 7, damagePerImpact, 20);
                 break;
             }
         }
@@ -118,12 +97,17 @@ public class Quiraxian : EnemyBehaviour
     //          PATROL
     protected override void OnPlayerSeen()
     {
+        if(forgivePlayer != null)
+        {
+            StopCoroutine(forgivePlayer);
+        }
         ChangeState(StateOfEnemy.FOLLOWING);
     }
 
     protected override void InitStatePatrol()
     {
         Debug.Log("Patrol");
+        CalculatePath(randomPositions[indexCurrentPointAlert]);
     }
 
     protected override void UpdateStatePatrol()
@@ -137,15 +121,7 @@ public class Quiraxian : EnemyBehaviour
         {
             CalculatePath(randomPositions[indexCurrentPointAlert]);
         }
-        if (navmeshIndexPosition < currentPath.corners.Length)
-        {
-            Vector3 v = currentPath.corners[navmeshIndexPosition] - transform.position;
-            if ((v.x < 0.1 && v.x > -0.1) && (v.z < 0.1 && v.z > -0.1))
-            {
-                navmeshIndexPosition++;
-            }
-            rb.velocity = setTheVelocity();
-        }
+        setTheVelocity();
     }
 
     protected override void ExitStatePatrol()
@@ -168,17 +144,7 @@ public class Quiraxian : EnemyBehaviour
 
     protected override void FixedUpdateStateFollowing()
     {
-        Debug.Log("Following");
-        if (navmeshIndexPosition < currentPath.corners.Length)
-        {
-            Vector3 v = currentPath.corners[navmeshIndexPosition] - transform.position;
-            if ((v.x < 0.1 && v.x > -0.1) && (v.z < 0.1 && v.z > -0.1))
-            {
-                navmeshIndexPosition++;
-            }
-            rb.velocity = setTheVelocity();
-        }
-        Debug.Log(rb.velocity);
+        setTheVelocity();
         if (CheckIfItsClosePlayer())
         {
             ChangeState(StateOfEnemy.ATTACK);
@@ -187,7 +153,7 @@ public class Quiraxian : EnemyBehaviour
 
     protected override void ExitStateFollowing()
     {
-        StopCoroutine(FindPlayer());
+        StopCoroutine(findPlayer);
     }
 
     //          ATTACK
@@ -205,6 +171,7 @@ public class Quiraxian : EnemyBehaviour
         {
             ChangeState(StateOfEnemy.FOLLOWING);   
         }
+        RotationWithTheTarget(playerRef.position);
     }
 
     protected override void FixedUpdateStateAttack()
@@ -214,7 +181,7 @@ public class Quiraxian : EnemyBehaviour
 
     protected override void ExitStateAttack()
     {
-        StopCoroutine(attack);
+        StopCoroutine(attack);   
     }
 
     protected override IEnumerator FindPlayer()
@@ -224,5 +191,14 @@ public class Quiraxian : EnemyBehaviour
             CalculatePath(playerRef.position);
             yield return new WaitForSeconds(1);
         }
+    }
+    protected override IEnumerator ForgivePlayer()
+    {
+        yield return new WaitForSeconds(10);
+        ChangeState(StateOfEnemy.PATROL);
+    }
+    protected override void OnPlayerAway()
+    {
+        forgivePlayer = StartCoroutine(ForgivePlayer());
     }
 }

@@ -10,8 +10,7 @@ using static UnityEditor.VersionControl.Asset;
 public abstract class EnemyBehaviour : MonoBehaviour
 {
     //      StateMachine and Basic Stats
-    [SerializeField]
-    protected GameObject parentOfPoints;
+    public GameObject parentOfPoints;
     protected float damagePerImpact;
     protected float maxHealth;
     protected float currentHealth;
@@ -19,7 +18,7 @@ public abstract class EnemyBehaviour : MonoBehaviour
     protected List<Vector3> randomPositions = new List<Vector3>();
     protected float RangeAttack;
     protected float velocity;
-
+    protected bool PlayerForgive;
     //      Pathfinding
     
     protected NavMeshQueryFilter filter;
@@ -37,39 +36,23 @@ public abstract class EnemyBehaviour : MonoBehaviour
     protected LayerMask targetMask;
     [SerializeField]
     protected LayerMask obstructionMask;
-
     private Coroutine checkPlayerCoroutine;
-    protected Coroutine attack, findPlayer;
+    protected Coroutine attack, findPlayer, forgivePlayer;
+    
     protected void SetRandomPostions()
     {
-        if(targetMask == null)
-        {
-            targetMask |= (1 << LayerMask.NameToLayer("Target"));
-        }
-        if (obstructionMask == null)
-        {
-            obstructionMask |= (1 << LayerMask.NameToLayer("Target"));
-            obstructionMask |= (1 << LayerMask.NameToLayer("Obstruction"));
-        }
+        
+         targetMask |= (1 << LayerMask.NameToLayer("Target"));
+        
+        
+        obstructionMask |= (1 << LayerMask.NameToLayer("Target"));
+        obstructionMask |= (1 << LayerMask.NameToLayer("Obstruction"));
+        
         for (int a  = 0; a < parentOfPoints.transform.childCount; a++) { 
             randomPositions.Add(parentOfPoints.transform.GetChild(a).position);
         }
     }
-
-    private IEnumerator FOVRoutine(Transform transformPlayer)
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(0.2f);
-            if (FieldOfViewCheck(transformPlayer))
-            {
-                Debug.Log(transformPlayer.name);
-                playerRef = transformPlayer;
-                OnPlayerSeen();
-            }
-        }
-    }
-    protected abstract IEnumerator FindPlayer();
+    
     private void Update()
     {
         UpdateState(currentState);
@@ -82,11 +65,30 @@ public abstract class EnemyBehaviour : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        playerRef = other.transform;
         checkPlayerCoroutine = StartCoroutine(FOVRoutine(other.transform));        
     }
     private void OnTriggerExit(Collider other)
     {
         StopCoroutine(checkPlayerCoroutine);
+        OnPlayerAway();
+    }
+    /**
+     * ###################################### Patrol Of Enemy ################################ 
+     */
+    private IEnumerator FOVRoutine(Transform transformPlayer)
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.2f);
+            if (FieldOfViewCheck(transformPlayer))
+            {
+                OnPlayerSeen();
+            }else 
+            {
+                OnPlayerAway();
+            }
+        }
     }
     private bool FieldOfViewCheck(Transform transformTarget)
     {
@@ -101,7 +103,42 @@ public abstract class EnemyBehaviour : MonoBehaviour
         }
         return false;
     }
-
+    /**
+     * ###################################### Movement ################################ 
+     */
+    protected bool KeepGoingPatrolPoint()
+    {
+        Vector3 v = (randomPositions[indexCurrentPointAlert] - transform.position);
+        if (Mathf.Abs(v.x) <= .1 && Mathf.Abs(v.z) <= .1)
+        {
+            int a = indexCurrentPointAlert;
+            while (a == indexCurrentPointAlert)
+            {
+                a = UnityEngine.Random.Range(0, randomPositions.Count);
+            }
+            indexCurrentPointAlert = a;
+            return true;
+        }
+        return false;
+    }
+    protected void setTheVelocity()
+    {
+        if (navmeshIndexPosition < currentPath.corners.Length)
+        {
+            float xCoor = currentPath.corners[navmeshIndexPosition].x - transform.position.x;
+            float zCoor = currentPath.corners[navmeshIndexPosition].z - transform.position.z;
+            Vector3 d = new Vector3(xCoor, 0, zCoor);
+            rb.velocity = d.normalized * velocity;
+            Vector3 v = currentPath.corners[navmeshIndexPosition] - transform.position;
+            if ((v.x < 0.1 && v.x > -0.1) && (v.z < 0.1 && v.z > -0.1))
+            {
+                navmeshIndexPosition++;
+            }
+        }
+    }
+    /**
+     * ###################################### State Machine ################################ 
+     */
     protected void ChangeState(StateOfEnemy newState)
     {
         if (newState == currentState)
@@ -184,9 +221,10 @@ public abstract class EnemyBehaviour : MonoBehaviour
                 break;
         }
     }
-
-
+    protected abstract IEnumerator FindPlayer();
+    protected abstract IEnumerator ForgivePlayer();
     protected abstract void OnPlayerSeen();
+    protected abstract void OnPlayerAway();
     protected abstract void InitStatePatrol();
     protected abstract void UpdateStatePatrol();
     protected abstract void FixedUpdateStatePatrol();

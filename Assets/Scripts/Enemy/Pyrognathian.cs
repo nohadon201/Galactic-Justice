@@ -174,4 +174,13 @@ public class Pyrognathian : EnemyBehaviour
     {
         throw new System.NotImplementedException();
     }
+    protected override IEnumerator ForgivePlayer()
+    {
+        yield return new WaitForSeconds(7);
+        ChangeState(StateOfEnemy.PATROL);
+    }
+    protected override void OnPlayerAway()
+    {
+        forgivePlayer = StartCoroutine(ForgivePlayer());
+    }
 }

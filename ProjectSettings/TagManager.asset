@@ -7,6 +7,7 @@ TagManager:
   - CinemachineTarget
   - Physics
   - Floor
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -17,8 +18,8 @@ TagManager:
   - Target
   - Obstruction
   - EnemyAggro
-  - 
-  - 
+  - Projectiles
+  - Enemy
   - 
   - 
   - 

@@ -21,9 +21,9 @@ public class PlayerInfo : ScriptableObject
 
     public float Sensibility;
 
-    [NonSerialized]
     public List<SlotOfMemory> MemorySlots;
 
+    
 
     public void DefaultValues()
     {
@@ -35,7 +35,7 @@ public class PlayerInfo : ScriptableObject
         Sensibility = Sensibility == 0 ? 0.3f : Sensibility;
 
         playersCurrentHealth = playersMaxHealth;
-        playersCurrentShield = playersCurrentShield;
+        playersCurrentShield = playersMaxShield;
 
         RegenerationShieldValue = RegenerationShieldValue == 0 ? 0.3f : RegenerationShieldValue;
 

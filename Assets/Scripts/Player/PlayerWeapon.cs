@@ -46,7 +46,7 @@ public class PlayerWeapon : MonoBehaviour
     }
     private void Start()
     {
-        Debug.Log(CurrentConfiguration.ToString());
+        //Debug.Log(CurrentConfiguration.ToString());
     }
 
     public void Shoot()
@@ -71,7 +71,7 @@ public class PlayerWeapon : MonoBehaviour
     
     public void RegenerateAmmunition(float RegenerationValue)
     {
-        Debug.Log("Regenerating: " + CurrentConfiguration.CurrentAmmunition);
+        //Debug.Log("Regenerating: " + CurrentConfiguration.CurrentAmmunition);
         CurrentConfiguration.CurrentAmmunition += RegenerationValue;
     }
     public bool AmmunitionEmpty()
@@ -88,7 +88,6 @@ public class PlayerWeapon : MonoBehaviour
     
     public void CalculateAccuracy()
     {
-        //Debug.Log("aaaaaaaaaaaa");
         if (CurrentConfiguration.Accuracy == 1)
         {
             RayCastTo(camera.transform.forward);
@@ -105,8 +104,6 @@ public class PlayerWeapon : MonoBehaviour
     private void RayCastTo(Vector3 v)
     {
         CurrentConfiguration.CurrentAmmunition -= CurrentConfiguration.CurrentWasteOfAmmunitionPerBullet;
-        //if (CurrentConfiguration.CurrentAmmunition <= 0) Debug.Log("Tonto que no tienes más");
-        //else Debug.Log("aaaaaaaa");
         RaycastHit hit;
         if (Physics.Raycast(camera.transform.position, v, out hit, CurrentConfiguration.MaxRange * CurrentConfiguration.Power))
         {
@@ -114,6 +111,9 @@ public class PlayerWeapon : MonoBehaviour
             if(hit.transform.tag.Contains("Physics"))
             {
                 hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * CurrentConfiguration.CurrentForce, hit.point);
+            }else if (hit.transform.tag.Contains("Enemy"))
+            {
+                hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * CurrentConfiguration.CurrentForce * 10, hit.point);
             }
             
         }
