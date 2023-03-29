@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1d2404901163124488167b6aef5a819, type: 3}
   m_Name: PlayerHostInfo
   m_EditorClassIdentifier: 
-  playerVelocity: 0
-  playersMaxHealth: 0
-  playersCurrentHealth: 0
-  playersMaxShield: 0
-  playersCurrentShield: 0
-  RegenerationShieldValue: 0
-  Sensibility: 0
+  playerVelocity: 10
+  playersMaxHealth: 100
+  playersCurrentHealth: 100
+  playersMaxShield: 300
+  playersCurrentShield: 300
+  RegenerationShieldValue: 0.3
+  Sensibility: 0.3
+  MemorySlots: []
+  abilities: []

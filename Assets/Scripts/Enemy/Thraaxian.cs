@@ -261,6 +261,7 @@ public class Thraaxian : EnemyBehaviour
                 break;
             case StateOfEnemy.ATTACK:
                 Debug.Log("ATTACK ONPLAYER AWAY");
+                Debug.Log(PlayerForgive);
                 if (!PlayerForgive)
                 {
                     forgivePlayer = StartCoroutine(ForgivePlayer());

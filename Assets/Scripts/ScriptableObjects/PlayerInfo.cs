@@ -23,11 +23,18 @@ public class PlayerInfo : ScriptableObject
 
     public List<SlotOfMemory> MemorySlots;
 
-    
+    public List<Skills> abilities;
 
     public void DefaultValues()
     {
-        playerVelocity = playerVelocity == 0 ? 3f : playerVelocity;
+        if (abilities.Count == 0)
+        {
+            abilities.Add(Resources.Load<Skills>("Abilities/Skill1"));
+            abilities.Add(Resources.Load<Skills>("Abilities/Skill2"));
+            abilities.Add(Resources.Load<Skills>("Abilities/Skill3"));
+            abilities.Add(Resources.Load<Skills>("Abilities/Skill4"));
+        }
+        playerVelocity = playerVelocity == 0 ? 10f : playerVelocity;
 
         playersMaxHealth = playersMaxHealth == 0 ? 100 : playersMaxHealth;
         playersMaxShield = playersMaxShield == 0 ? 300 : playersMaxShield;  

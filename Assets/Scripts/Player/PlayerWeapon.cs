@@ -71,7 +71,7 @@ public class PlayerWeapon : MonoBehaviour
     
     public void RegenerateAmmunition(float RegenerationValue)
     {
-        //Debug.Log("Regenerating: " + CurrentConfiguration.CurrentAmmunition);
+        Debug.Log("Regenerating: " + CurrentConfiguration.CurrentAmmunition);
         CurrentConfiguration.CurrentAmmunition += RegenerationValue;
     }
     public bool AmmunitionEmpty()
@@ -111,6 +111,7 @@ public class PlayerWeapon : MonoBehaviour
             if(hit.transform.tag.Contains("Physics"))
             {
                 hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * CurrentConfiguration.CurrentForce, hit.point);
+                hit.transform.gameObject.GetComponent<aaaScript>().cosa2();
             }else if (hit.transform.tag.Contains("Enemy"))
             {
                 hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * CurrentConfiguration.CurrentForce * 10, hit.point);

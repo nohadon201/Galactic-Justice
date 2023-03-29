@@ -83,9 +83,11 @@ public abstract class EnemyBehaviour : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
             if (FieldOfViewCheck(transformPlayer))
             {
+                Debug.Log("aaaa");
                 OnPlayerSeen();
             }else 
             {
+                Debug.Log("aaaa2");
                 OnPlayerAway();
             }
         }
@@ -98,7 +100,7 @@ public abstract class EnemyBehaviour : MonoBehaviour
             RaycastHit raycastInfo;
             if (Physics.Raycast(transform.position, directionToTarget, out raycastInfo, transform.GetChild(1).GetComponent<SphereCollider>().radius, obstructionMask))
             {
-                return raycastInfo.transform.gameObject.layer == LayerMask.NameToLayer("Target");
+                return raycastInfo.transform.gameObject.layer == LayerMask.NameToLayer("Target") && raycastInfo.transform.tag == "Player";
             }
         }
         return false;
@@ -141,6 +143,7 @@ public abstract class EnemyBehaviour : MonoBehaviour
      */
     protected void ChangeState(StateOfEnemy newState)
     {
+        Debug.Log("CHANGE STATE FROM: "+ currentState.ToString() + " TO "+ newState.ToString());  
         if (newState == currentState)
             return;
 
