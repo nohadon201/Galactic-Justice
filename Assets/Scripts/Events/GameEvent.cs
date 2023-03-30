@@ -1,25 +1,32 @@
 using System.Collections.Generic;
 using UnityEngine;
-[CreateAssetMenu]
 public  class GameEvent : ScriptableObject
 {
-    private readonly List<GameEventListener> eventListeners =
-        new List<GameEventListener>();
+    private readonly List<IEventListener> eventListeners =
+        new List<IEventListener>();
 
     public void Raise()
     {
         for (int i = eventListeners.Count - 1; i >= 0; i--)
-            eventListeners[i].OnEventRaised();
-
+            if (eventListeners[i].GetType() == typeof(MissionEventListener))
+            {
+                MissionEventListener mel = (MissionEventListener)eventListeners[i];
+                mel.OnEventRaised();
+            }
+            else
+            {
+                GameEventListener mel = (GameEventListener)eventListeners[i];
+                mel.OnEventRaised();
+            }
     }
 
-    public void RegisterListener(GameEventListener listener)
+    public void RegisterListener(IEventListener listener)
     {
         if (!eventListeners.Contains(listener))
             eventListeners.Add(listener);
     }
 
-    public void UnregisterListener(GameEventListener listener)
+    public void UnregisterListener(IEventListener listener)
     {
         if (eventListeners.Contains(listener))
             eventListeners.Remove(listener);

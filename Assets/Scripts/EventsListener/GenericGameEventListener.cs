@@ -16,7 +16,7 @@ public abstract class GameEventListener<T> : MonoBehaviour
     [Tooltip("Response to invoke when Event is raised.")]
     public UnityEvent<GameEvent<T>,T> Response;
 
-    private void OnEnable()
+    private void Start()
     {
         Event.RegisterListener(this);
     }
@@ -28,7 +28,7 @@ public abstract class GameEventListener<T> : MonoBehaviour
 
     public void OnEventRaised(T parameter)
     {
-
+        Debug.Log("ENTRA AQUÍ");
         Response.Invoke(Event, parameter);
     }
 }
@@ -41,7 +41,7 @@ public abstract class GameEventListener<T0, T1> : MonoBehaviour
     [Tooltip("Response to invoke when Event is raised.")]
     public UnityEvent<GameEvent<T0, T1>,T0, T1> Response;
 
-    private void OnEnable()
+    private void Start()
     {
         Event.RegisterListener(this);
     }
@@ -65,7 +65,7 @@ public abstract class GameEventListener<T0, T1, T2> : MonoBehaviour
     [Tooltip("Response to invoke when Event is raised.")]
     public UnityEvent<GameEvent<T0, T1, T2>,T0, T1, T2> Response;
 
-    private void OnEnable()
+    private void Start()
     {
         Event.RegisterListener(this);
     }

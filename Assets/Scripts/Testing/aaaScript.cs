@@ -6,34 +6,21 @@ using UnityEngine.AI;
 public class aaaScript : MonoBehaviour
 {
     [SerializeField]
-    private Mission1Event mission1Event;
+    private MissionOneParamIntEvent mission1Event;
     public Transform t;
     // Start is called before the first frame update
     void Start()
     {
-        mission1Event = Resources.Load<Mission1Event>("Missions/lvl1/Events/Mission1Event");   
+        mission1Event = Resources.Load<MissionOneParamIntEvent>("Events/OnTestIntParam");   
     }
 
     // Update is called once per frame
     void Update()
     {
-        //if(Input.GetKeyUp(KeyCode.Space))
-        //{
-        //    RaycastHit hit;
-        //    Vector3 v = t.position - transform.position;    
-        //    if(Physics.Raycast(transform.position, v.normalized, out hit, 50000, 1))
-        //    {
-        //        Debug.DrawLine(transform.position, hit.point);
-        //        if(hit.transform.name == "Thraaxian")
-        //        {
-        //            Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        //            hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * 10000, hit.point);
-        //        }
-        //    }
-        //}
+        
     }
     public void cosa2() {
-        mission1Event?.Raise();
+        mission1Event?.Raise(250);
     }
     IEnumerator cosa(RaycastHit hit)
     {

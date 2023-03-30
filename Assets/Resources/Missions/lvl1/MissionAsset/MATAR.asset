@@ -10,10 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62a0ba2bacb2ded46a090d8a1918e96e, type: 3}
-  m_Name: New Mission 1
+  m_Name: MATAR
   m_EditorClassIdentifier: 
   idMission: 0
   Done: 0
-  Points: 0
-  Title: 
-  Description: 
+  Points: 5
+  Title: MATAR
+  Description: "MATA!!! HAZ LA MORICI\xD3N!! DESTRUYE!!! QUEM... Espera acabo de
+    poner 'morici\xF3n'? (mata 3 enemigos)"
+  Event: {fileID: 11400000, guid: 95893d5ddad72784481d5e8f5f5eb607, type: 2}
+  totalAmount: 3
+  currentAmount: 0

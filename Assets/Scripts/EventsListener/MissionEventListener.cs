@@ -1,12 +1,12 @@
 using UnityEngine.Events;
 using UnityEngine;
-public class GameEventListener : MonoBehaviour, IEventListener
+public class MissionEventListener : MonoBehaviour, IEventListener
 {
     [Tooltip("Event to register with.")]
     public GameEvent Event;
 
     [Tooltip("Response to invoke when Event is raised.")]
-    public UnityEvent Response;
+    public UnityEvent<GameEvent> Response;
 
     private void Start()
     {
@@ -20,6 +20,6 @@ public class GameEventListener : MonoBehaviour, IEventListener
 
     public void OnEventRaised()
     {
-        Response.Invoke();
+        Response.Invoke(Event);
     }
 }

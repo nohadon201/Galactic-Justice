@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 public class MissionsSystemManager : MonoBehaviour
 {
@@ -11,14 +9,23 @@ public class MissionsSystemManager : MonoBehaviour
     private Dictionary<int, bool> missionsInitialValues = new Dictionary<int, bool>();
     protected virtual void Awake()
     {
+        List<GameEvent> listEvents = new List<GameEvent>();
         missions = Resources.LoadAll<Mission>("Missions/lvl" + lvl + "/MissionAsset/").ToList();
         foreach (Mission mission in missions)
         {
             mission.initValues();
+            if (!listEvents.Contains(mission.Event))
+                listEvents.Add(mission.Event);
+        }
+        foreach (GameEvent evento in listEvents)
+        {
+            GameEventListener gameEventListener = gameObject.AddComponent<GameEventListener>() as GameEventListener;
+            gameEventListener.Event = evento;
+            gameEventListener.Response = new UnityEngine.Events.UnityEvent();
+            gameEventListener.Response.AddListener(() => this.RaisedEvent(evento));
         }
         foreach (Mission mission in missions)
         {
-            Debug.Log("aaa");
             missionsInitialValues.Add(mission.idMission, mission.Done);
         }
     }
@@ -36,11 +43,10 @@ public class MissionsSystemManager : MonoBehaviour
 
     public void RaisedEvent(GameEvent gameEvent)
     {
-        Debug.Log("AAAAAAAAAAAAAAA");
-        foreach(Mission mission in missions)
+        foreach (Mission mission in missions)
             mission.execute(gameEvent);
     }
-    
+
 }
 
 public class MissionsSystemManager<T> : MonoBehaviour
@@ -49,12 +55,12 @@ public class MissionsSystemManager<T> : MonoBehaviour
     [SerializeField]
     private List<Mission<T>> missions;
     private Dictionary<int, bool> missionsInitialValues = new Dictionary<int, bool>();
-    protected virtual void Awake()
+    protected virtual void Start()
     {
         missions = Resources.LoadAll<Mission<T>>("Missions/lvl" + lvl + "/MissionAsset/").ToList();
         foreach (Mission<T> mission in missions)
         {
-            mission.initValues();
+            mission.initValues(this.gameObject).Response.AddListener(this.RaisedEvent);
         }
         foreach (Mission<T> mission in missions)
         {
@@ -72,25 +78,26 @@ public class MissionsSystemManager<T> : MonoBehaviour
             }
         }
     }
-    
+
     public void RaisedEvent(GameEvent<T> gameEvent, T parameter1)
     {
         foreach (Mission<T> mission in missions)
-            mission.execute(gameEvent, parameter1);
+            mission.execute(gameEvent, parameter1); Debug.Log("aaaa");
     }
 }
 public class MissionsSystemManager<T1, T2> : MonoBehaviour
 {
     public int lvl;
     [SerializeField]
-    private List<Mission<T1,T2>> missions;
+    private List<Mission<T1, T2>> missions;
     private Dictionary<int, bool> missionsInitialValues = new Dictionary<int, bool>();
-    protected virtual void Awake()
+    protected virtual void Start()
     {
-        missions = Resources.LoadAll< Mission <T1,T2>> ("Missions/lvl" + lvl + "/MissionAsset/").ToList();
-        foreach (Mission<T1, T2> mission in missions)
+        List<GameEvent<T1,T2>> listEvents = new List<GameEvent<T1,T2>>();
+        missions = Resources.LoadAll<Mission<T1, T2>>("Missions/lvl" + lvl + "/MissionAsset/").ToList();
+        foreach (Mission<T1,T2> mission in missions)
         {
-            mission.initValues();
+            mission.initValues(this.gameObject).Response.AddListener(this.RaisedEvent);
         }
         foreach (Mission<T1, T2> mission in missions)
         {
@@ -121,14 +128,15 @@ public class MissionsSystemManager<T1, T2, T3> : MonoBehaviour
     [SerializeField]
     private List<Mission<T1, T2, T3>> missions;
     private Dictionary<int, bool> missionsInitialValues = new Dictionary<int, bool>();
-    protected virtual void Awake()
+    protected virtual void Start()
     {
+        List<GameEvent<T1, T2, T3>> listEvents = new List<GameEvent<T1, T2, T3>>();
         missions = Resources.LoadAll<Mission<T1, T2, T3>>("Missions/lvl" + lvl + "/MissionAsset/").ToList();
         foreach (Mission<T1, T2, T3> mission in missions)
         {
-            mission.initValues();
+            mission.initValues(this.gameObject).Response.AddListener(this.RaisedEvent);
         }
-            foreach (Mission<T1, T2, T3> mission in missions)
+        foreach (Mission<T1, T2, T3> mission in missions)
         {
             missionsInitialValues.Add(mission.idMission, mission.Done);
         }
