@@ -4,13 +4,19 @@ using UnityEngine;
 public class MissionsSystemManager : MonoBehaviour
 {
     public int lvl;
+    private PlayersPoints playersPoints;
     [SerializeField]
     private List<Mission> missions;
     private Dictionary<int, bool> missionsInitialValues = new Dictionary<int, bool>();
+    public PlayerControlls playerControlls;
+    private bool iker;
     protected virtual void Awake()
     {
+        iker = false; 
+        playerControlls.EndLevelDelegator += checkIfWinPoints;
         List<GameEvent> listEvents = new List<GameEvent>();
         missions = Resources.LoadAll<Mission>("Missions/lvl" + lvl + "/MissionAsset/").ToList();
+        playersPoints = Resources.Load<PlayersPoints>("Player/PlayersPoints");
         foreach (Mission mission in missions)
         {
             mission.initValues();
@@ -31,12 +37,14 @@ public class MissionsSystemManager : MonoBehaviour
     }
     public void checkIfWinPoints()
     {
+        Debug.Log("check!!");
         foreach (Mission mission in missions)
         {
             bool b = missionsInitialValues.GetValueOrDefault(mission.idMission);
             if (!b && mission.Done)
             {
-                //Activar Evento para ganar puntos
+                playersPoints.Points += (int) mission.Points;
+                playersPoints.DebugPoints();
             }
         }
     }
@@ -51,13 +59,18 @@ public class MissionsSystemManager : MonoBehaviour
 
 public class MissionsSystemManager<T> : MonoBehaviour
 {
+    private bool iker;
     public int lvl;
+    private PlayersPoints playersPoints;
     [SerializeField]
     private List<Mission<T>> missions;
     private Dictionary<int, bool> missionsInitialValues = new Dictionary<int, bool>();
-    protected virtual void Start()
+    public PlayerControlls playerControlls;
+    protected virtual void Awake()
     {
+        playerControlls.EndLevelDelegator += checkIfWinPoints;
         missions = Resources.LoadAll<Mission<T>>("Missions/lvl" + lvl + "/MissionAsset/").ToList();
+        playersPoints = Resources.Load<PlayersPoints>("Player/PlayersPoints");
         foreach (Mission<T> mission in missions)
         {
             mission.initValues(this.gameObject).Response.AddListener(this.RaisedEvent);
@@ -69,12 +82,19 @@ public class MissionsSystemManager<T> : MonoBehaviour
     }
     public void checkIfWinPoints()
     {
+        if (iker) return;
+        iker = true;
         foreach (Mission<T> mission in missions)
         {
             bool b = missionsInitialValues.GetValueOrDefault(mission.idMission);
             if (!b && mission.Done)
             {
-                //Activar Evento para ganar puntos
+                playersPoints.Points += (int)mission.Points;
+                playersPoints.DebugPoints();
+            }
+            else
+            {
+                Debug.Log(b + " " + mission.Done);
             }
         }
     }
@@ -88,13 +108,17 @@ public class MissionsSystemManager<T> : MonoBehaviour
 public class MissionsSystemManager<T1, T2> : MonoBehaviour
 {
     public int lvl;
+    private PlayersPoints playersPoints;
     [SerializeField]
     private List<Mission<T1, T2>> missions;
     private Dictionary<int, bool> missionsInitialValues = new Dictionary<int, bool>();
-    protected virtual void Start()
+    public PlayerControlls playerControlls;
+    protected virtual void Awake()
     {
+        playerControlls.EndLevelDelegator += checkIfWinPoints;
         List<GameEvent<T1,T2>> listEvents = new List<GameEvent<T1,T2>>();
         missions = Resources.LoadAll<Mission<T1, T2>>("Missions/lvl" + lvl + "/MissionAsset/").ToList();
+        playersPoints = Resources.Load<PlayersPoints>("Player/PlayersPoints");
         foreach (Mission<T1,T2> mission in missions)
         {
             mission.initValues(this.gameObject).Response.AddListener(this.RaisedEvent);
@@ -111,7 +135,8 @@ public class MissionsSystemManager<T1, T2> : MonoBehaviour
             bool b = missionsInitialValues.GetValueOrDefault(mission.idMission);
             if (!b && mission.Done)
             {
-                //Activar Evento para ganar puntos
+                playersPoints.Points += (int)mission.Points;
+                playersPoints.DebugPoints();
             }
         }
     }
@@ -124,14 +149,19 @@ public class MissionsSystemManager<T1, T2> : MonoBehaviour
 }
 public class MissionsSystemManager<T1, T2, T3> : MonoBehaviour
 {
+
     public int lvl;
+    private PlayersPoints playersPoints;
     [SerializeField]
     private List<Mission<T1, T2, T3>> missions;
     private Dictionary<int, bool> missionsInitialValues = new Dictionary<int, bool>();
-    protected virtual void Start()
+    public PlayerControlls playerControlls;
+    protected virtual void Awake()
     {
+        playerControlls.EndLevelDelegator += checkIfWinPoints;
         List<GameEvent<T1, T2, T3>> listEvents = new List<GameEvent<T1, T2, T3>>();
         missions = Resources.LoadAll<Mission<T1, T2, T3>>("Missions/lvl" + lvl + "/MissionAsset/").ToList();
+        playersPoints = Resources.Load<PlayersPoints>("Player/PlayersPoints");
         foreach (Mission<T1, T2, T3> mission in missions)
         {
             mission.initValues(this.gameObject).Response.AddListener(this.RaisedEvent);
@@ -148,7 +178,8 @@ public class MissionsSystemManager<T1, T2, T3> : MonoBehaviour
             bool b = missionsInitialValues.GetValueOrDefault(mission.idMission);
             if (!b && mission.Done)
             {
-                //Activar Evento para ganar puntos
+                playersPoints.Points += (int)mission.Points;
+                playersPoints.DebugPoints();
             }
         }
     }

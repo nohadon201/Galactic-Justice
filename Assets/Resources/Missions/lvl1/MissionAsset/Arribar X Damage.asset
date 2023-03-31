@@ -20,4 +20,4 @@ MonoBehaviour:
     o mayor"
   Event: {fileID: 11400000, guid: 106841b9c11fe8c43b0b9a4faa1fedd1, type: 2}
   damageToSuperate: 300
-  damageAccumulated: 250
+  damageAccumulated: 0

@@ -31,6 +31,8 @@ public class PlayerControlls : MonoBehaviour
     [SerializeField]
     private PlayerInfo OwnInfo;
 
+    public delegate void EndLevel();
+    public EndLevel EndLevelDelegator;
 
     void Awake()
     {
@@ -85,6 +87,9 @@ public class PlayerControlls : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             ActivateSkill(3);
+        }else if (Input.GetKeyDown(KeyCode.P))
+        {
+            EndLevelDelegator?.Invoke();
         }
         // Velocity of the player
         PlayerMovement();
