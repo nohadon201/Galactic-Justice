@@ -9,14 +9,10 @@ public class PlayerControlls : MonoBehaviour
 {
     //      Controls Variables
     [Header("Configs")]
-
-    [SerializeField]
-    private float playerVelocity;
-
+    
     [SerializeField]
     private float Sensibility;
 
-    [SerializeField]
     private GameObject CameraTarget;
 
     private Vector2 directionMovement, directionRotationOfCamera;
@@ -32,13 +28,15 @@ public class PlayerControlls : MonoBehaviour
     private Coroutine RegenerationOfAmmunition,RegenerationShieldCoroutine;
 
     private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield;
-
+    [SerializeField]
     private PlayerInfo OwnInfo;
+
+    public delegate void EndLevel();
+    public EndLevel EndLevelDelegator;
 
     void Awake()
     {
         DefaultValues();
-
     }
     public void DefaultValues()
     {
@@ -50,15 +48,16 @@ public class PlayerControlls : MonoBehaviour
         dashForce = 24f;
         dashCooldown = 1f;
         dashingTime = 0.3f;
+        
         Cursor.lockState = CursorLockMode.Locked;
+        
         rb = GetComponent<Rigidbody>();
         weapon = GetComponent<PlayerWeapon>();
-        
-        if (playerVelocity == 0)
+        OwnInfo.DefaultValues();
+        foreach(Skills sk in OwnInfo.abilities)
         {
-            playerVelocity = 3f;
+            sk.initValues();
         }
-
         if (CameraTarget == null)
         {
             CameraTarget = transform.GetChild(0).gameObject;
@@ -69,11 +68,29 @@ public class PlayerControlls : MonoBehaviour
         if(Dashing)
         {
             rb.velocity = transform.forward * dashForce;
-            Debug.Log(rb.velocity);
         }
     }
     void LateUpdate()
     {
+        if(Input.GetKeyDown(KeyCode.Alpha1)) 
+        {
+            ActivateSkill(0);
+        }
+        else if(Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            ActivateSkill(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            ActivateSkill(2);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            ActivateSkill(3);
+        }else if (Input.GetKeyDown(KeyCode.P))
+        {
+            EndLevelDelegator?.Invoke();
+        }
         // Velocity of the player
         PlayerMovement();
 
@@ -109,7 +126,6 @@ public class PlayerControlls : MonoBehaviour
             weapon.Shooting = false;
             RegenerationOfAmmunition = StartCoroutine(RegenerateAmunition());
         }
-
     }
     private IEnumerator ShootFrequency()
     {
@@ -153,11 +169,11 @@ public class PlayerControlls : MonoBehaviour
         Vector3 velocity;
         if (directionMovement.x > 0)
         {
-            rb.velocity = new Vector3(transform.right.x * playerVelocity, rb.velocity.y, transform.right.z * playerVelocity);
+            rb.velocity = new Vector3(transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, transform.right.z * OwnInfo.playerVelocity);
         }
         else if (directionMovement.x < 0)
         {
-            rb.velocity = new Vector3(-transform.right.x * playerVelocity, rb.velocity.y, -transform.right.z * playerVelocity);
+            rb.velocity = new Vector3(-transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, -transform.right.z * OwnInfo.playerVelocity);
         }
         else
         {
@@ -168,11 +184,11 @@ public class PlayerControlls : MonoBehaviour
 
         if (directionMovement.y > 0)
         {
-            rb.velocity += new Vector3(transform.forward.x, 0, transform.forward.z) * playerVelocity;
+            rb.velocity += new Vector3(transform.forward.x, 0, transform.forward.z) * OwnInfo.playerVelocity;
         }
         else if (directionMovement.y < 0)
         {
-            rb.velocity += new Vector3(-transform.forward.x, 0, -transform.forward.z) * playerVelocity;
+            rb.velocity += new Vector3(-transform.forward.x, 0, -transform.forward.z) * OwnInfo.playerVelocity;
         }
 
 
@@ -303,7 +319,7 @@ public class PlayerControlls : MonoBehaviour
             TouchFloor();
         }
     }
-    
+
     public void Damage(float damage)
     {
         if (OwnInfo.playersCurrentShield > 0)
@@ -351,4 +367,16 @@ public class PlayerControlls : MonoBehaviour
         Debug.Log("ShieldRegenerating: "+OwnInfo.playersCurrentShield);
     }
 
+    /**
+     * ############################ Temporal Skills ########################################### 
+     */
+    public void ActivateSkill(int num)
+    {
+        if(num<OwnInfo.abilities.Count && num>=0) {
+            Debug.Log(weapon.CurrentConfiguration.DamageBaseWeapon);
+            StartCoroutine(OwnInfo.abilities[num].SkillCoroutine(OwnInfo, gameObject));
+            OwnInfo.abilities.Remove(OwnInfo.abilities[num]);
+            Debug.Log(weapon.CurrentConfiguration.DamageBaseWeapon);
+        }
+    }
 }

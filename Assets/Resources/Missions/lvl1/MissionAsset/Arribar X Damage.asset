@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0600df5f54c8df74c9c3a9d840a8ea1a, type: 3}
+  m_Name: Arribar X Damage
+  m_EditorClassIdentifier: 
+  idMission: 0
+  Done: 0
+  Points: 3
+  Title: Alcanzame Si Puedes
+  Description: "Llega  a lo largo del nivel a una cantidad total de da\xF1o de 300
+    o mayor"
+  Event: {fileID: 11400000, guid: 106841b9c11fe8c43b0b9a4faa1fedd1, type: 2}
+  damageToSuperate: 300
+  damageAccumulated: 0

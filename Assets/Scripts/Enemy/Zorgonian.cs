@@ -7,109 +7,194 @@ using UnityEngine.AI;
 
 public class Zorgonian : EnemyBehaviour
 {
-    
     void Awake()
     {
         //  Pyrognathian unique values
-        GetComponent<NavMeshAgent>().speed= 10.0f;
-        damagePerImpact = 20f;
-        maxHealth = 20;
+        filter.agentTypeID = 0;
+        filter.areaMask = 7;
+        velocity = 4f;
+        currentPath = new();
+        damagePerImpact = 11.5f;
+        maxHealth = 30;
         currentHealth = maxHealth;
-        RangeAttack = 10;
+        RangeAttack = 3;
         //  Generic Enemy default values
         SetRandomPostions();
-        currentState = StateOfEnemy.ALERT;
-        Attacking = false;
-        check = false;
-        canSeePlayer = false;
+        navmeshIndexPosition = 0;
+        rb = GetComponent<Rigidbody>();
     }
+
     private void Start()
     {
         indexCurrentPointAlert = Random.Range(0, randomPositions.Count);
+        CalculatePath(randomPositions[indexCurrentPointAlert]);
+        ChangeState(StateOfEnemy.PATROL);
     }
-
-    void Update()
-    {
-        if(currentState == StateOfEnemy.ALERT) {
-            KeepGoingAlertPoint();
-            GetComponent<NavMeshAgent>().destination = randomPositions[indexCurrentPointAlert];
-        }else if(currentState == StateOfEnemy.FOLLOWING)
-        {
-            if (CheckIfItsClose())
-            {
-                currentState = StateOfEnemy.ATTACK;
-                StartCoroutine(AttackingCoroutine());
-                GetComponent<NavMeshAgent>().destination = transform.position;
-            }
-            else
-            {
-                GetComponent<NavMeshAgent>().destination = playerRef.transform.position;
-            }
-                
-        }else if(currentState == StateOfEnemy.ATTACK)
-        {
-            if(CheckIfItsFarAway()) { 
-                currentState = StateOfEnemy.FOLLOWING;
-                Attacking = false;
-            }
-        }
-    }
-
-    private IEnumerator AttackingCoroutine()
-    {
-        Attacking = true;
-        while (Attacking)
-        {
-            Shoot(playerRef.transform.position);
-            yield return new WaitForSeconds(1);
-        }
-    }
-    public void Shoot(Vector3 v)
-    {
-        GameObject pool = GeneralPool.Instance.poolThraaxian;
-        for(int a = 0; a < pool.transform.childCount; a++)
-        {
-            if(!pool.transform.GetChild(a).gameObject.activeSelf)
-            {
-                Vector3 diff = (v - transform.position).normalized;
-                Vector3 position = transform.position + (transform.forward * 3);
-                pool.transform.GetChild(a).gameObject.SetActive(true);
-                pool.transform.GetChild(a).gameObject.GetComponent<Projectile>().ShootBullet(position, diff, 7,damagePerImpact);
-                break;
-            }
-        }
-    }
-    public void KeepGoingAlertPoint()
-    {
-        Vector3 v = (randomPositions[indexCurrentPointAlert] - transform.position);
-        if (v.x < 1 && v.z < 1)
-        {
-            int a = indexCurrentPointAlert;
-            while (a == indexCurrentPointAlert) { 
-                a = Random.Range(0, randomPositions.Count);
-            }
-            indexCurrentPointAlert = a;
-        }
-    }
-    public bool CheckIfItsClose()
+    /*
+     * ################################### Range Attack ##############################################
+     */
+    private bool CheckIfItsClosePlayer()
     {
         Vector3 v = (playerRef.transform.position - transform.position);
         return (v.x < RangeAttack && v.x > -RangeAttack) && (v.z < RangeAttack && v.z > -RangeAttack);
 
     }
-    public bool CheckIfItsFarAway()
+    private bool CheckIfItsFarAwayPlayer()
     {
-        Vector3 v = (playerRef.transform.position - transform.position);
-        return (v.x > RangeAttack || v.x < -RangeAttack) || (v.z > RangeAttack || v.z < -RangeAttack);
+        Vector3 v = (playerRef.position - transform.position);
+        Debug.Log((Mathf.Abs(v.x) > RangeAttack || Mathf.Abs(v.z) > RangeAttack));
+        return (Mathf.Abs(v.x) > RangeAttack || Mathf.Abs(v.z) > RangeAttack);
     }
-    private void FixedUpdate()
+
+    /*
+     * ################################### Rotation and Movement with Navmesh ##############################################
+     */
+    private void RotationWithTheTarget(Vector3 target)
     {
-        
+        Vector3 forward = target - transform.position;
+        float x = target.x - transform.position.x;
+        float z = target.z - transform.position.z;
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(new Vector3(x, transform.position.y, z)), 1.5f);
     }
-    private void LateUpdate()
+    private void CalculatePath(Vector3 position)
     {
-        
+        currentPath.ClearCorners();
+        if (!NavMesh.CalculatePath(transform.position, position, filter, currentPath))
+        {
+            Debug.Log("No Path finded");
+        }
+        navmeshIndexPosition = 0;
     }
-    
-    
+
+
+    /*
+     * ################################### Attack ##############################################
+     */
+    private IEnumerator AttackingCoroutine()
+    {
+        while (true)
+        {
+            Attack();
+            yield return new WaitForSeconds(2.5f);
+        }
+
+    }
+    public void Attack()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, (transform.forward + new Vector3(0, 0.1f, 0)), out hit, 7, obstructionMask))
+        {
+            Debug.DrawLine(transform.position, hit.point, Color.red, 2f);  
+            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Target"))
+            {
+                hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * 1000, hit.point);
+            }
+        }
+    }
+    /*
+     * ################################### State Machine ##############################################
+     */
+    //          PATROL
+    protected override void OnPlayerSeen()
+    {
+        ChangeState(StateOfEnemy.FOLLOWING);
+    }
+
+    protected override void InitStatePatrol()
+    {
+        Debug.Log("Patrol");
+    }
+
+    protected override void UpdateStatePatrol()
+    {
+        RotationWithTheTarget(randomPositions[indexCurrentPointAlert]);
+    }
+
+    protected override void FixedUpdateStatePatrol()
+    {
+        if (KeepGoingPatrolPoint())
+        {
+            CalculatePath(randomPositions[indexCurrentPointAlert]);
+        }
+        setTheVelocity();
+    }
+
+    protected override void ExitStatePatrol()
+    {
+
+    }
+
+    //          FOLLOWING
+
+    protected override void InitStateFollowing()
+    {
+        Debug.Log("Following");
+        findPlayer = StartCoroutine(FindPlayer());
+    }
+
+    protected override void UpdateStateFollowing()
+    {
+        RotationWithTheTarget(playerRef.position);
+    }
+
+    protected override void FixedUpdateStateFollowing()
+    {
+        Debug.Log("Following");
+        setTheVelocity();
+        Debug.Log(rb.velocity);
+        if (CheckIfItsClosePlayer())
+        {
+            ChangeState(StateOfEnemy.ATTACK);
+        }
+    }
+
+    protected override void ExitStateFollowing()
+    {
+        StopCoroutine(findPlayer);
+    }
+
+    //          ATTACK
+
+    protected override void InitStateAttack()
+    {
+        Debug.Log("Attack");
+        rb.velocity = new Vector3(0, rb.velocity.y, 0);
+        attack = StartCoroutine(AttackingCoroutine());
+    }
+
+    protected override void UpdateStateAttack()
+    {
+        if (CheckIfItsFarAwayPlayer())
+        {
+            ChangeState(StateOfEnemy.FOLLOWING);
+        }
+    }
+
+    protected override void FixedUpdateStateAttack()
+    {
+
+    }
+
+    protected override void ExitStateAttack()
+    {
+        StopCoroutine(attack);
+    }
+
+    protected override IEnumerator FindPlayer()
+    {
+        while (true)
+        {
+            CalculatePath(playerRef.position);
+            yield return new WaitForSeconds(1);
+        }
+    }
+    protected override IEnumerator ForgivePlayer()
+    {
+        yield return new WaitForSeconds(7);
+        ChangeState(StateOfEnemy.PATROL);
+    }
+    protected override void OnPlayerAway()
+    {
+        forgivePlayer = StartCoroutine(ForgivePlayer());
+    }
 }

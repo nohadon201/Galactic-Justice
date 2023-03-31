@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 4999573789304520457}
   - component: {fileID: 4999573789304520452}
   - component: {fileID: 4999573789304520455}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -67,7 +67,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerVelocity: 7
   Sensibility: 0.11
-  CameraTarget: {fileID: 3080409772847166278}
+  abilities: []
 --- !u!114 &4999573789304520452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -285,7 +285,7 @@ GameObject:
   - component: {fileID: 3080409772785315030}
   - component: {fileID: 3080409772785315033}
   - component: {fileID: 3080409772785315032}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -380,7 +380,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3080409772907506482}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: TargetCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}

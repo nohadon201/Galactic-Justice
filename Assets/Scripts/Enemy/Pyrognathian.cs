@@ -21,10 +21,7 @@ public class Pyrognathian : EnemyBehaviour
         Arm2 = transform.GetChild(0).transform.GetChild(1).gameObject;
         //  Generic Enemy default values
         SetRandomPostions();
-        currentState = StateOfEnemy.ALERT;
-        Attacking = false;
-        check = false;
-        canSeePlayer = false;
+        currentState = StateOfEnemy.PATROL;
     }
     private void Start()
     {
@@ -33,7 +30,7 @@ public class Pyrognathian : EnemyBehaviour
 
     void Update()
     {
-        if(currentState == StateOfEnemy.ALERT) {
+        if(currentState == StateOfEnemy.PATROL) {
             KeepGoingAlertPoint();
             GetComponent<NavMeshAgent>().destination = randomPositions[indexCurrentPointAlert];
         }else if(currentState == StateOfEnemy.FOLLOWING)
@@ -53,15 +50,13 @@ public class Pyrognathian : EnemyBehaviour
         {
             if(CheckIfItsFarAway()) { 
                 currentState = StateOfEnemy.FOLLOWING;
-                Attacking = false;
             }
         }
     }
 
     private IEnumerator AttackingCoroutine()
     {
-        Attacking = true;
-        while (Attacking)
+        while (true)
         {
             Attack();
             yield return new WaitForSeconds(1);
@@ -109,6 +104,83 @@ public class Pyrognathian : EnemyBehaviour
     {
         
     }
-    
-    
+
+    protected override void OnPlayerSeen()
+    {
+        ChangeState(StateOfEnemy.FOLLOWING);
+    }
+
+    protected override void InitStatePatrol()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStatePatrol()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStatePatrol()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStatePatrol()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void InitStateFollowing()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStateFollowing()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStateFollowing()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStateFollowing()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void InitStateAttack()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStateAttack()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStateAttack()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStateAttack()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override IEnumerator FindPlayer()
+    {
+        throw new System.NotImplementedException();
+    }
+    protected override IEnumerator ForgivePlayer()
+    {
+        yield return new WaitForSeconds(7);
+        ChangeState(StateOfEnemy.PATROL);
+    }
+    protected override void OnPlayerAway()
+    {
+        forgivePlayer = StartCoroutine(ForgivePlayer());
+    }
 }
