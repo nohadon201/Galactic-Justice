@@ -6,8 +6,10 @@ using UnityEngine.InputSystem;
 
 public class PlayerWeapon : MonoBehaviour
 {
+    //######################## PowerBullets ########################
+    PowerBullets powerBullets;
     //######################## STATES ########################
-    
+
     public bool Shooting;
     public bool Regeneration;
 
@@ -29,7 +31,7 @@ public class PlayerWeapon : MonoBehaviour
     //      Functions that executes only at Start
     void Awake()
     {
-        
+        powerBullets = GetComponent<PowerBullets>();
         if(camera == null) camera = Object.FindObjectOfType<Camera>();
         IndexCurrentConfiguration = 0;
         CurrentConfiguration = WeaponConfigurations[IndexCurrentConfiguration];
@@ -90,28 +92,31 @@ public class PlayerWeapon : MonoBehaviour
     {
         if (CurrentConfiguration.Accuracy == 1)
         {
-            RayCastTo(camera.transform.forward);
+            RayCastTo(transform.position, camera.transform.forward, false);
         }
         else
         {
             for (int a = 0; a < CurrentConfiguration.CurrentDispersion.Length; a++)
             {
-                RayCastTo(CurrentConfiguration.CurrentDispersion[a] + camera.transform.forward);
+                RayCastTo(transform.position, CurrentConfiguration.CurrentDispersion[a] + camera.transform.forward, false);
             }
         }
     }
     
-    private void RayCastTo(Vector3 v)
+    public void RayCastTo(Vector3 origin, Vector3 v, bool byPowerBullet)
     {
-        CurrentConfiguration.CurrentAmmunition -= CurrentConfiguration.CurrentWasteOfAmmunitionPerBullet;
+        if(!byPowerBullet)
+            CurrentConfiguration.CurrentAmmunition -= CurrentConfiguration.CurrentWasteOfAmmunitionPerBullet;
         RaycastHit hit;
-        if (Physics.Raycast(camera.transform.position, v, out hit, CurrentConfiguration.MaxRange * CurrentConfiguration.Power))
+        if (Physics.Raycast(origin, v, out hit, CurrentConfiguration.MaxRange * CurrentConfiguration.Power))
         {
-            Debug.DrawLine(camera.transform.position, hit.point, Color.red, 3f);
+            powerBullets.execute(hit, byPowerBullet);  
+            Debug.DrawLine(origin, hit.point, Color.red, 3f);
             if(hit.transform.tag.Contains("Physics"))
             {
                 hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * CurrentConfiguration.CurrentForce, hit.point);
-                hit.transform.gameObject.GetComponent<aaaScript>().cosa2();
+                //Uncomment this only for debug
+                //hit.transform.gameObject.GetComponent<aaaScript>().cosa2();
             }else if (hit.transform.tag.Contains("Enemy"))
             {
                 hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * CurrentConfiguration.CurrentForce * 10, hit.point);

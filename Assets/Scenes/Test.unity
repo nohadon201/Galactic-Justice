@@ -198,6 +198,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 3080409772785315033, guid: 66cdee4eacdbbd6419ee384e6a541c34,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+    - target: {fileID: 4728617520483536182, guid: 66cdee4eacdbbd6419ee384e6a541c34,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4728617520483536182, guid: 66cdee4eacdbbd6419ee384e6a541c34,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4a7718d36cc52fb41ba3416f528a39a0, type: 2}
     - target: {fileID: 4999573789304520454, guid: 66cdee4eacdbbd6419ee384e6a541c34,
         type: 3}
       propertyPath: m_RootOrder
@@ -302,12 +317,38 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 676049470}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 676049473}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd1eb443ced0ec344b47f5bd7bcf9642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &676049473 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3080409772703280482, guid: 66cdee4eacdbbd6419ee384e6a541c34,
+    type: 3}
+  m_PrefabInstance: {fileID: 676049470}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &676049474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676049473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2763623f1a282ba46bd2b071a2a289e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  powerBullets: []
+  pointsCount: 50
+  MaxRadious: 10
+  Speed: 100
+  ForceExpansion: 2
+  flameParticles: {fileID: 0}
+  ExplosionParticles: {fileID: 0}
+  ExplosionWave: {fileID: 0}
 --- !u!1 &787023742
 GameObject:
   m_ObjectHideFlags: 0
@@ -321,7 +362,7 @@ GameObject:
   - component: {fileID: 787023745}
   - component: {fileID: 787023744}
   - component: {fileID: 787023747}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube
   m_TagString: Floor
   m_Icon: {fileID: 0}
@@ -436,7 +477,7 @@ GameObject:
   - component: {fileID: 849008797}
   - component: {fileID: 849008801}
   - component: {fileID: 849008802}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube
   m_TagString: Physics
   m_Icon: {fileID: 0}
@@ -564,7 +605,7 @@ GameObject:
   - component: {fileID: 853376654}
   - component: {fileID: 853376653}
   - component: {fileID: 853376657}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (2)
   m_TagString: Physics
   m_Icon: {fileID: 0}
@@ -792,7 +833,7 @@ GameObject:
   - component: {fileID: 1217811370}
   - component: {fileID: 1217811369}
   - component: {fileID: 1217811368}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -963,7 +1004,7 @@ GameObject:
   - component: {fileID: 1575472079}
   - component: {fileID: 1575472078}
   - component: {fileID: 1575472077}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

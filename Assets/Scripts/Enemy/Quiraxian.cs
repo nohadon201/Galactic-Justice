@@ -16,6 +16,7 @@ public class Quiraxian : EnemyBehaviour
         maxHealth = 5;
         currentHealth = maxHealth;
         RangeAttack = 5;
+        CooldownAttack = 1f;
         //  Generic Enemy default values
         SetRandomPostions();
         navmeshIndexPosition = 0;
@@ -77,7 +78,7 @@ public class Quiraxian : EnemyBehaviour
         while (true)
         {
             Shoot(playerRef.transform.position);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(CooldownAttack);
         }
 
     }

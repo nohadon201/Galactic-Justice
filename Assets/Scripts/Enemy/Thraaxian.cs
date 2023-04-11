@@ -23,6 +23,7 @@ public class Thraaxian : EnemyBehaviour
         maxHealth = 5;
         currentHealth = maxHealth;
         RangeAttack = 12;
+        CooldownAttack = 2f;
         //  Generic Enemy default values
         SetRandomPostions();
         navmeshIndexPosition = 0;
@@ -88,7 +89,7 @@ public class Thraaxian : EnemyBehaviour
         while (true)
         {
             Shoot(playerRef.transform.position);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(CooldownAttack);
         }
 
     }

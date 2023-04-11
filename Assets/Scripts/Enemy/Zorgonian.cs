@@ -18,6 +18,7 @@ public class Zorgonian : EnemyBehaviour
         maxHealth = 30;
         currentHealth = maxHealth;
         RangeAttack = 3;
+        CooldownAttack = 3f;
         //  Generic Enemy default values
         SetRandomPostions();
         navmeshIndexPosition = 0;
@@ -75,7 +76,7 @@ public class Zorgonian : EnemyBehaviour
         while (true)
         {
             Attack();
-            yield return new WaitForSeconds(2.5f);
+            yield return new WaitForSeconds(CooldownAttack);
         }
 
     }

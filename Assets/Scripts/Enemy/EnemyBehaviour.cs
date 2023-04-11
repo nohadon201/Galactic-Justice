@@ -17,8 +17,9 @@ public abstract class EnemyBehaviour : MonoBehaviour
     protected StateOfEnemy currentState;
     protected List<Vector3> randomPositions = new List<Vector3>();
     protected float RangeAttack;
-    protected float velocity;
+    public float velocity;
     protected bool PlayerForgive;
+    public float CooldownAttack;
     //      Pathfinding
     
     protected NavMeshQueryFilter filter;
@@ -83,11 +84,9 @@ public abstract class EnemyBehaviour : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
             if (FieldOfViewCheck(transformPlayer))
             {
-                Debug.Log("aaaa");
                 OnPlayerSeen();
             }else 
             {
-                Debug.Log("aaaa2");
                 OnPlayerAway();
             }
         }
@@ -138,10 +137,18 @@ public abstract class EnemyBehaviour : MonoBehaviour
             }
         }
     }
+    public void GetHit(float damage)
+    {
+        currentHealth-= damage; 
+        if(damage <= 0)
+        {
+            this.gameObject.SetActive(false);    
+        }
+    }
     /**
      * ###################################### State Machine ################################ 
      */
-    protected void ChangeState(StateOfEnemy newState)
+    public void ChangeState(StateOfEnemy newState)
     {
         Debug.Log("CHANGE STATE FROM: "+ currentState.ToString() + " TO "+ newState.ToString());  
         if (newState == currentState)
@@ -245,5 +252,5 @@ public abstract class EnemyBehaviour : MonoBehaviour
 
 public enum StateOfEnemy
 {
-    PATROL, ATTACK, FOLLOWING
+    PATROL, ATTACK, FOLLOWING, STUNED, CRAZY, TERRIFIED
 }

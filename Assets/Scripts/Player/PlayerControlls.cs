@@ -29,7 +29,7 @@ public class PlayerControlls : MonoBehaviour
 
     private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield;
     [SerializeField]
-    private PlayerInfo OwnInfo;
+    public PlayerInfo OwnInfo;
 
     public delegate void EndLevel();
     public EndLevel EndLevelDelegator;
