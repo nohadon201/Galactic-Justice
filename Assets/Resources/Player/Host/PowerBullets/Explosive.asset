@@ -16,7 +16,7 @@ MonoBehaviour:
   Name: Explosive Bullet
   Description: This Bullet has a probability to explode when hits an enemy
   InvestmentValue: 0.25
-  currentInvestmentValue: 26
+  currentInvestmentValue: 0
   Points: 0
   id: 10
   type: 1

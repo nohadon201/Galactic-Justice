@@ -19,6 +19,8 @@ public class PowerBullets : MonoBehaviour
     [SerializeField] private int MaxRadious;
     [SerializeField] private int Speed;
     [SerializeField] private float ForceExpansion;
+    [SerializeField] private GameObject ExpandWave;
+    private GameObject InstanceExpandWave;
     private LineRenderer lineRendererExpand;
     /**
      *################################ FLAMEBULLET VARIABLES ################################
@@ -48,9 +50,9 @@ public class PowerBullets : MonoBehaviour
         InstanceExplosion.SetActive(false);
         InstanceExplosionWave.SetActive(false);
         //  Expand
-        lineRendererExpand = GetComponent<LineRenderer>();
+        lineRendererExpand = InstanceExpandWave.GetComponent<LineRenderer>();
         lineRendererExpand.positionCount = pointsCount + 1;
-        //lineRendererExpand.enabled = true;
+        lineRendererExpand.enabled = true;
         //  Explosion
         lineRendererExplosion = InstanceExplosionWave.GetComponent<LineRenderer>();
         lineRendererExplosion.positionCount = pointsCount + 1;
@@ -66,7 +68,11 @@ public class PowerBullets : MonoBehaviour
         
         //  FlameBullet Variables
         flameParticles = Resources.Load<GameObject>("ParticlesSystem/Fire");
-        
+
+        //  ExpandBullet Variables
+        ExpandWave = Resources.Load<GameObject>("ParticlesSystem/ExpansionWave");
+        InstanceExpandWave = Instantiate(ExpandWave);
+        InstanceExpandWave.SetActive(false);
         //  ExplosionBullet Variables
         ExplosionParticles = Resources.Load<GameObject>("ParticlesSystem/Explosion");
         ExplosionWave = Resources.Load<GameObject>("ParticlesSystem/ExplosionWave");
@@ -428,6 +434,7 @@ public class PowerBullets : MonoBehaviour
      */
     private IEnumerator Expansion(RaycastHit hit)
     {
+        InstanceExpandWave.SetActive(true);
         lineRendererExpand.enabled = true;
         float currentRadious = 0f;
         while (currentRadious < MaxRadious)
@@ -437,6 +444,7 @@ public class PowerBullets : MonoBehaviour
             ExpansionWave(hit.transform.position, currentRadious);
             yield return null;
         }
+        InstanceExpandWave.SetActive(false);
     }
     private IEnumerator ExplosionParticlesCoroutine(RaycastHit hit)
     {

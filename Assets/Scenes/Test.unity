@@ -303,7 +303,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 7554b301d65dd2b438491a75656b70bd,
         type: 2}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4728617520483536182, guid: 66cdee4eacdbbd6419ee384e6a541c34, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 66cdee4eacdbbd6419ee384e6a541c34, type: 3}
 --- !u!4 &676049471 stripped
 Transform:
@@ -346,6 +347,7 @@ MonoBehaviour:
   MaxRadious: 10
   Speed: 100
   ForceExpansion: 2
+  ExpandWave: {fileID: 0}
   flameParticles: {fileID: 0}
   ExplosionParticles: {fileID: 0}
   ExplosionWave: {fileID: 0}
