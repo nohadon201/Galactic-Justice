@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Skill2", menuName = "Skills/Skill2")]
+[CreateAssetMenu(fileName = "Skill2", menuName = "Player/Skills/Skill2")]
 public class Skill2 : Skills
 {
     public override IEnumerator SkillCoroutine(PlayerInfo playerInfo, GameObject Player)

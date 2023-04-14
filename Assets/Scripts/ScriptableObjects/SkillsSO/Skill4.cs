@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Skill4", menuName = "Skills/Skill4")]
+[CreateAssetMenu(fileName = "Skill4", menuName = "Player/Skills/Skill4")]
 public class Skill4 : Skills
 {
     private bool DamageChange;

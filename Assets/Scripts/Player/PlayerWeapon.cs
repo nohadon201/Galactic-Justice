@@ -46,10 +46,6 @@ public class PlayerWeapon : MonoBehaviour
         }
         Shooting = false;
     }
-    private void Start()
-    {
-        //Debug.Log(CurrentConfiguration.ToString());
-    }
 
     public void Shoot()
     {

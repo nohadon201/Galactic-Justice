@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-[CreateAssetMenu(fileName = "Skill5", menuName = "Skills/Skill5")]
+[CreateAssetMenu(fileName = "Skill5", menuName = "Player/Skills/Skill5")]
 public class Skill5 : Skills
 {
     public override void initValues()

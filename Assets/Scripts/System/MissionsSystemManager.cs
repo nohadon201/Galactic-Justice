@@ -13,7 +13,7 @@ public class MissionsSystemManager : MonoBehaviour
     protected virtual void Awake()
     {
         iker = false; 
-        playerControlls.EndLevelDelegator += checkIfWinPoints;
+        //playerControlls.EndLevelDelegator += checkIfWinPoints;
         List<GameEvent> listEvents = new List<GameEvent>();
         missions = Resources.LoadAll<Mission>("Missions/lvl" + lvl + "/MissionAsset/").ToList();
         playersPoints = Resources.Load<PlayersPoints>("Player/PlayersPoints");
@@ -68,7 +68,7 @@ public class MissionsSystemManager<T> : MonoBehaviour
     public PlayerControlls playerControlls;
     protected virtual void Awake()
     {
-        playerControlls.EndLevelDelegator += checkIfWinPoints;
+        //playerControlls.EndLevelDelegator += checkIfWinPoints; 
         missions = Resources.LoadAll<Mission<T>>("Missions/lvl" + lvl + "/MissionAsset/").ToList();
         playersPoints = Resources.Load<PlayersPoints>("Player/PlayersPoints");
         foreach (Mission<T> mission in missions)

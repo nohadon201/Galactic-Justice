@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-[CreateAssetMenu(fileName = "PowerBulletSO", menuName = "Power Bullets")]
+[CreateAssetMenu(fileName = "PowerBulletSO", menuName = "Player/Power Bullets")]
 public class PowerBulletSO : ScriptableObject
 {
     public int ScaleInvestment;

@@ -1,12 +1,18 @@
+using Cinemachine;
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
-public class PlayerControlls : MonoBehaviour
+public class PlayerControlls : NetworkBehaviour
 {
+    //####################### Events and delegators ########################## 
+    
     //      Controls Variables
     [Header("Configs")]
     
@@ -34,6 +40,9 @@ public class PlayerControlls : MonoBehaviour
     public delegate void EndLevel();
     public EndLevel EndLevelDelegator;
 
+    private GameObject VirtualCamera;
+    private GameObject Camera;
+
     void Awake()
     {
         DefaultValues();
@@ -48,9 +57,6 @@ public class PlayerControlls : MonoBehaviour
         dashForce = 24f;
         dashCooldown = 1f;
         dashingTime = 0.3f;
-        
-        Cursor.lockState = CursorLockMode.Locked;
-        
         rb = GetComponent<Rigidbody>();
         weapon = GetComponent<PlayerWeapon>();
         OwnInfo.DefaultValues();
@@ -62,16 +68,28 @@ public class PlayerControlls : MonoBehaviour
         {
             CameraTarget = transform.GetChild(0).gameObject;
         }
+
+        if (!IsOwner) return;
+        Camera oldCamera = FindObjectOfType<Camera>();   
+        Camera = Instantiate(Resources.Load<GameObject>("Player/MainCamera"));
+        GameObject a = Resources.Load<GameObject>("Player/CameraCinemachine");
+        a.GetComponent<CinemachineVirtualCamera>().Follow = CameraTarget.transform;
+        VirtualCamera = Instantiate(a);
+        if(oldCamera != null && oldCamera.enabled) {
+            oldCamera.enabled = false;
+        }
     }
     private void FixedUpdate()
     {
-        if(Dashing)
+        if(!IsOwner) return;
+        if (Dashing)
         {
             rb.velocity = transform.forward * dashForce;
         }
     }
     void LateUpdate()
     {
+        if(!IsOwner) return;
         if(Input.GetKeyDown(KeyCode.Alpha1)) 
         {
             ActivateSkill(0);
@@ -98,9 +116,36 @@ public class PlayerControlls : MonoBehaviour
         CameraRotation();
     }
     /**
+     * ############################ NETWORK STATES ########################################### 
+     */
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        if (!IsOwner) return;
+        DefaultValues();
+        //this.gameObject.SetActive(false);
+        //MultiplayerInfo info = Resources.Load<MultiplayerInfo>("Multiplayer/MultiplayerInfo");
+        //info.NumberOfPlayers++;
+        //info.connected= true;   
+    }
+    private void OnLevelWasLoaded(int level)
+    {
+        if (SceneManager.GetSceneByBuildIndex(level).name != "Menu" && SceneManager.GetSceneByBuildIndex(level).name != "LevelMenu")
+        {
+            //this.gameObject.SetActive(true); Instanciar Player Prefab y sus movidas de camaras y tal
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        else
+        {
+            this.gameObject.SetActive(false);
+            Cursor.lockState = CursorLockMode.None;
+            Destroy(this.Camera);
+            Destroy(this.VirtualCamera);
+        }
+    }
+    /**
      * ############################ SHOOTING ########################################### 
      */
-
     public void OnClick(InputAction.CallbackContext context)
     {
         if (Dashing) return;
@@ -169,29 +214,39 @@ public class PlayerControlls : MonoBehaviour
         Vector3 velocity;
         if (directionMovement.x > 0)
         {
-            rb.velocity = new Vector3(transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, transform.right.z * OwnInfo.playerVelocity);
+            SetVelocityServerRpc(new Vector3(transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, transform.right.z * OwnInfo.playerVelocity));
         }
         else if (directionMovement.x < 0)
         {
-            rb.velocity = new Vector3(-transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, -transform.right.z * OwnInfo.playerVelocity);
+            SetVelocityServerRpc(new Vector3(-transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, -transform.right.z * OwnInfo.playerVelocity));
         }
         else
         {
-            rb.velocity = new Vector3(0, rb.velocity.y, 0);
+            SetVelocityServerRpc(new Vector3(0, rb.velocity.y, 0));
         }
 
         //      +Z
 
         if (directionMovement.y > 0)
         {
-            rb.velocity += new Vector3(transform.forward.x, 0, transform.forward.z) * OwnInfo.playerVelocity;
+            AddVelocityServerRpc(new Vector3(transform.forward.x, 0, transform.forward.z) * OwnInfo.playerVelocity);
         }
         else if (directionMovement.y < 0)
         {
-            rb.velocity += new Vector3(-transform.forward.x, 0, -transform.forward.z) * OwnInfo.playerVelocity;
+            AddVelocityServerRpc(new Vector3(-transform.forward.x, 0, -transform.forward.z) * OwnInfo.playerVelocity);
         }
 
 
+    }
+    [ServerRpc]
+    public void SetVelocityServerRpc(Vector3 a)
+    {
+        rb.velocity = a;
+    }
+    [ServerRpc]
+    public void AddVelocityServerRpc(Vector3 a)
+    {
+        rb.velocity += a;
     }
     public IEnumerator Dash()
     {

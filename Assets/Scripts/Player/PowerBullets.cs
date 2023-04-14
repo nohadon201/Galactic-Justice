@@ -466,6 +466,7 @@ public class PowerBullets : MonoBehaviour
             yield return null;
         }
         InstanceExplosionWave.SetActive(false);
+        Exploting = false;
     }
     private IEnumerator DamageFlame(EnemyBehaviour eb, GameObject gameObject)
     {

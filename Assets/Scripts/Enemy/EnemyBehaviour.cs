@@ -1,11 +1,8 @@
-using Cinemachine.Utility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Burst.Intrinsics;
 using UnityEngine;
 using UnityEngine.AI;
-using static UnityEditor.VersionControl.Asset;
 
 public abstract class EnemyBehaviour : MonoBehaviour
 {
