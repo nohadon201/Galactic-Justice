@@ -1,23 +1,18 @@
 using Cinemachine;
-using JetBrains.Annotations;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.Mathematics;
 using Unity.Netcode;
-using Unity.VisualScripting;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
+
 
 public class PlayerControlls : NetworkBehaviour
 {
     //####################### Events and delegators ########################## 
-    
-    //      Controls Variables
+
     [Header("Configs")]
     
-    [SerializeField]
-    private float Sensibility;
+    [SerializeField] private float Sensibility;
 
     private GameObject CameraTarget;
 
@@ -34,14 +29,14 @@ public class PlayerControlls : NetworkBehaviour
     private Coroutine RegenerationOfAmmunition,RegenerationShieldCoroutine;
 
     private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield;
-    [SerializeField]
-    public PlayerInfo OwnInfo;
+    
+    [SerializeField] public PlayerInfo OwnInfo;
 
     public delegate void EndLevel();
     public EndLevel EndLevelDelegator;
 
     private GameObject VirtualCamera;
-    private GameObject Camera;
+    public GameObject Camera;
 
     void Awake()
     {
@@ -54,30 +49,42 @@ public class PlayerControlls : NetworkBehaviour
         CanDash = true;
         Dashing = false;
         RegenerationShield = false;
+        
         dashForce = 24f;
         dashCooldown = 1f;
         dashingTime = 0.3f;
+        
         rb = GetComponent<Rigidbody>();
         weapon = GetComponent<PlayerWeapon>();
         OwnInfo.DefaultValues();
+        
         foreach(Skills sk in OwnInfo.abilities)
         {
             sk.initValues();
         }
+        
         if (CameraTarget == null)
         {
             CameraTarget = transform.GetChild(0).gameObject;
         }
 
         if (!IsOwner) return;
+        
         Camera oldCamera = FindObjectOfType<Camera>();   
+        
         Camera = Instantiate(Resources.Load<GameObject>("Player/MainCamera"));
+        
         GameObject a = Resources.Load<GameObject>("Player/CameraCinemachine");
+        
         a.GetComponent<CinemachineVirtualCamera>().Follow = CameraTarget.transform;
+        
         VirtualCamera = Instantiate(a);
+        
         if(oldCamera != null && oldCamera.enabled) {
             oldCamera.enabled = false;
         }
+        
+        weapon.camera = Camera.GetComponent<Camera>(); 
     }
     private void FixedUpdate()
     {
@@ -86,10 +93,12 @@ public class PlayerControlls : NetworkBehaviour
         {
             rb.velocity = transform.forward * dashForce;
         }
+
     }
     void LateUpdate()
     {
         if(!IsOwner) return;
+        Debug.Log("UPDATE: "+directionRotationOfCamera.ToString());
         if(Input.GetKeyDown(KeyCode.Alpha1)) 
         {
             ActivateSkill(0);
@@ -109,11 +118,15 @@ public class PlayerControlls : NetworkBehaviour
         {
             EndLevelDelegator?.Invoke();
         }
+        
         // Velocity of the player
         PlayerMovement();
 
         // Camera Rotation
         CameraRotation();
+        if (!IsClient) return;
+        Debug.Log("IIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
+        //CameraRotationServerRpc();
     }
     /**
      * ############################ NETWORK STATES ########################################### 
@@ -121,34 +134,16 @@ public class PlayerControlls : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        if (!IsOwner) return;
         DefaultValues();
-        //this.gameObject.SetActive(false);
-        //MultiplayerInfo info = Resources.Load<MultiplayerInfo>("Multiplayer/MultiplayerInfo");
-        //info.NumberOfPlayers++;
-        //info.connected= true;   
-    }
-    private void OnLevelWasLoaded(int level)
-    {
-        if (SceneManager.GetSceneByBuildIndex(level).name != "Menu" && SceneManager.GetSceneByBuildIndex(level).name != "LevelMenu")
-        {
-            //this.gameObject.SetActive(true); Instanciar Player Prefab y sus movidas de camaras y tal
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-        else
-        {
-            this.gameObject.SetActive(false);
-            Cursor.lockState = CursorLockMode.None;
-            Destroy(this.Camera);
-            Destroy(this.VirtualCamera);
-        }
+        //Debug.Log(Sensibility);
     }
     /**
      * ############################ SHOOTING ########################################### 
      */
     public void OnClick(InputAction.CallbackContext context)
     {
-        if (Dashing) return;
+        if (Dashing || !IsOwner) return;
+
         if (context.started)
         {
             if (weapon.CanShoot())
@@ -198,56 +193,64 @@ public class PlayerControlls : NetworkBehaviour
      */
     public void CameraRotation()
     {
-        
+        //Debug.Log(directionRotationOfCamera);
         transform.Rotate(Vector3.up * directionRotationOfCamera.x * Sensibility);
 
         cameraRotation += (-directionRotationOfCamera.y * Sensibility);
 
         cameraRotation = Mathf.Clamp(cameraRotation, -90, 90);
 
-        CameraTarget.transform.eulerAngles = new Vector3(cameraRotation, CameraTarget.transform.eulerAngles.y, CameraTarget.transform.eulerAngles.z);
+        CameraTarget.transform.eulerAngles = new Vector3(cameraRotation, CameraTarget.transform.eulerAngles.y, CameraTarget.transform.eulerAngles.z);   
     }
+    
+    //[ServerRpc]
+    //public void CameraRotationServerRpc()
+    //{
+    //    transform.Rotate(Vector3.up * directionRotationOfCamera.x * Sensibility);
 
+    //    cameraRotation += (-directionRotationOfCamera.y * Sensibility);
+
+    //    cameraRotation = Mathf.Clamp(cameraRotation, -90, 90);
+
+    //    CameraTarget.transform.eulerAngles = new Vector3(cameraRotation, CameraTarget.transform.eulerAngles.y, CameraTarget.transform.eulerAngles.z);
+    //}
     public void PlayerMovement()
     {
         //      X 
         Vector3 velocity;
         if (directionMovement.x > 0)
         {
-            SetVelocityServerRpc(new Vector3(transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, transform.right.z * OwnInfo.playerVelocity));
+            rb.velocity = new Vector3(transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, transform.right.z * OwnInfo.playerVelocity);
         }
         else if (directionMovement.x < 0)
         {
-            SetVelocityServerRpc(new Vector3(-transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, -transform.right.z * OwnInfo.playerVelocity));
+            rb.velocity = new Vector3(-transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, -transform.right.z * OwnInfo.playerVelocity);
         }
         else
         {
-            SetVelocityServerRpc(new Vector3(0, rb.velocity.y, 0));
+            rb.velocity = new Vector3(0, rb.velocity.y, 0);
         }
 
         //      +Z
-
         if (directionMovement.y > 0)
         {
-            AddVelocityServerRpc(new Vector3(transform.forward.x, 0, transform.forward.z) * OwnInfo.playerVelocity);
+            rb.velocity += new Vector3(transform.forward.x, 0, transform.forward.z) * OwnInfo.playerVelocity;
         }
         else if (directionMovement.y < 0)
         {
-            AddVelocityServerRpc(new Vector3(-transform.forward.x, 0, -transform.forward.z) * OwnInfo.playerVelocity);
+            rb.velocity += new Vector3(-transform.forward.x, 0, -transform.forward.z) * OwnInfo.playerVelocity;
         }
-
-
     }
-    [ServerRpc]
-    public void SetVelocityServerRpc(Vector3 a)
-    {
-        rb.velocity = a;
-    }
-    [ServerRpc]
-    public void AddVelocityServerRpc(Vector3 a)
-    {
-        rb.velocity += a;
-    }
+    //[ServerRpc]
+    //public void SetVelocityServerRpc(Vector3 a)
+    //{
+    //    rb.velocity = a;
+    //}
+    //[ServerRpc]
+    //public void AddVelocityServerRpc(Vector3 a)
+    //{
+    //    rb.velocity += a;
+    //}
     public IEnumerator Dash()
     {
         CanDash = false;
@@ -261,18 +264,19 @@ public class PlayerControlls : NetworkBehaviour
     }
     public void OnDashing(InputAction.CallbackContext context)
     {
-        if(CanDash)
+        if(CanDash || IsOwner)
         {
             StartCoroutine(Dash());
         }
     }
     public void OnCameraRotate(InputAction.CallbackContext context)
     {
-        if (Dashing) return;
+        if (Dashing || !IsOwner) return;
         try
         {
             Vector2 v2 = context.ReadValue<Vector2>();
             directionRotationOfCamera = v2;
+            Debug.Log("INPUT: " + directionRotationOfCamera.ToString());
         }
         catch (System.Exception e)
         {
@@ -281,7 +285,7 @@ public class PlayerControlls : NetworkBehaviour
     }
     public void OnPlayerMove(InputAction.CallbackContext context)
     {
-        if (Dashing) return;
+        if (Dashing || !IsOwner) return;
         try
         {
             Vector2 v2 = context.ReadValue<Vector2>();
@@ -294,7 +298,8 @@ public class PlayerControlls : NetworkBehaviour
     }
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (Dashing) return;
+        if (Dashing || !IsOwner) return;
+        
         if (context.performed)
         {
             if(!Jump1 && !Jump2)
@@ -309,7 +314,6 @@ public class PlayerControlls : NetworkBehaviour
             }
             
         }
-
     }
     public void TouchFloor()
     {
@@ -323,7 +327,7 @@ public class PlayerControlls : NetworkBehaviour
 
     public void OnRightSlot(InputAction.CallbackContext context)
     {
-
+        if (!IsOwner) return;
         if(context.performed && !weapon.Regeneration)
         {
             weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration + 1 == weapon.WeaponConfigurations.Count ? 0 : weapon.IndexCurrentConfiguration + 1;
@@ -343,7 +347,8 @@ public class PlayerControlls : NetworkBehaviour
     }
     public void OnLeftSlot(InputAction.CallbackContext context)
     {
-        if(context.performed && !weapon.Regeneration)
+        if (!IsOwner) return;
+        if (context.performed && !weapon.Regeneration)
         {
             weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration - 1 < 0 ? weapon.WeaponConfigurations.Count - 1 : weapon.IndexCurrentConfiguration - 1;
             weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;

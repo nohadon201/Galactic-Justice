@@ -13,19 +13,17 @@ public class UserSession : NetworkBehaviour
     }
     public override void OnNetworkSpawn()
     {
-        Debug.Log("aa");
         MultiplayerInfo info = Resources.Load<MultiplayerInfo>("Multiplayer/MultiplayerInfo");
         info.NumberOfPlayers++;
         info.connected= true;   
     }
     private void OnLevelWasLoaded(int level)
     {
-        
+        if (!IsOwner) return;
         if (SceneManager.GetSceneByBuildIndex(level).name != "Menu" && SceneManager.GetSceneByBuildIndex(level).name != "LevelMenu")
         {
             Cursor.lockState = CursorLockMode.Locked;
             SpawnPlayerServerRpc(this.GetComponent<NetworkBehaviour>().OwnerClientId);    
-            Debug.Log("AAAAAAAAAAAAAAAAAAAAAAA");
         }
     }
     [ServerRpc]

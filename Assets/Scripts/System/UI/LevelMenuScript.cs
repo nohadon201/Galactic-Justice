@@ -95,6 +95,12 @@ public class LevelMenuScript : MonoBehaviour
 
     public void LoadLevel1()
     {
+        //SceneManager.LoadScene("Test");
+        NetworkManager.Singleton.SceneManager.LoadScene("Test", LoadSceneMode.Single);
+        
+    }
+    [ClientRpc]
+    public void LoadLevel1ClientRpc() {
         SceneManager.LoadScene("Test");
     }
 }

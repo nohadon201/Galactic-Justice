@@ -18,7 +18,7 @@ public class PlayerWeapon : MonoBehaviour
     [Header("")]
     [Header("Others")]
     [SerializeField]
-    protected Camera camera;
+    public Camera camera;
 
     //######################## CONFIGURATIONS ########################
 
@@ -32,7 +32,6 @@ public class PlayerWeapon : MonoBehaviour
     void Awake()
     {
         powerBullets = GetComponent<PowerBullets>();
-        if(camera == null) camera = Object.FindObjectOfType<Camera>();
         IndexCurrentConfiguration = 0;
         CurrentConfiguration = WeaponConfigurations[IndexCurrentConfiguration];
         for(int i = 0; i < WeaponConfigurations.Count; i++) { 
@@ -46,7 +45,10 @@ public class PlayerWeapon : MonoBehaviour
         }
         Shooting = false;
     }
-
+    public void Start()
+    {
+        //camera = GetComponent<PlayerControlls>().Camera.GetComponent<Camera>();
+    }
     public void Shoot()
     {
         if (CurrentConfiguration.CurrentAmmunition > 0)
