@@ -56,6 +56,12 @@ public class PlayerControlls : NetworkBehaviour
         
         rb = GetComponent<Rigidbody>();
         weapon = GetComponent<PlayerWeapon>();
+        
+        if((!IsServer && IsOwner) || (IsServer && !IsOwner)) 
+            OwnInfo = Resources.Load<PlayerInfo>("Player/Client/ClientPlayerInformation");
+        else 
+            OwnInfo = Resources.Load<PlayerInfo>("Player/Host/HostPlayerInformation");
+        
         OwnInfo.DefaultValues();
         
         foreach(Skills sk in OwnInfo.abilities)
@@ -64,13 +70,13 @@ public class PlayerControlls : NetworkBehaviour
         }
         
         if (CameraTarget == null)
-        {
             CameraTarget = transform.GetChild(0).gameObject;
-        }
+        
 
         if (!IsOwner) return;
         
-        Camera oldCamera = FindObjectOfType<Camera>();   
+        Camera oldCamera = FindObjectOfType<Camera>();  
+        oldCamera.gameObject.GetComponent<AudioListener>().enabled = false;
         
         Camera = Instantiate(Resources.Load<GameObject>("Player/MainCamera"));
         
@@ -80,25 +86,22 @@ public class PlayerControlls : NetworkBehaviour
         
         VirtualCamera = Instantiate(a);
         
-        if(oldCamera != null && oldCamera.enabled) {
+        if(oldCamera != null && oldCamera.enabled) 
             oldCamera.enabled = false;
-        }
+        
         
         weapon.camera = Camera.GetComponent<Camera>(); 
     }
     private void FixedUpdate()
     {
         if(!IsOwner) return;
+        
         if (Dashing)
-        {
             rb.velocity = transform.forward * dashForce;
-        }
-
     }
     void LateUpdate()
     {
         if(!IsOwner) return;
-        Debug.Log("UPDATE: "+directionRotationOfCamera.ToString());
         if(Input.GetKeyDown(KeyCode.Alpha1)) 
         {
             ActivateSkill(0);
@@ -124,9 +127,6 @@ public class PlayerControlls : NetworkBehaviour
 
         // Camera Rotation
         CameraRotation();
-        if (!IsClient) return;
-        Debug.Log("IIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
-        //CameraRotationServerRpc();
     }
     /**
      * ############################ NETWORK STATES ########################################### 
@@ -135,7 +135,6 @@ public class PlayerControlls : NetworkBehaviour
     {
         base.OnNetworkSpawn();
         DefaultValues();
-        //Debug.Log(Sensibility);
     }
     /**
      * ############################ SHOOTING ########################################### 
@@ -193,7 +192,6 @@ public class PlayerControlls : NetworkBehaviour
      */
     public void CameraRotation()
     {
-        //Debug.Log(directionRotationOfCamera);
         transform.Rotate(Vector3.up * directionRotationOfCamera.x * Sensibility);
 
         cameraRotation += (-directionRotationOfCamera.y * Sensibility);
@@ -202,18 +200,6 @@ public class PlayerControlls : NetworkBehaviour
 
         CameraTarget.transform.eulerAngles = new Vector3(cameraRotation, CameraTarget.transform.eulerAngles.y, CameraTarget.transform.eulerAngles.z);   
     }
-    
-    //[ServerRpc]
-    //public void CameraRotationServerRpc()
-    //{
-    //    transform.Rotate(Vector3.up * directionRotationOfCamera.x * Sensibility);
-
-    //    cameraRotation += (-directionRotationOfCamera.y * Sensibility);
-
-    //    cameraRotation = Mathf.Clamp(cameraRotation, -90, 90);
-
-    //    CameraTarget.transform.eulerAngles = new Vector3(cameraRotation, CameraTarget.transform.eulerAngles.y, CameraTarget.transform.eulerAngles.z);
-    //}
     public void PlayerMovement()
     {
         //      X 
@@ -241,16 +227,6 @@ public class PlayerControlls : NetworkBehaviour
             rb.velocity += new Vector3(-transform.forward.x, 0, -transform.forward.z) * OwnInfo.playerVelocity;
         }
     }
-    //[ServerRpc]
-    //public void SetVelocityServerRpc(Vector3 a)
-    //{
-    //    rb.velocity = a;
-    //}
-    //[ServerRpc]
-    //public void AddVelocityServerRpc(Vector3 a)
-    //{
-    //    rb.velocity += a;
-    //}
     public IEnumerator Dash()
     {
         CanDash = false;
@@ -265,9 +241,7 @@ public class PlayerControlls : NetworkBehaviour
     public void OnDashing(InputAction.CallbackContext context)
     {
         if(CanDash || IsOwner)
-        {
             StartCoroutine(Dash());
-        }
     }
     public void OnCameraRotate(InputAction.CallbackContext context)
     {
@@ -276,7 +250,6 @@ public class PlayerControlls : NetworkBehaviour
         {
             Vector2 v2 = context.ReadValue<Vector2>();
             directionRotationOfCamera = v2;
-            Debug.Log("INPUT: " + directionRotationOfCamera.ToString());
         }
         catch (System.Exception e)
         {
@@ -375,9 +348,7 @@ public class PlayerControlls : NetworkBehaviour
     public void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.tag == "Floor")
-        {
             TouchFloor();
-        }
     }
 
     public void Damage(float damage)
@@ -398,6 +369,7 @@ public class PlayerControlls : NetworkBehaviour
                 StopCoroutine(RegenerationShieldCoroutine);
             }
             OwnInfo.playersCurrentHealth -= damage;
+
             RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
         }
     }
@@ -440,3 +412,4 @@ public class PlayerControlls : NetworkBehaviour
         }
     }
 }
+

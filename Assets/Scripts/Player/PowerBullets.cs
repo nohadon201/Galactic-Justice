@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class PowerBullets : MonoBehaviour
+public class PowerBullets : NetworkBehaviour
 {
     /**
      *################################ GENERIC VARIABLES ################################
@@ -39,52 +40,80 @@ public class PowerBullets : MonoBehaviour
      *################################ TIME-SLOWBULLET VARIABLES ################################
      */
     private bool timeSlow;
+    private bool Expanding;
+
     void Awake()
     {
-        DefaultValues();
-    }
-    void Start()
-    {
-        InstanceExplosion = Instantiate(ExplosionParticles);
-        InstanceExplosionWave = Instantiate(ExplosionWave);
-        InstanceExplosion.SetActive(false);
-        InstanceExplosionWave.SetActive(false);
-        //  Expand
-        lineRendererExpand = InstanceExpandWave.GetComponent<LineRenderer>();
-        lineRendererExpand.positionCount = pointsCount + 1;
-        lineRendererExpand.enabled = true;
-        //  Explosion
-        lineRendererExplosion = InstanceExplosionWave.GetComponent<LineRenderer>();
-        lineRendererExplosion.positionCount = pointsCount + 1;
-        lineRendererExplosion.enabled = true;
 
+    }
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        if (!IsOwner && !IsServer) return;
+        DefaultValues();
     }
     private void DefaultValues()
     {
         //  Generic Variables
         playerWeapon = GetComponent<PlayerWeapon>();
         playerControlls = GetComponent<PlayerControlls>();
-        powerBullets = (Resources.LoadAll<PowerBulletSO>("Player/Host/PowerBullets/")).ToList();  
-        
+
+        if ((!IsServer && IsOwner) || (IsServer && !IsOwner))
+            powerBullets = (Resources.LoadAll<PowerBulletSO>("Player/Client/PowerBullets/")).ToList();  
+        else
+            powerBullets = (Resources.LoadAll<PowerBulletSO>("Player/Host/PowerBullets/")).ToList();
+
         //  FlameBullet Variables
-        flameParticles = Resources.Load<GameObject>("ParticlesSystem/Fire");
+        if ((!IsServer && IsOwner) || (IsServer && !IsOwner))
+            flameParticles = Resources.Load<GameObject>("ParticlesSystem/Client/Fire");
+        else
+            flameParticles = Resources.Load<GameObject>("ParticlesSystem/Server/Fire");
 
         //  ExpandBullet Variables
-        ExpandWave = Resources.Load<GameObject>("ParticlesSystem/ExpansionWave");
+        if ((!IsServer && IsOwner) || (IsServer && !IsOwner)) 
+            ExpandWave = Resources.Load<GameObject>("ParticlesSystem/Client/ExpansionWave");
+        
+        else
+            ExpandWave = Resources.Load<GameObject>("ParticlesSystem/Server/ExpansionWave");
+
         InstanceExpandWave = Instantiate(ExpandWave);
         InstanceExpandWave.SetActive(false);
+
+
+
         //  ExplosionBullet Variables
-        ExplosionParticles = Resources.Load<GameObject>("ParticlesSystem/Explosion");
-        ExplosionWave = Resources.Load<GameObject>("ParticlesSystem/ExplosionWave");
         Exploting = false;
+        if ((!IsServer && IsOwner) || (IsServer && !IsOwner))
+        {
+            ExplosionParticles = Resources.Load<GameObject>("ParticlesSystem/Client/Explosion");
+            ExplosionWave = Resources.Load<GameObject>("ParticlesSystem/Client/ExplosionWave");
+        }
+        else
+        {
+            ExplosionParticles = Resources.Load<GameObject>("ParticlesSystem/Server/Explosion");
+            ExplosionWave = Resources.Load<GameObject>("ParticlesSystem/Server/ExplosionWave");
+        }
+        InstanceExplosion = Instantiate(ExplosionParticles);
+        InstanceExplosionWave = Instantiate(ExplosionWave);
+        InstanceExplosion.SetActive(false);
+        InstanceExplosionWave.SetActive(false);
+
         //  TimeSlow Bullet
-        timeSlow = false;   
+        timeSlow = false;
+
+        //  LineRenderers
+        
+        //Expand
+        lineRendererExpand = InstanceExpandWave.GetComponent<LineRenderer>();
+        lineRendererExpand.positionCount = pointsCount + 1;
+        lineRendererExpand.enabled = true;
+
+        //Explosion
+        lineRendererExplosion = InstanceExplosionWave.GetComponent<LineRenderer>();
+        lineRendererExplosion.positionCount = pointsCount + 1;
+        lineRendererExplosion.enabled = true;
     }
 
-    void Update()
-    {
-       
-    }
     /**
      * ################################ PRINCIPAL FUNCTION ################################
      */
@@ -100,6 +129,7 @@ public class PowerBullets : MonoBehaviour
                         break;
                     case PowerBulletID.EXPAND:
                         ExpandBullet(hit, powerBullet);
+                        ExpandBulletClientRpc(hit.transform.position);
                         break;
                     case PowerBulletID.DOUBLE_FORCE:
                         DoubleForceBullet(hit, powerBullet);
@@ -185,6 +215,14 @@ public class PowerBullets : MonoBehaviour
     /**
      * ################################ EXPAND BULLET FUNCTIONS ################################
      */
+    [ClientRpc]
+    private void ExpandBulletClientRpc(Vector3 hitPosition)
+    {
+        if (!Expanding) { 
+            Expanding = true;
+            StartCoroutine(ExpansionClient(hitPosition));
+        }
+    }
     private void ExpandBullet(RaycastHit hit, PowerBulletSO powerBulletData) { Debug.Log("################################# EXPAND BULLET #################################"); StartCoroutine(Expansion(hit)); }
     private void DrawTheLine(float currentRadious)
     {
@@ -301,7 +339,7 @@ public class PowerBullets : MonoBehaviour
                 EnemyBehaviour eb = hit.transform.gameObject.GetComponent<EnemyBehaviour>();
                 if (eb != null)
                 {
-                    StartCoroutine(DamageFlame(eb, hit.transform.gameObject));
+                    StartCoroutine(DamageFlame(eb, hit.transform.gameObject)); 
                 }
             }
         }
@@ -325,6 +363,14 @@ public class PowerBullets : MonoBehaviour
     /**
     * ################################ EXPLOSIVE BULLET FUNCTIONS ################################
     */
+    [ClientRpc]
+    private void ExplosiveBulletClientRpc(Vector3 ExplosionPoint)
+    {
+        if (!IsOwner) return;
+         Exploting = true;
+         StartCoroutine(ExplosionClient(ExplosionPoint));
+         StartCoroutine(ExplosionParticlesCoroutine(ExplosionPoint));
+    }
     private void ExplosiveBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# EXPLOSIVE BULLET #################################");
@@ -335,7 +381,8 @@ public class PowerBullets : MonoBehaviour
             {
                 Exploting = true;
                 StartCoroutine(Explosion(hit));
-                StartCoroutine(ExplosionParticlesCoroutine(hit));
+                StartCoroutine(ExplosionParticlesCoroutine(hit.point));
+                ExplosiveBulletClientRpc(hit.point);
             }
         } 
     }
@@ -435,6 +482,7 @@ public class PowerBullets : MonoBehaviour
     private IEnumerator Expansion(RaycastHit hit)
     {
         InstanceExpandWave.SetActive(true);
+        InstanceExpandWave.transform.position = hit.transform.position;
         lineRendererExpand.enabled = true;
         float currentRadious = 0f;
         while (currentRadious < MaxRadious)
@@ -446,17 +494,46 @@ public class PowerBullets : MonoBehaviour
         }
         InstanceExpandWave.SetActive(false);
     }
-    private IEnumerator ExplosionParticlesCoroutine(RaycastHit hit)
+    private IEnumerator ExpansionClient(Vector3 v3)
     {
-        InstanceExplosion.transform.position = hit.point;
+        InstanceExpandWave.SetActive(true);
+        InstanceExpandWave.transform.position = v3;
+        lineRendererExpand.enabled = true;
+        float currentRadious = 0f;
+        while (currentRadious < MaxRadious)
+        {
+            currentRadious += Time.deltaTime * Speed;
+            DrawTheLine(currentRadious);
+            yield return null;
+        }
+        InstanceExpandWave.SetActive(false);
+        Expanding = false;
+    }
+    private IEnumerator ExplosionParticlesCoroutine(Vector3 hit)
+    {
+        InstanceExplosion.transform.position = hit;
         InstanceExplosion.SetActive(true);
         yield return new WaitForSeconds(0.5f);
         InstanceExplosion.SetActive(false);
     }
+    private IEnumerator ExplosionClient(Vector3 hit)
+    {
+        InstanceExplosionWave.SetActive(true);
+        InstanceExplosionWave.transform.position = hit;
+        float currentRadious = 0f;
+        while (currentRadious < MaxRadious)
+        {
+            currentRadious += Time.deltaTime * Speed;
+            DrawExplosionTheLine(currentRadious);
+            yield return null;
+        }
+        InstanceExplosionWave.SetActive(false);
+        Exploting = false;
+    }
     private IEnumerator Explosion(RaycastHit hit)
     {
         InstanceExplosionWave.SetActive(true);
-        InstanceExplosion.transform.position = hit.point;
+        InstanceExplosionWave.transform.position = hit.point;
         float currentRadious = 0f;
         while (currentRadious < MaxRadious)
         {
