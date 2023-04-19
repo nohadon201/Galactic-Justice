@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.17553508, g: 0.21963893, b: 0.3019628, a: 1}
+  m_IndirectSpecularColor: {r: 0.17834325, g: 0.22330391, b: 0.30533338, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -594,7 +594,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 550294893}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
@@ -773,9 +773,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentOfPoints: {fileID: 1756318610}
+  currentState: 0
   velocity: 0
   CooldownAttack: 0
   angle: 46
+  playerRef: {fileID: 0}
   targetMask:
     serializedVersion: 2
     m_Bits: 0
@@ -1766,14 +1768,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1766884739}
-  m_LocalRotation: {x: 0.5468089, y: -0.21429548, z: 0.12404062, w: 0.79980713}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: 0.4759806, y: -0.06579813, z: 0.053073827, w: 0.8753835}
+  m_LocalPosition: {x: 0, y: 12.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 68.102, y: -33.737, z: -5.53}
+  m_LocalEulerAnglesHint: {x: 57.173, y: -6.852, z: 3.202}
 --- !u!114 &1766884742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1846,7 +1848,7 @@ PrefabInstance:
     - target: {fileID: 296265966804452610, guid: 1ba40ccb84e3ac9479b1607d58bc4ad7,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 296265966804452615, guid: 1ba40ccb84e3ac9479b1607d58bc4ad7,
         type: 3}
@@ -2349,7 +2351,7 @@ PrefabInstance:
     - target: {fileID: 4492744700409155320, guid: 738b3af2ba6407546bfa6de284d05288,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4492744700409155325, guid: 738b3af2ba6407546bfa6de284d05288,
         type: 3}

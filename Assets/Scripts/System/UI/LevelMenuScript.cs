@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class LevelMenuScript : MonoBehaviour
 {
@@ -63,6 +64,10 @@ public class LevelMenuScript : MonoBehaviour
             NetworkManager.Singleton.StartHost();
         }
     }
+    public void BackToMenu(InputAction.CallbackContext callbackContext)
+    {
+        
+    }
     public void setIp()
     {
         var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -95,8 +100,6 @@ public class LevelMenuScript : MonoBehaviour
 
     public void LoadLevel1()
     {
-        //SceneManager.LoadScene("Test");
-        NetworkManager.Singleton.SceneManager.LoadScene("Test", LoadSceneMode.Single);
-        
+        NetworkManager.Singleton.SceneManager.LoadScene("Test2", LoadSceneMode.Single);
     }
 }

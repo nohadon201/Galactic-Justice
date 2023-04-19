@@ -11,6 +11,7 @@ public abstract class EnemyBehaviour : MonoBehaviour
     protected float damagePerImpact;
     protected float maxHealth;
     protected float currentHealth;
+    [SerializeField]
     protected StateOfEnemy currentState;
     protected List<Vector3> randomPositions = new List<Vector3>();
     protected float RangeAttack;
@@ -28,6 +29,7 @@ public abstract class EnemyBehaviour : MonoBehaviour
     [SerializeField]
     [Range(0f, 360f)]
     public float angle;
+    [SerializeField]    
     protected Transform playerRef;
     protected int indexCurrentPointAlert;
     [SerializeField]
@@ -63,13 +65,19 @@ public abstract class EnemyBehaviour : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        playerRef = other.transform;
-        checkPlayerCoroutine = StartCoroutine(FOVRoutine(other.transform));        
+        if(other.transform.tag == "Player")
+        {
+            playerRef = other.transform;
+            checkPlayerCoroutine = StartCoroutine(FOVRoutine(other.transform));
+        }
     }
     private void OnTriggerExit(Collider other)
     {
-        StopCoroutine(checkPlayerCoroutine);
-        OnPlayerAway();
+        if(other.transform.tag == "Player")
+        {
+            StopCoroutine(checkPlayerCoroutine);
+            OnPlayerAway();
+        }
     }
     /**
      * ###################################### Patrol Of Enemy ################################ 

@@ -17,7 +17,7 @@ MonoBehaviour:
   Description: This bullet has a probability of taking fire damage every second during
     20 seconds
   InvestmentValue: 0.25
-  currentInvestmentValue: 0
+  currentInvestmentValue: 1
   Points: 0
   id: 7
   type: 1

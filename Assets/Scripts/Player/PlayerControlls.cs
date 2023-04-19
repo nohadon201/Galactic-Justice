@@ -353,6 +353,7 @@ public class PlayerControlls : NetworkBehaviour
 
     public void Damage(float damage)
     {
+        Debug.Log("AU! Damage:" + damage + ", HealthBeforeImpact: " + OwnInfo.playersCurrentHealth + ", Shield: " + OwnInfo.playersCurrentShield);
         if (OwnInfo.playersCurrentShield > 0)
         {
             if (RegenerationShield)
@@ -369,7 +370,12 @@ public class PlayerControlls : NetworkBehaviour
                 StopCoroutine(RegenerationShieldCoroutine);
             }
             OwnInfo.playersCurrentHealth -= damage;
-
+            if(OwnInfo.playersCurrentHealth <= 0)
+            {
+                //Player Death
+               
+                this.gameObject.SetActive(false);
+            }
             RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
         }
     }

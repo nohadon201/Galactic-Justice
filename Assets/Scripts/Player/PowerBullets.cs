@@ -550,14 +550,14 @@ public class PowerBullets : NetworkBehaviour
         if(gameObject.transform.childCount == 3)
         {
             GameObject flameParticlesInstantiation = Instantiate(flameParticles);
-            flameParticles.transform.position = gameObject.transform.position;
-            flameParticles.transform.parent = gameObject.transform;
+            flameParticlesInstantiation.transform.position = gameObject.transform.position;
+            flameParticlesInstantiation.transform.parent = gameObject.transform;
             for (int a = 0; a < 10; a++)
             {
                 eb.GetHit(5);
                 yield return new WaitForSeconds(1f);
             }
-            Destroy(flameParticles);
+            Destroy(flameParticlesInstantiation);
         }
     }
     private IEnumerator TimeSlow(EnemyBehaviour enemyBehaviour)
