@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 public abstract class EnemyBehaviour : MonoBehaviour
 {
@@ -25,19 +26,23 @@ public abstract class EnemyBehaviour : MonoBehaviour
     protected NavMeshPath currentPath;
     protected int navmeshIndexPosition;
 
+    // Piercing
+    [SerializeField]
+    private Transform piercingPoint;
+    public Transform PiercingPoint => piercingPoint;
     //      Enemy vision
     [SerializeField]
     [Range(0f, 360f)]
     public float angle;
     [SerializeField]    
-    protected Transform playerRef;
+    public Transform playerRef;
     protected int indexCurrentPointAlert;
     [SerializeField]
     protected LayerMask targetMask;
     [SerializeField]
     protected LayerMask obstructionMask;
     private Coroutine checkPlayerCoroutine;
-    protected Coroutine attack, findPlayer, forgivePlayer;
+    protected Coroutine attack, findPlayer, forgivePlayer, RunAwayPlayer;
     
     protected void SetRandomPostions()
     {
@@ -133,8 +138,9 @@ public abstract class EnemyBehaviour : MonoBehaviour
         {
             float xCoor = currentPath.corners[navmeshIndexPosition].x - transform.position.x;
             float zCoor = currentPath.corners[navmeshIndexPosition].z - transform.position.z;
-            Vector3 d = new Vector3(xCoor, 0, zCoor);
-            rb.velocity = d.normalized * velocity;
+            Vector3 d = (new Vector3(xCoor, 0, zCoor).normalized * velocity);
+            d.y += rb.velocity.y;
+            rb.velocity = d;
             Vector3 v = currentPath.corners[navmeshIndexPosition] - transform.position;
             if ((v.x < 0.1 && v.x > -0.1) && (v.z < 0.1 && v.z > -0.1))
             {
@@ -144,8 +150,9 @@ public abstract class EnemyBehaviour : MonoBehaviour
     }
     public void GetHit(float damage)
     {
+        Debug.Log("DAMAGE! " + damage);
         currentHealth-= damage; 
-        if(damage <= 0)
+        if(currentHealth <= 0)
         {
             this.gameObject.SetActive(false);    
         }
@@ -153,6 +160,10 @@ public abstract class EnemyBehaviour : MonoBehaviour
     /**
      * ###################################### State Machine ################################ 
      */
+    public bool IsInPatrol()
+    {
+        return currentState == StateOfEnemy.PATROL;
+    }
     public void ChangeState(StateOfEnemy newState)
     {
         Debug.Log("CHANGE STATE FROM: "+ currentState.ToString() + " TO "+ newState.ToString());  
@@ -170,13 +181,24 @@ public abstract class EnemyBehaviour : MonoBehaviour
         switch (currentState)
         {
             case StateOfEnemy.PATROL:
+                Debug.Log("Init PATROL");
                 InitStatePatrol();
                 break;
             case StateOfEnemy.FOLLOWING:
+                Debug.Log("Init FOLLOWING");
                 InitStateFollowing();
                 break;
             case StateOfEnemy.ATTACK:
+                Debug.Log("Init ATTACK");
                 InitStateAttack();
+                break;
+            case StateOfEnemy.CRAZY:
+                Debug.Log("Init CRAZY");
+                InitStateCrazy();
+                break;
+            case StateOfEnemy.TERRIFIED:
+                Debug.Log("Init TERRIFIED");
+                InitStateTerrified();
                 break;
             default:
                 break;
@@ -196,6 +218,12 @@ public abstract class EnemyBehaviour : MonoBehaviour
             case StateOfEnemy.ATTACK:
                 UpdateStateAttack();
                 break;
+            case StateOfEnemy.CRAZY:    
+                UpdateStateCrazy();
+                break;
+            case StateOfEnemy.TERRIFIED:
+                UpdateStateTerrified();
+                break;
             default:
                 break;
         }
@@ -213,6 +241,12 @@ public abstract class EnemyBehaviour : MonoBehaviour
                 break;
             case StateOfEnemy.ATTACK:
                 FixedUpdateStateAttack();
+                break; 
+            case StateOfEnemy.CRAZY:
+                FixedUpdateStateCrazy();
+                break;
+            case StateOfEnemy.TERRIFIED:
+                FixedUpdateStateTerrified();
                 break;
             default:
                 break;
@@ -232,9 +266,39 @@ public abstract class EnemyBehaviour : MonoBehaviour
             case StateOfEnemy.ATTACK:
                 ExitStateAttack();
                 break;
+            case StateOfEnemy.CRAZY:
+                ExitStateCrazy();
+                break;
+            case StateOfEnemy.TERRIFIED:
+                ExitStateTerrified();
+                break;
             default:
                 break;
         }
+    }
+    protected IEnumerator RunAwayFromPlayer()
+    {
+        currentPath.ClearCorners();
+        NavMesh.CalculatePath(transform.position, RunAway(), filter, currentPath);
+        navmeshIndexPosition = 0;
+        while (currentState == StateOfEnemy.TERRIFIED)
+        {
+            if(10f > Vector3.Distance(transform.position, playerRef.transform.position))
+            {
+                currentPath.ClearCorners();
+                NavMesh.CalculatePath(transform.position, RunAway(), filter, currentPath);
+                navmeshIndexPosition = 0;
+            }    
+            yield return new WaitForSeconds(1f);
+        }
+    }
+    private Vector3 RunAway()
+    {
+        Vector3 diff = transform.position - playerRef.position;
+        diff.Normalize();
+        diff.y = 0;
+        return playerRef.transform.position + (diff * 30);
+
     }
     protected abstract IEnumerator FindPlayer();
     protected abstract IEnumerator ForgivePlayer();
@@ -252,6 +316,14 @@ public abstract class EnemyBehaviour : MonoBehaviour
     protected abstract void UpdateStateAttack();
     protected abstract void FixedUpdateStateAttack();
     protected abstract void ExitStateAttack();
+    protected abstract void InitStateCrazy();
+    protected abstract void UpdateStateCrazy();
+    protected abstract void FixedUpdateStateCrazy();
+    protected abstract void ExitStateCrazy();
+    protected abstract void InitStateTerrified();
+    protected abstract void UpdateStateTerrified();
+    protected abstract void FixedUpdateStateTerrified();
+    protected abstract void ExitStateTerrified();
 
 }
 

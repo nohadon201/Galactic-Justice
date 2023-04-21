@@ -2340,6 +2340,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4492744700409155314, guid: 738b3af2ba6407546bfa6de284d05288,
         type: 3}
+      propertyPath: aaa
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4492744700409155314, guid: 738b3af2ba6407546bfa6de284d05288,
+        type: 3}
       propertyPath: parentOfPoints
       value: 
       objectReference: {fileID: 1756318610}

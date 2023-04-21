@@ -42,10 +42,6 @@ public class PowerBullets : NetworkBehaviour
     private bool timeSlow;
     private bool Expanding;
 
-    void Awake()
-    {
-
-    }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -202,7 +198,7 @@ public class PowerBullets : NetworkBehaviour
     private void StuneBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# STUNE BULLET #################################");
-        float rand = Random.Range(0, 1);
+        float rand = Random.Range(0f, 1f);
         if(rand<= powerBulletData.currentInvestmentValue)
         {
             EnemyBehaviour eb = hit.transform.gameObject.GetComponent<EnemyBehaviour>();
@@ -265,12 +261,14 @@ public class PowerBullets : NetworkBehaviour
     private void PiercingBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# PIERCING BULLET #################################");
-        float rand = Random.Range(0, 1);
+        float rand = Random.Range(0f, 1f);
         if (rand <= powerBulletData.currentInvestmentValue)
         {
             if (hit.transform.tag == "Enemy")
             {
-                playerWeapon.RayCastTo(hit.transform.GetChild(2).transform.position, -hit.normal, true);
+                Vector3 v = hit.transform.GetChild(2).transform.position;
+                playerWeapon.RayCastToServerRpc(v, -hit.normal, true);
+                Debug.DrawLine(v, v + (-hit.normal * 10), Color.green, 3f);
             }
         }
     }
@@ -280,13 +278,16 @@ public class PowerBullets : NetworkBehaviour
     private void MultiplierBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# MULTIPLIER BULLET #################################");
-        float rand = Random.Range(0, 1);
+        float rand = Random.Range(0f, 1f);
         if (rand <= powerBulletData.currentInvestmentValue)
         {
             if (hit.transform.tag == "Enemy")
             {
-                playerWeapon.RayCastTo(hit.transform.GetChild(2).transform.position, -hit.transform.forward + new Vector3(0.5f, 0, 0), true);
-                playerWeapon.RayCastTo(hit.transform.GetChild(2).transform.position, -hit.transform.forward + new Vector3(-0.5f, 0, 0), true);
+                Vector3 dir = -hit.transform.forward + hit.transform.right * 0.5f;
+                Vector3 dir2 = -hit.transform.forward + hit.transform.right * -0.5f;
+                Vector3 piercingPoint = hit.transform.GetComponent<EnemyBehaviour>().PiercingPoint.position;
+                playerWeapon.RayCastToServerRpc(piercingPoint, dir.normalized, true);
+                playerWeapon.RayCastToServerRpc(piercingPoint, dir2.normalized, true);
             }
         }
     }
@@ -296,14 +297,15 @@ public class PowerBullets : NetworkBehaviour
     private void BouncingBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# BOUNCING BULLET #################################");
-        float rand = Random.Range(0, 1);
+        float rand = Random.Range(0f, 1f);
         if (rand <= powerBulletData.currentInvestmentValue)
         {
             if (hit.transform.tag == "Enemy")
             {
                 Vector3 direction = (hit.transform.position - transform.position).normalized;
                 Vector3 reflection = Vector3.Reflect(direction, hit.normal);
-                playerWeapon.RayCastTo(hit.point, reflection, true);
+                playerWeapon.RayCastToServerRpc(hit.point, reflection, true);
+                Debug.DrawLine(hit.point, hit.point + (reflection * 10), Color.green, 3f);
             }
         }
     }
@@ -313,7 +315,7 @@ public class PowerBullets : NetworkBehaviour
     private void BouncingSurfaceBullet(RaycastHit hit, PowerBulletSO powerBulletData, bool byPowerBullet)
     {
         Debug.Log("################################# BOUNCING SURFACE BULLET #################################");
-        float rand = Random.Range(0, 1);
+        float rand = Random.Range(0f, 1f);
         if (rand <= powerBulletData.currentInvestmentValue && !byPowerBullet)
         {
             if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstruction"))
@@ -321,7 +323,7 @@ public class PowerBullets : NetworkBehaviour
                 Vector3 direction = (hit.point - transform.position).normalized;
                 Vector3 reflection = Vector3.Reflect(direction, hit.normal);
                 Debug.DrawLine(hit.point, hit.point + (reflection * 5), Color.red, 3f);
-                playerWeapon.RayCastTo(hit.point, reflection, true);
+                playerWeapon.RayCastToServerRpc(hit.point, reflection, true);
             }
         }
     }
@@ -331,7 +333,7 @@ public class PowerBullets : NetworkBehaviour
     private void FlameBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# FLAME BULLET #################################");
-        float rand = Random.Range(0, 1);
+        float rand = Random.Range(0f, 1f);
         if (rand <= powerBulletData.currentInvestmentValue)
         {
             if (hit.transform.tag == "Enemy")
@@ -350,7 +352,14 @@ public class PowerBullets : NetworkBehaviour
     private void HealthStealthBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# HEALTH-STEALTH BULLET #################################");
-        playerControlls.OwnInfo.playersCurrentHealth += playerWeapon.CurrentConfiguration.CurrentDamageWeapon * powerBulletData.currentInvestmentValue;
+        EnemyBehaviour eb = hit.transform.gameObject.GetComponent<EnemyBehaviour>();    
+        if(eb != null)
+        { 
+            Debug.Log("Health Antes: " + playerControlls.OwnInfo.playersCurrentHealth);
+            playerControlls.OwnInfo.playersCurrentHealth += playerWeapon.CurrentConfiguration.CurrentDamageWeapon * powerBulletData.currentInvestmentValue;
+            if (playerControlls.OwnInfo.playersMaxHealth < playerControlls.OwnInfo.playersCurrentHealth) playerControlls.OwnInfo.playersCurrentHealth = playerControlls.OwnInfo.playersMaxHealth;
+            Debug.Log("Health Despues: " + playerControlls.OwnInfo.playersCurrentHealth);
+        }
     }
     /**
      * ################################ SHIELD-STEALTH BULLET FUNCTIONS ################################ 
@@ -358,7 +367,14 @@ public class PowerBullets : NetworkBehaviour
     private void ShieldStealthBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# SHIELD-STEALTH BULLET #################################");
-        playerControlls.OwnInfo.playersCurrentShield += playerWeapon.CurrentConfiguration.CurrentDamageWeapon * powerBulletData.currentInvestmentValue;
+        EnemyBehaviour eb = hit.transform.gameObject.GetComponent<EnemyBehaviour>();
+        if (eb != null)
+        {
+            Debug.Log("Shield Antes: " + playerControlls.OwnInfo.playersCurrentShield);
+            playerControlls.OwnInfo.playersCurrentShield += playerWeapon.CurrentConfiguration.CurrentDamageWeapon * powerBulletData.currentInvestmentValue;
+            if (playerControlls.OwnInfo.playersMaxShield < playerControlls.OwnInfo.playersCurrentShield) playerControlls.OwnInfo.playersCurrentShield = playerControlls.OwnInfo.playersMaxShield;
+            Debug.Log("Shield Despues: " + playerControlls.OwnInfo.playersCurrentShield);
+        }
     }
     /**
     * ################################ EXPLOSIVE BULLET FUNCTIONS ################################
@@ -374,7 +390,7 @@ public class PowerBullets : NetworkBehaviour
     private void ExplosiveBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# EXPLOSIVE BULLET #################################");
-        float rand = Random.Range(0, 1);
+        float rand = Random.Range(0f, 1f);
         if (rand <= powerBulletData.currentInvestmentValue)
         {
             if (!Exploting)
@@ -417,7 +433,7 @@ public class PowerBullets : NetworkBehaviour
     private void CriticalBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# CRITICAL BULLET #################################");
-        float rand = Random.Range(0, 1);
+        float rand = Random.Range(0f, 1f);
         if (rand <= powerBulletData.currentInvestmentValue)
         {
             EnemyBehaviour eb = hit.transform.gameObject.GetComponent<EnemyBehaviour>();
@@ -433,7 +449,7 @@ public class PowerBullets : NetworkBehaviour
     private void TerrifierBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# TERRIFIER BULLET #################################");
-        float rand = Random.Range(0, 1);
+        float rand = Random.Range(0f, 1f);
         if (rand <= powerBulletData.currentInvestmentValue)
         {
             EnemyBehaviour eb = hit.transform.gameObject.GetComponent<EnemyBehaviour>();
@@ -449,7 +465,7 @@ public class PowerBullets : NetworkBehaviour
     private void TimeSlowBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# TIMESLOW BULLET #################################");
-        float rand = Random.Range(0, 1);
+        float rand = Random.Range(0f, 1f);
         if (rand <= powerBulletData.currentInvestmentValue)
         {
             EnemyBehaviour eb = hit.transform.gameObject.GetComponent<EnemyBehaviour>();
@@ -466,7 +482,7 @@ public class PowerBullets : NetworkBehaviour
     private void CrazyBullet(RaycastHit hit, PowerBulletSO powerBulletData)
     {
         Debug.Log("################################# CRAZYFIER BULLET #################################");
-        float rand = Random.Range(0, 1);
+        float rand = Random.Range(0f, 1f);
         if (rand <= powerBulletData.currentInvestmentValue)
         {
             EnemyBehaviour eb = hit.transform.gameObject.GetComponent<EnemyBehaviour>();
@@ -564,9 +580,9 @@ public class PowerBullets : NetworkBehaviour
     {
         float a = enemyBehaviour.CooldownAttack;
         float b = enemyBehaviour.velocity;
-        enemyBehaviour.CooldownAttack += enemyBehaviour.CooldownAttack * 0.25f;
-        enemyBehaviour.velocity += enemyBehaviour.velocity * 0.25f;
-        yield return new WaitForSeconds(10f);
+        enemyBehaviour.CooldownAttack -= enemyBehaviour.CooldownAttack * 0.25f;
+        enemyBehaviour.velocity -= enemyBehaviour.velocity * 0.25f;
+        yield return new WaitForSeconds(15f);
         enemyBehaviour.CooldownAttack += a * 0.25f;
         enemyBehaviour.velocity += b * 0.25f;
         timeSlow = false;

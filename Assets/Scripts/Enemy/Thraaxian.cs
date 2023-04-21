@@ -280,4 +280,44 @@ public class Thraaxian : EnemyBehaviour
                 break;
         }
     }
+
+    protected override void InitStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void InitStateTerrified()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStateTerrified()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStateTerrified()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStateTerrified()
+    {
+        throw new System.NotImplementedException();
+    }
 }

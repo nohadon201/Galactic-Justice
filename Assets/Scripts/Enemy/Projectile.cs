@@ -18,8 +18,13 @@ public class Projectile : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if(other.transform.tag == "Player") {
-            PlayerControlls pc = other.gameObject.GetComponent<PlayerControlls>();
-            if(pc!=null) pc.Damage(this.damage);
+            Debug.Log("aaaa");
+            PlayerControlls pc = other.transform.GetComponentInParent<PlayerControlls>();
+            if (pc != null) 
+            {
+                Debug.Log("aaaa2");
+                pc.Damage(this.damage); 
+            }
             this.gameObject.SetActive(false);
         }
         else

@@ -1,10 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerWeapon : NetworkBehaviour
 {
@@ -33,7 +30,7 @@ public class PlayerWeapon : NetworkBehaviour
     private void Start()
     {
         powerBullets = GetComponent<PowerBullets>();
-        if(IsServer && IsOwner)
+        if (IsServer && IsOwner)
             WeaponConfigurations = Resources.LoadAll<SlotOfMemory>("Player/Host/SlotOfMemory").ToList();
         else
             WeaponConfigurations = Resources.LoadAll<SlotOfMemory>("Player/Client/SlotOfMemory").ToList();
@@ -70,10 +67,9 @@ public class PlayerWeapon : NetworkBehaviour
             return CurrentConfiguration.CurrentAmmunition - (CurrentConfiguration.CurrentWasteOfAmmunitionPerBullet * 8) >= 0;
         }
     }
-
     public void RegenerateAmmunition(float RegenerationValue)
     {
-        Debug.Log("Regenerating: " + CurrentConfiguration.CurrentAmmunition);
+        //Debug.Log("Regenerating: " + CurrentConfiguration.CurrentAmmunition);
         CurrentConfiguration.CurrentAmmunition += RegenerationValue;
     }
     public bool AmmunitionEmpty()
@@ -87,73 +83,35 @@ public class PlayerWeapon : NetworkBehaviour
             this.Shooting = false;
         }
     }
-
     public void CalculateAccuracy()
     {
         if (CurrentConfiguration.Accuracy == 1)
         {
-            if (IsClient)
-            {
-                RayCastToServerRpc(transform.position, camera.gameObject.transform.forward, false);
-            }
-            else
-            {
-                RayCastTo(transform.position, camera.transform.forward, false);
-            }
-
+            RayCastToServerRpc(transform.position, camera.transform.forward, false);
         }
         else
         {
             for (int a = 0; a < CurrentConfiguration.CurrentDispersion.Length; a++)
             {
-                if (IsClient)
-                {
-                    RayCastToServerRpc(transform.position, CurrentConfiguration.CurrentDispersion[a] + camera.transform.forward, false);
-                }
-                else
-                {
-                    RayCastTo(transform.position, CurrentConfiguration.CurrentDispersion[a] + camera.transform.forward, false);
-                }
+                Vector3 shootDirection = camera.transform.forward
+                                        + camera.transform.right * CurrentConfiguration.CurrentDispersion[a].x
+                                        + camera.transform.up * CurrentConfiguration.CurrentDispersion[a].y;
+                RayCastToServerRpc(transform.position, shootDirection.normalized, false);
             }
-
         }
     }
-
-
-    public void RayCastTo(Vector3 origin, Vector3 v, bool byPowerBullet)
-    {
-        if (!byPowerBullet)
-            CurrentConfiguration.CurrentAmmunition -= CurrentConfiguration.CurrentWasteOfAmmunitionPerBullet;
-        
-        RaycastHit hit;
-        
-        if (Physics.Raycast(origin, v, out hit, CurrentConfiguration.MaxRange * CurrentConfiguration.Power))
-        {
-            powerBullets.execute(hit, byPowerBullet);
-            Debug.DrawLine(origin, hit.point, Color.red, 3f);
-            if (hit.transform.tag.Contains("Physics"))
-            {
-                hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * CurrentConfiguration.CurrentForce, hit.point);
-            }
-            else if (hit.transform.tag.Contains("Enemy"))
-            {
-                hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * CurrentConfiguration.CurrentForce * 10, hit.point);
-            }
-
-        }
-    }
-
     [ServerRpc]
     public void RayCastToServerRpc(Vector3 origin, Vector3 v, bool byPowerBullet)
     {
         if (!byPowerBullet)
+        {
             RestAmmunitionClientRpc();
-        
+        }
+
         RaycastHit hit;
-        
+
         if (Physics.Raycast(origin, v, out hit, CurrentConfiguration.MaxRange * CurrentConfiguration.Power))
         {
-            powerBullets.execute(hit, byPowerBullet);
             Debug.DrawLine(origin, hit.point, Color.red, 3f);
             if (hit.transform.tag.Contains("Physics"))
             {
@@ -162,8 +120,17 @@ public class PlayerWeapon : NetworkBehaviour
             else if (hit.transform.tag.Contains("Enemy"))
             {
                 hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * CurrentConfiguration.CurrentForce * 10, hit.point);
-            }
+                EnemyBehaviour eb = hit.transform.gameObject.GetComponent<EnemyBehaviour>();
+                if (eb != null)
+                {
+                    eb.playerRef = transform;
+                    eb.ChangeState(StateOfEnemy.FOLLOWING);
+                    eb.GetHit(CurrentConfiguration.CurrentDamageWeapon);
 
+                    
+                }
+            }
+            if (!byPowerBullet) powerBullets.execute(hit, byPowerBullet);
         }
     }
     [ClientRpc]

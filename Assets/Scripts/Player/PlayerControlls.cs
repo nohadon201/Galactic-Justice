@@ -162,6 +162,7 @@ public class PlayerControlls : NetworkBehaviour
         }
         else if (context.canceled && !weapon.Regeneration)
         {
+            //      NOTA PARAR CORRUTINA DE DISPARAR
             weapon.Shooting = false;
             RegenerationOfAmmunition = StartCoroutine(RegenerateAmunition());
         }
@@ -372,9 +373,9 @@ public class PlayerControlls : NetworkBehaviour
             OwnInfo.playersCurrentHealth -= damage;
             if(OwnInfo.playersCurrentHealth <= 0)
             {
-                //Player Death
-               
-                this.gameObject.SetActive(false);
+                OwnInfo.playersCurrentHealth = 0;
+                Debug.Log("Muelto");
+                //this.gameObject.SetActive(false);
             }
             RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
         }
@@ -402,7 +403,7 @@ public class PlayerControlls : NetworkBehaviour
     public void RegenerationShieldSum()
     {
         OwnInfo.playersCurrentShield += OwnInfo.RegenerationShieldValue;
-        Debug.Log("ShieldRegenerating: "+OwnInfo.playersCurrentShield);
+        //Debug.Log("ShieldRegenerating: "+OwnInfo.playersCurrentShield);
     }
 
     /**

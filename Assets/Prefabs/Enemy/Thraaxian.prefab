@@ -124,7 +124,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentOfPoints: {fileID: 0}
+  currentState: 0
+  velocity: 0
+  CooldownAttack: 0
+  piercingPoint: {fileID: 1096767088157366171}
   angle: 107
+  playerRef: {fileID: 0}
   targetMask:
     serializedVersion: 2
     m_Bits: 0
