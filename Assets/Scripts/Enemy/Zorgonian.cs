@@ -18,6 +18,7 @@ public class Zorgonian : EnemyBehaviour
         maxHealth = 30;
         currentHealth = maxHealth;
         RangeAttack = 3;
+        CooldownAttack = 3f;
         //  Generic Enemy default values
         SetRandomPostions();
         navmeshIndexPosition = 0;
@@ -75,7 +76,7 @@ public class Zorgonian : EnemyBehaviour
         while (true)
         {
             Attack();
-            yield return new WaitForSeconds(2.5f);
+            yield return new WaitForSeconds(CooldownAttack);
         }
 
     }
@@ -196,5 +197,45 @@ public class Zorgonian : EnemyBehaviour
     protected override void OnPlayerAway()
     {
         forgivePlayer = StartCoroutine(ForgivePlayer());
+    }
+
+    protected override void InitStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void InitStateTerrified()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStateTerrified()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStateTerrified()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStateTerrified()
+    {
+        throw new System.NotImplementedException();
     }
 }

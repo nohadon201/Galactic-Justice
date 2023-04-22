@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-[CreateAssetMenu]
+[CreateAssetMenu(fileName = "Player Information", menuName = "Player/Player Information")]
 public class PlayerInfo : ScriptableObject
 {
     //      Controls Variables

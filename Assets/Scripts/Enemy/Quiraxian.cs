@@ -16,6 +16,7 @@ public class Quiraxian : EnemyBehaviour
         maxHealth = 5;
         currentHealth = maxHealth;
         RangeAttack = 5;
+        CooldownAttack = 1f;
         //  Generic Enemy default values
         SetRandomPostions();
         navmeshIndexPosition = 0;
@@ -77,7 +78,7 @@ public class Quiraxian : EnemyBehaviour
         while (true)
         {
             Shoot(playerRef.transform.position);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(CooldownAttack);
         }
 
     }
@@ -100,35 +101,10 @@ public class Quiraxian : EnemyBehaviour
      * ################################### State Machine ##############################################
      */
     //          PATROL
-    protected override void OnPlayerSeen()
-    {
-        Debug.Log("OnPlayerSeen");
-        switch (currentState)
-        {
-            case StateOfEnemy.PATROL:
-                ChangeState(StateOfEnemy.FOLLOWING);
-                break;
-            case StateOfEnemy.FOLLOWING:
-                if (forgivePlayer != null)
-                {
-                    if (!iker)
-                    {
-                        StopCoroutine(forgivePlayer);
-                        if (PlayerForgive) PlayerForgive = false;
-                    }
-                }
-                break;
-            case StateOfEnemy.ATTACK:
-            default:
-                break;
-        }
-    }
-
     protected override void InitStatePatrol()
     {
         if (findPlayer != null)
         {
-            Debug.Log("NO ENTRA POR QUE SOY UN DESGRACIADO QUE NO SABE PROGRAMAR");
             StopCoroutine(findPlayer);
         }
         CalculatePath(randomPositions[indexCurrentPointAlert]);
@@ -158,6 +134,7 @@ public class Quiraxian : EnemyBehaviour
 
     protected override void InitStateFollowing()
     {
+        Debug.Log("EMPIEZO LA CORRUTINA");
         findPlayer = StartCoroutine(FindPlayer());
 
     }
@@ -178,7 +155,7 @@ public class Quiraxian : EnemyBehaviour
 
     protected override void ExitStateFollowing()
     {
-
+        StopCoroutine(findPlayer);
     }
 
     //          ATTACK
@@ -190,7 +167,6 @@ public class Quiraxian : EnemyBehaviour
         if (forgivePlayer != null)
         {
             StopCoroutine(forgivePlayer);
-            print("iker rencoroso");
         }
 
     }
@@ -211,29 +187,51 @@ public class Quiraxian : EnemyBehaviour
 
     protected override void ExitStateAttack()
     {
-        Debug.Log("QUIRAXIAN ATTACKSTOP");
         StopCoroutine(attack);
     }
-
+    //      COROUTINES
     protected override IEnumerator FindPlayer()
     {
         while (true)
         {
+            print("find player");
             if(currentState!= StateOfEnemy.PATROL) CalculatePath(playerRef.position);
             yield return new WaitForSeconds(1);
         }
     }
     protected override IEnumerator ForgivePlayer()
     {
-        Debug.Log("ENTRA FORGIVE");
         PlayerForgive = true;
         iker = true;
         yield return new WaitForSeconds(0.2f);
         iker = false;
         yield return new WaitForSeconds(3);
         ChangeState(StateOfEnemy.PATROL);
-        Debug.Log("SALE FORGIVE");
         PlayerForgive = false;
+    }
+    //      OnPlayerVision Functions
+    protected override void OnPlayerSeen()
+    {
+        Debug.Log("OnPlayerSeen");
+        switch (currentState)
+        {
+            case StateOfEnemy.PATROL:
+                ChangeState(StateOfEnemy.FOLLOWING);
+                break;
+            case StateOfEnemy.FOLLOWING:
+                if (forgivePlayer != null)
+                {
+                    if (!iker)
+                    {
+                        StopCoroutine(forgivePlayer);
+                        if (PlayerForgive) PlayerForgive = false;
+                    }
+                }
+                break;
+            case StateOfEnemy.ATTACK:
+            default:
+                break;
+        }
     }
 
     protected override void OnPlayerAway()
@@ -242,10 +240,8 @@ public class Quiraxian : EnemyBehaviour
         switch (currentState)
         {
             case StateOfEnemy.PATROL:
-                Debug.Log("PATROL ONPLAYER AWAY");
                 break;
             case StateOfEnemy.ATTACK:
-                Debug.Log("ATTACK ONPLAYER AWAY");
                 if (!PlayerForgive)
                 {
                     forgivePlayer = StartCoroutine(ForgivePlayer());
@@ -253,7 +249,6 @@ public class Quiraxian : EnemyBehaviour
                 ChangeState(StateOfEnemy.FOLLOWING);
                 break;
             case StateOfEnemy.FOLLOWING:
-                Debug.Log("FOLLOWING ON PLAYER AWAY");
                 if (!PlayerForgive)
                 {
                     forgivePlayer = StartCoroutine(ForgivePlayer());
@@ -263,5 +258,51 @@ public class Quiraxian : EnemyBehaviour
                 break;
         }
     }
+    //      OTHER STATES
+    protected override void InitStateCrazy()
+    {
+        
+    }
 
+    protected override void UpdateStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void InitStateTerrified()
+    {
+        if (findPlayer != null)
+        {
+            Debug.Log(" PARO LA CORRUTINA");
+            StopCoroutine(findPlayer);
+        }
+        RunAwayPlayer = StartCoroutine(RunAwayFromPlayer());
+    }
+
+    protected override void UpdateStateTerrified()
+    {
+        
+    }
+
+    protected override void FixedUpdateStateTerrified()
+    {
+        setTheVelocity();
+    }
+
+    protected override void ExitStateTerrified()
+    {
+        StopCoroutine(RunAwayPlayer);   
+    }
+
+   
 }

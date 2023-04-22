@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.InputSystem;
-[CreateAssetMenu]
+[CreateAssetMenu(fileName = "Slot", menuName = "Player/Slot of Memory")]
 public class SlotOfMemory : ScriptableObject
 {
     //      WEAPON CONFIGURATION

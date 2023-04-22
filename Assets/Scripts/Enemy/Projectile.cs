@@ -17,11 +17,15 @@ public class Projectile : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        //Debug.Log("aaaa");
         if(other.transform.tag == "Player") {
-            //other.gameObject.GetComponent<PlayerControlls>().Damage(this.damage);
+            Debug.Log("aaaa");
+            PlayerControlls pc = other.transform.GetComponentInParent<PlayerControlls>();
+            if (pc != null) 
+            {
+                Debug.Log("aaaa2");
+                pc.Damage(this.damage); 
+            }
             this.gameObject.SetActive(false);
-            //Debug.Log("eeeee");
         }
         else
         {

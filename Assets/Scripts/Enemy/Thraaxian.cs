@@ -23,6 +23,7 @@ public class Thraaxian : EnemyBehaviour
         maxHealth = 5;
         currentHealth = maxHealth;
         RangeAttack = 12;
+        CooldownAttack = 2f;
         //  Generic Enemy default values
         SetRandomPostions();
         navmeshIndexPosition = 0;
@@ -88,7 +89,7 @@ public class Thraaxian : EnemyBehaviour
         while (true)
         {
             Shoot(playerRef.transform.position);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(CooldownAttack);
         }
 
     }
@@ -278,5 +279,45 @@ public class Thraaxian : EnemyBehaviour
             default:
                 break;
         }
+    }
+
+    protected override void InitStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStateCrazy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void InitStateTerrified()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateStateTerrified()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void FixedUpdateStateTerrified()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void ExitStateTerrified()
+    {
+        throw new System.NotImplementedException();
     }
 }
