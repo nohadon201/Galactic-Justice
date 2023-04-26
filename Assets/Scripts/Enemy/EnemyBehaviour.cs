@@ -1,20 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UIElements;
 
-public abstract class EnemyBehaviour : MonoBehaviour
+public abstract class EnemyBehaviour : NetworkBehaviour
 {
     //      StateMachine and Basic Stats
-    public GameObject parentOfPoints;
     protected float damagePerImpact;
     protected float maxHealth;
     protected float currentHealth;
     [SerializeField]
     protected StateOfEnemy currentState;
-    protected List<Vector3> randomPositions = new List<Vector3>();
+    public List<Vector3> randomPositions = new List<Vector3>();
     protected float RangeAttack;
     public float velocity;
     protected bool PlayerForgive;
@@ -43,33 +42,39 @@ public abstract class EnemyBehaviour : MonoBehaviour
     protected LayerMask obstructionMask;
     private Coroutine checkPlayerCoroutine;
     protected Coroutine attack, findPlayer, forgivePlayer, RunAwayPlayer;
-    
-    protected void SetRandomPostions()
+    protected virtual void Awake()
+    {
+        if (IsServer)
+        {
+            GetComponent<NetworkObject>().Spawn();
+        }
+          
+    }
+    protected void SetLayers()
     {
         
-         targetMask |= (1 << LayerMask.NameToLayer("Target"));
-        
+        targetMask |= (1 << LayerMask.NameToLayer("Target"));
         
         obstructionMask |= (1 << LayerMask.NameToLayer("Target"));
         obstructionMask |= (1 << LayerMask.NameToLayer("Obstruction"));
-        
-        for (int a  = 0; a < parentOfPoints.transform.childCount; a++) { 
-            randomPositions.Add(parentOfPoints.transform.GetChild(a).position);
-        }
+
     }
     
     private void Update()
     {
+        if (!IsServer) return;
         UpdateState(currentState);
     }
 
     private void FixedUpdate()
     {
+        if (!IsServer) return;
         FixedUpdateState(currentState);
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!IsServer) return;
         if(other.transform.tag == "Player")
         {
             playerRef = other.transform;
@@ -78,7 +83,8 @@ public abstract class EnemyBehaviour : MonoBehaviour
     }
     private void OnTriggerExit(Collider other)
     {
-        if(other.transform.tag == "Player")
+        if (!IsServer) return;
+        if (other.transform.tag == "Player")
         {
             StopCoroutine(checkPlayerCoroutine);
             OnPlayerAway();
@@ -154,8 +160,14 @@ public abstract class EnemyBehaviour : MonoBehaviour
         currentHealth-= damage; 
         if(currentHealth <= 0)
         {
-            this.gameObject.SetActive(false);    
+            this.gameObject.SetActive(false);
+            DieClientRpc();
         }
+    }
+    [ClientRpc]
+    public void DieClientRpc()
+    {
+        this.gameObject.SetActive(false);
     }
     /**
      * ###################################### State Machine ################################ 

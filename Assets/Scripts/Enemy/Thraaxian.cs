@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,10 +11,12 @@ public class Thraaxian : EnemyBehaviour
     private float AngleAttack;
     private Vector3 PositionAttack;
     private bool iker;
-    void Awake()
+    [SerializeField] private Material materialProjectile;
+    private void Start()
     {
+        if (!IsServer) return;
         //  Thraaxian custom values
-        AngleAttack = Random.Range(0, 360);  
+        AngleAttack = Random.Range(0, 360);
         //  Thraaxian unique values
         filter.agentTypeID = 0;
         filter.areaMask = 7;
@@ -25,14 +28,9 @@ public class Thraaxian : EnemyBehaviour
         RangeAttack = 12;
         CooldownAttack = 2f;
         //  Generic Enemy default values
-        SetRandomPostions();
+        SetLayers();
         navmeshIndexPosition = 0;
         rb = GetComponent<Rigidbody>();
-        
-    }
-
-    private void Start()
-    {
         indexCurrentPointAlert = UnityEngine.Random.Range(0, randomPositions.Count);
         CalculatePath(randomPositions[indexCurrentPointAlert]);
         ChangeState(StateOfEnemy.PATROL);
@@ -44,7 +42,6 @@ public class Thraaxian : EnemyBehaviour
     {
         Vector3 v = (PositionAttack - transform.position);
         return (Mathf.Abs(v.x) <= 1) && (Mathf.Abs(v.z) <= 1 );
-
     }
     private bool CheckIfItsFarAwayPlayer()
     {
@@ -79,7 +76,7 @@ public class Thraaxian : EnemyBehaviour
             this.PositionAttack = playerRef.position + v;
             CalculatePath(playerRef.position + v);
         }
-    } 
+    }
 
     /*
      * ################################### Attack ##############################################
@@ -88,26 +85,18 @@ public class Thraaxian : EnemyBehaviour
     {
         while (true)
         {
-            Shoot(playerRef.transform.position);
+            Shoot(playerRef.transform.position, GeneralPool.Instance.getProjectile());
             yield return new WaitForSeconds(CooldownAttack);
         }
-
     }
-    public void Shoot(Vector3 v)
+    public void Shoot(Vector3 v, GameObject projectile)
     {
-        GameObject pool = GeneralPool.Instance.poolThraaxian;
-        for (int a = 0; a < pool.transform.childCount; a++)
-        {
-            if (!pool.transform.GetChild(a).gameObject.activeSelf)
-            {
-                
-                Vector3 position = transform.position + (transform.forward * 2.5f);
-                Vector3 diff = (v - position).normalized;
-                pool.transform.GetChild(a).gameObject.SetActive(true);
-                pool.transform.GetChild(a).gameObject.GetComponent<Projectile>().ShootBullet(position, diff, 7, damagePerImpact, 20);
-                break;
-            }
-        }
+        Vector3 position = transform.position + (transform.forward * 2.5f);
+        Vector3 diff = (v - position).normalized;
+        projectile.GetComponent<MeshRenderer>().material = materialProjectile;
+        projectile.GetComponent<Light>().color = Color.yellow;
+        projectile.GetComponent<Projectile>().ShootBullet(position, diff, 7, damagePerImpact, 20);
+        projectile.GetComponent<NetworkObject>().Spawn();
     }
     /*
      * ################################### State Machine ##############################################

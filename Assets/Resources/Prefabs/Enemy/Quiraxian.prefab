@@ -40,6 +40,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4492744700409155325}
+  - component: {fileID: 4453270497843646058}
+  - component: {fileID: 3631177442524898075}
   - component: {fileID: 4492744700409155324}
   - component: {fileID: 4492744700409155314}
   - component: {fileID: 4492744700409155315}
@@ -68,6 +70,48 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4453270497843646058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4492744700409155320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
+--- !u!114 &3631177442524898075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4492744700409155320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!54 &4492744700409155324
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -96,8 +140,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9c33befcbab9f34fb5b7ddd6c3225c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parentOfPoints: {fileID: 0}
   currentState: 0
+  randomPositions: []
   velocity: 0
   CooldownAttack: 0
   piercingPoint: {fileID: 2200499236967492705}
@@ -109,6 +153,8 @@ MonoBehaviour:
   obstructionMask:
     serializedVersion: 2
     m_Bits: 0
+  materialProjectile: {fileID: 2100000, guid: 15e28f80850d12d4e859c4d599deddf9, type: 2}
+  ColorProjectile: {r: 0.47636747, g: 0, b: 1, a: 0}
 --- !u!136 &4492744700409155315
 CapsuleCollider:
   m_ObjectHideFlags: 0

@@ -9,6 +9,8 @@ public class Zorgonian : EnemyBehaviour
 {
     void Awake()
     {
+        if (!IsServer) return;
+        base.Awake();
         //  Pyrognathian unique values
         filter.agentTypeID = 0;
         filter.areaMask = 7;
@@ -20,13 +22,14 @@ public class Zorgonian : EnemyBehaviour
         RangeAttack = 3;
         CooldownAttack = 3f;
         //  Generic Enemy default values
-        SetRandomPostions();
+        SetLayers();
         navmeshIndexPosition = 0;
         rb = GetComponent<Rigidbody>();
     }
 
     private void Start()
     {
+        if (!IsServer) return;
         indexCurrentPointAlert = Random.Range(0, randomPositions.Count);
         CalculatePath(randomPositions[indexCurrentPointAlert]);
         ChangeState(StateOfEnemy.PATROL);

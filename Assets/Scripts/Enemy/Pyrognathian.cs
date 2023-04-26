@@ -11,6 +11,8 @@ public class Pyrognathian : EnemyBehaviour
     private GameObject Arm2;
     void Awake()
     {
+        if (!IsServer) return;
+        base.Awake();
         //  Pyrognathian unique values
         GetComponent<NavMeshAgent>().speed= 10.0f;
         damagePerImpact = 20f;
@@ -20,11 +22,12 @@ public class Pyrognathian : EnemyBehaviour
         Arm1 = transform.GetChild(0).transform.GetChild(0).gameObject;
         Arm2 = transform.GetChild(0).transform.GetChild(1).gameObject;
         //  Generic Enemy default values
-        SetRandomPostions();
+        SetLayers();
         currentState = StateOfEnemy.PATROL;
     }
     private void Start()
     {
+        if (!IsServer) return;
         indexCurrentPointAlert = Random.Range(0, randomPositions.Count);
     }
 

@@ -29,7 +29,7 @@ public class UserSession : NetworkBehaviour
     [ServerRpc]
     public void SpawnPlayerServerRpc(ulong OwnerClientId)
     {
-        GameObject go = Instantiate(Resources.Load<GameObject>("Prefabs/Player"));
+        GameObject go = Instantiate(Resources.Load<GameObject>("Prefabs/Player/Player"));
         go.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId, true);
     } 
     void Update()

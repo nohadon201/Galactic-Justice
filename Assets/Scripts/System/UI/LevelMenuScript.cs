@@ -100,6 +100,13 @@ public class LevelMenuScript : MonoBehaviour
 
     public void LoadLevel1()
     {
-        NetworkManager.Singleton.SceneManager.LoadScene("Test", LoadSceneMode.Single);
+        NetworkManager.Singleton.SceneManager.LoadScene("Test2", LoadSceneMode.Single);
+    }
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape)) {
+            NetworkManager.Singleton.Shutdown();
+            SceneManager.LoadScene("Menu");
+        }
     }
 }

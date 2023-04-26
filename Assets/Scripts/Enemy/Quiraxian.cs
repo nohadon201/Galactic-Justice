@@ -1,13 +1,17 @@
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class Quiraxian : EnemyBehaviour
-{ 
+{
     private bool iker;
-    void Awake()
+    [SerializeField] private Material materialProjectile;
+    [SerializeField] private Color ColorProjectile;
+    private void Start()
     {
-        //  Thraaxian unique values
+        if (!IsServer) return;
+        //  Quiraxian unique values
         filter.agentTypeID = 0;
         filter.areaMask = 7;
         velocity = 10.0f;
@@ -17,16 +21,14 @@ public class Quiraxian : EnemyBehaviour
         currentHealth = maxHealth;
         RangeAttack = 5;
         CooldownAttack = 1f;
-        //  Generic Enemy default values
-        SetRandomPostions();
+        //  Generic Enemy default values+
+        SetLayers();
         navmeshIndexPosition = 0;
         rb = GetComponent<Rigidbody>();
         PlayerForgive = false;
-    }
-
-    private void Start()
-    {
         indexCurrentPointAlert = UnityEngine.Random.Range(0, randomPositions.Count);
+        //Debug.Log(indexCurrentPointAlert);
+        //Debug.Log(randomPositions[indexCurrentPointAlert]);
         CalculatePath(randomPositions[indexCurrentPointAlert]);
         ChangeState(StateOfEnemy.PATROL);
     }
@@ -63,13 +65,7 @@ public class Quiraxian : EnemyBehaviour
         }
         navmeshIndexPosition = 0;
     }
-    /*
-     * ################################### Attack ##############################################
-     */
-    protected virtual void Damage() 
-    {
-        Debug.Log("aaaa me isieron pupa");
-    }
+
     /*
      * ################################### Attack ##############################################
      */
@@ -77,25 +73,18 @@ public class Quiraxian : EnemyBehaviour
     {
         while (true)
         {
-            Shoot(playerRef.transform.position);
+            Shoot(playerRef.transform.position, GeneralPool.Instance.getProjectile());
             yield return new WaitForSeconds(CooldownAttack);
         }
-
     }
-    public void Shoot(Vector3 v)
+    public void Shoot(Vector3 v, GameObject projectile)
     {
-        GameObject pool = GeneralPool.Instance.poolThraaxian;
-        for (int a = 0; a < pool.transform.childCount; a++)
-        {
-            if (!pool.transform.GetChild(a).gameObject.activeSelf)
-            {
-                Vector3 position = transform.position + (transform.forward * 2.5f);
-                Vector3 diff = (v - position).normalized;
-                pool.transform.GetChild(a).gameObject.SetActive(true);
-                pool.transform.GetChild(a).gameObject.GetComponent<Projectile>().ShootBullet(position, diff, 7, damagePerImpact, 20);
-                break;
-            }
-        }
+        Vector3 position = transform.position + (transform.forward * 1f);
+        Vector3 diff = (v - position).normalized;
+        projectile.GetComponent<MeshRenderer>().material = materialProjectile;
+        projectile.GetComponent<Light>().color = ColorProjectile;
+        projectile.GetComponent<Projectile>().ShootBullet(position, diff, 7, damagePerImpact, 20);
+        projectile.GetComponent<NetworkObject>().Spawn();
     }
     /*
      * ################################### State Machine ##############################################
@@ -134,7 +123,6 @@ public class Quiraxian : EnemyBehaviour
 
     protected override void InitStateFollowing()
     {
-        Debug.Log("EMPIEZO LA CORRUTINA");
         findPlayer = StartCoroutine(FindPlayer());
 
     }
@@ -194,8 +182,7 @@ public class Quiraxian : EnemyBehaviour
     {
         while (true)
         {
-            print("find player");
-            if(currentState!= StateOfEnemy.PATROL) CalculatePath(playerRef.position);
+            if (currentState != StateOfEnemy.PATROL) CalculatePath(playerRef.position);
             yield return new WaitForSeconds(1);
         }
     }
@@ -261,7 +248,7 @@ public class Quiraxian : EnemyBehaviour
     //      OTHER STATES
     protected override void InitStateCrazy()
     {
-        
+
     }
 
     protected override void UpdateStateCrazy()
@@ -283,7 +270,6 @@ public class Quiraxian : EnemyBehaviour
     {
         if (findPlayer != null)
         {
-            Debug.Log(" PARO LA CORRUTINA");
             StopCoroutine(findPlayer);
         }
         RunAwayPlayer = StartCoroutine(RunAwayFromPlayer());
@@ -291,7 +277,7 @@ public class Quiraxian : EnemyBehaviour
 
     protected override void UpdateStateTerrified()
     {
-        
+
     }
 
     protected override void FixedUpdateStateTerrified()
@@ -301,8 +287,8 @@ public class Quiraxian : EnemyBehaviour
 
     protected override void ExitStateTerrified()
     {
-        StopCoroutine(RunAwayPlayer);   
+        StopCoroutine(RunAwayPlayer);
     }
 
-   
+
 }
