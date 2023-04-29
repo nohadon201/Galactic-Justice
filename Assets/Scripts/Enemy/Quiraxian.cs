@@ -27,8 +27,6 @@ public class Quiraxian : EnemyBehaviour
         rb = GetComponent<Rigidbody>();
         PlayerForgive = false;
         indexCurrentPointAlert = UnityEngine.Random.Range(0, randomPositions.Count);
-        //Debug.Log(indexCurrentPointAlert);
-        //Debug.Log(randomPositions[indexCurrentPointAlert]);
         CalculatePath(randomPositions[indexCurrentPointAlert]);
         ChangeState(StateOfEnemy.PATROL);
     }
@@ -60,9 +58,7 @@ public class Quiraxian : EnemyBehaviour
     private void CalculatePath(Vector3 position)
     {
         currentPath.ClearCorners();
-        if (!NavMesh.CalculatePath(transform.position, position, filter, currentPath))
-        {
-        }
+        NavMesh.CalculatePath(transform.position, position, filter, currentPath);
         navmeshIndexPosition = 0;
     }
 
@@ -79,7 +75,7 @@ public class Quiraxian : EnemyBehaviour
     }
     public void Shoot(Vector3 v, GameObject projectile)
     {
-        Vector3 position = transform.position + (transform.forward * 1f);
+        Vector3 position = transform.position + (transform.forward * 1.5f);
         Vector3 diff = (v - position).normalized;
         projectile.GetComponent<MeshRenderer>().material = materialProjectile;
         projectile.GetComponent<Light>().color = ColorProjectile;
@@ -106,7 +102,6 @@ public class Quiraxian : EnemyBehaviour
 
     protected override void FixedUpdateStatePatrol()
     {
-        //Debug.Log("FIXED UPDATE PATROL");
         if (KeepGoingPatrolPoint())
         {
             CalculatePath(randomPositions[indexCurrentPointAlert]);
@@ -124,7 +119,6 @@ public class Quiraxian : EnemyBehaviour
     protected override void InitStateFollowing()
     {
         findPlayer = StartCoroutine(FindPlayer());
-
     }
 
     protected override void UpdateStateFollowing()

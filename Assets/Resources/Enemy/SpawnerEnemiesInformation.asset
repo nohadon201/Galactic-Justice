@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   listPositionSpawn:
   - spawnPosition: {x: 31.6, y: 1, z: -7.6}
-    enemyType: 1
+    enemyType: 2
   randomPositions:
   - {x: 31.6, y: 1, z: -23.9}
   - {x: -26.51, y: 1, z: -23.9}

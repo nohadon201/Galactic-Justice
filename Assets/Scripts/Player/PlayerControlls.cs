@@ -90,8 +90,15 @@ public class PlayerControlls : NetworkBehaviour
             oldCamera.enabled = false;
         
         
-        weapon.camera = Camera.GetComponent<Camera>(); 
+        weapon.camera = Camera.GetComponent<Camera>();
+
+        GameObject Interface = Instantiate(Resources.Load<GameObject>("Prefabs/Player/UI"));
+        UIPlayerControlls InterfaceComponent = Interface.GetComponent<UIPlayerControlls>();
+        Interface.GetComponent<Canvas>().worldCamera = Camera.GetComponent<Camera>();
+        InterfaceComponent.setValues(OwnInfo, weapon);
+        Debug.Log("AAA");
     }
+
     private void FixedUpdate()
     {
         if(!IsOwner) return;
@@ -135,6 +142,9 @@ public class PlayerControlls : NetworkBehaviour
     {
         base.OnNetworkSpawn();
         DefaultValues();
+        if (!IsOwner) {
+            transform.GetChild(2).gameObject.SetActive(false);
+        }
     }
     /**
      * ############################ SHOOTING ########################################### 

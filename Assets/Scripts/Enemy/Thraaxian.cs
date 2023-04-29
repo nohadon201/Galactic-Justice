@@ -132,7 +132,6 @@ public class Thraaxian : EnemyBehaviour
         Debug.Log("Patrol"); 
         if (findPlayer != null)
         {
-            Debug.Log("NO ENTRA POR QUE SOY UN DESGRACIADO QUE NO SABE PROGRAMAR");
             StopCoroutine(findPlayer);
         }
         CalculatePath(randomPositions[indexCurrentPointAlert]); 
@@ -145,7 +144,6 @@ public class Thraaxian : EnemyBehaviour
 
     protected override void FixedUpdateStatePatrol()
     {
-        Debug.Log("FIXED UPDATE PATROL");
         if (KeepGoingPatrolPoint())
         {
             CalculatePath(randomPositions[indexCurrentPointAlert]);
@@ -191,13 +189,11 @@ public class Thraaxian : EnemyBehaviour
 
     protected override void InitStateAttack()
     {
-        Debug.Log("Attack");
         rb.velocity = new Vector3(0, rb.velocity.y, 0);
         attack = StartCoroutine(AttackingCoroutine());
         if (forgivePlayer != null)
         {
             StopCoroutine(forgivePlayer);
-            print("iker rencoroso");
         }
 
     }
@@ -218,7 +214,6 @@ public class Thraaxian : EnemyBehaviour
 
     protected override void ExitStateAttack()
     {
-        Debug.Log("QUIRAXIAN ATTACKSTOP");
         StopCoroutine(attack);
     }
 
@@ -226,7 +221,7 @@ public class Thraaxian : EnemyBehaviour
     {
         while (true)
         {
-            CalculatePositionAroundPlayer();
+            if (currentState != StateOfEnemy.PATROL) CalculatePositionAroundPlayer();
             yield return new WaitForSeconds(1);
         }
     }
@@ -236,9 +231,7 @@ public class Thraaxian : EnemyBehaviour
         iker = true;
         yield return new WaitForSeconds(0.2f);
         iker = false;
-        Debug.Log("forgivestatrt");
         yield return new WaitForSeconds(3);
-        Debug.Log("forgiveend");
         ChangeState(StateOfEnemy.PATROL);
         PlayerForgive = false;
     }
@@ -250,7 +243,6 @@ public class Thraaxian : EnemyBehaviour
             case StateOfEnemy.PATROL:
                 break;
             case StateOfEnemy.ATTACK:
-                Debug.Log("ATTACK ONPLAYER AWAY");
                 Debug.Log(PlayerForgive);
                 if (!PlayerForgive)
                 {
@@ -259,7 +251,6 @@ public class Thraaxian : EnemyBehaviour
                 ChangeState(StateOfEnemy.FOLLOWING);
                 break;
             case StateOfEnemy.FOLLOWING:
-                Debug.Log("FOLLOWING ON PLAYER AWAY");
                 if (!PlayerForgive)
                 {
                     forgivePlayer = StartCoroutine(ForgivePlayer());
@@ -292,21 +283,25 @@ public class Thraaxian : EnemyBehaviour
 
     protected override void InitStateTerrified()
     {
-        throw new System.NotImplementedException();
+        if (findPlayer != null)
+        {
+            StopCoroutine(findPlayer);
+        }
+        RunAwayPlayer = StartCoroutine(RunAwayFromPlayer());
     }
 
     protected override void UpdateStateTerrified()
     {
-        throw new System.NotImplementedException();
+
     }
 
     protected override void FixedUpdateStateTerrified()
     {
-        throw new System.NotImplementedException();
+        setTheVelocity();
     }
 
     protected override void ExitStateTerrified()
     {
-        throw new System.NotImplementedException();
+        StopCoroutine(RunAwayPlayer);
     }
 }

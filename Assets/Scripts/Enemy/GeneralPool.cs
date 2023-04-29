@@ -31,7 +31,6 @@ public class GeneralPool : NetworkBehaviour
         for (int a = 0; a < poolSize; a++)
         {
             GameObject go = Instantiate(projectilePrefab, transform);
-            //go.GetComponent<NetworkObject>().Spawn();
             go.SetActive(false);
         }
     }

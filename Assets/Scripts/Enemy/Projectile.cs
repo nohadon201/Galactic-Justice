@@ -8,8 +8,6 @@ public class Projectile : NetworkBehaviour
     private Vector3 enemy;
     private float range;
     private float damage;
-    private MeshRenderer meshRenderer;
-    private Light Light;
     public void ShootBullet(Vector3 enemy, Vector3 directionOfPlayer, float velocity, float damage, float range)
     {
         this.range = range; 
@@ -56,23 +54,4 @@ public class Projectile : NetworkBehaviour
 
         GeneralPool.Instance.returnProjectile(gameObject);
     }
-    /*
-    [ClientRpc]
-    public void SetTrueRendClientRpc(Color c)
-    {
-        if (IsServer) return;
-        Debug.Log("ENTRA HOST TAMBIEN");
-        meshRenderer.material.color = c;
-        Light.color = c;
-        meshRenderer.enabled = true;
-        Light.enabled = true;
-    }
-    [ClientRpc]
-    public void SetFalseRendClientRpc()
-    {
-        if (IsServer) return;
-        meshRenderer.enabled = false;
-        Light.enabled = false;
-    }
-    */
 }
