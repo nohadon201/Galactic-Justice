@@ -25,15 +25,21 @@ public class PlayerWeapon : NetworkBehaviour
     public List<SlotOfMemory> WeaponConfigurations;
 
     public int IndexCurrentConfiguration;
+    [SerializeField]
+    private LayerMask obstructionMask;
 
     //      Functions that executes only at Start
     private void Start()
     {
+        obstructionMask |= (1 << LayerMask.NameToLayer("Enemy"));
+        obstructionMask |= (1 << LayerMask.NameToLayer("Obstruction"));
+
         powerBullets = GetComponent<PowerBullets>();
         if (IsServer && IsOwner)
             WeaponConfigurations = Resources.LoadAll<SlotOfMemory>("Player/Host/SlotOfMemory").ToList();
-        else
+        else if (IsOwner) {
             WeaponConfigurations = Resources.LoadAll<SlotOfMemory>("Player/Client/SlotOfMemory").ToList();
+        }
         IndexCurrentConfiguration = 0;
         CurrentConfiguration = WeaponConfigurations[IndexCurrentConfiguration];
         for (int i = 0; i < WeaponConfigurations.Count; i++)
@@ -47,6 +53,11 @@ public class PlayerWeapon : NetworkBehaviour
 
         }
         Shooting = false;
+        if (!IsOwner) return;
+        GameObject Interface = Instantiate(Resources.Load<GameObject>("Prefabs/Player/UI"));
+        UIPlayerControlls InterfaceComponent = Interface.GetComponent<UIPlayerControlls>();
+        Interface.GetComponent<Canvas>().worldCamera = GetComponent<PlayerControlls>().Camera.GetComponent<Camera>();
+        InterfaceComponent.setValues(this.gameObject);
     }
     public void Shoot()
     {
@@ -110,7 +121,7 @@ public class PlayerWeapon : NetworkBehaviour
 
         RaycastHit hit;
 
-        if (Physics.Raycast(origin, v, out hit, CurrentConfiguration.MaxRange * CurrentConfiguration.Power))
+        if (Physics.Raycast(origin, v, out hit, CurrentConfiguration.MaxRange * CurrentConfiguration.Power, obstructionMask))
         {
             Debug.DrawLine(origin, hit.point, Color.red, 3f);
             if (hit.transform.tag.Contains("Physics"))
@@ -126,8 +137,6 @@ public class PlayerWeapon : NetworkBehaviour
                     eb.playerRef = transform;
                     eb.ChangeState(StateOfEnemy.FOLLOWING);
                     eb.GetHit(CurrentConfiguration.CurrentDamageWeapon);
-
-                    
                 }
             }
             if (!byPowerBullet) powerBullets.execute(hit, byPowerBullet);

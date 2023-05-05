@@ -61,7 +61,7 @@ public class SlotOfMemory : ScriptableObject
 
     public void defaultValues()
     {
-        MaxRange = MaxRange == 0 ? 20 : MaxRange;
+        MaxRange = MaxRange == 0 ? 50 : MaxRange;
         MaxForce = MaxForce == 0 ? 200 : MaxForce;
         Power = Power == 0 ? 1f : Power;
         Accuracy = Accuracy == 0 ? 1f : Accuracy;

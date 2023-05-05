@@ -168,7 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cbc0ed6f1fcae548932bf61fc2dbdfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lvl: 0
+  lvl: 1
   missions: []
   playerControlls: {fileID: 0}
 --- !u!114 &514472081
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fef9030d33e8f24194d1c6456d63776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lvl: 0
+  lvl: 1
   missions: []
   playerControlls: {fileID: 0}
 --- !u!1 &787023742

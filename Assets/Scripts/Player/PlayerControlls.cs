@@ -4,14 +4,22 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
+using UnityEngine.SceneManagement;
 
 public class PlayerControlls : NetworkBehaviour
 {
     //####################### Events and delegators ########################## 
+    public delegate void DisplayInterface();
+    public DisplayInterface displayInterfaceDelegator;
+
+    public delegate void ChangeSlot();
+    public DisplayInterface changeSlotDelegator;
+
+    public delegate void GoToNextInterface(bool b);
+    public GoToNextInterface goToNextInterfaceDelegator;
 
     [Header("Configs")]
-    
+
     [SerializeField] private float Sensibility;
 
     private GameObject CameraTarget;
@@ -22,14 +30,15 @@ public class PlayerControlls : NetworkBehaviour
 
     private float cameraRotation;
 
-    private float dashForce,dashingTime,dashCooldown;
+    private float dashForce, dashingTime, dashCooldown;
 
     private PlayerWeapon weapon;
+    private PowerBullets powerBullets;
 
-    private Coroutine RegenerationOfAmmunition,RegenerationShieldCoroutine;
+    private Coroutine RegenerationOfAmmunition, RegenerationShieldCoroutine;
 
-    private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield;
-    
+    private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield, Interface;
+
     [SerializeField] public PlayerInfo OwnInfo;
 
     public delegate void EndLevel();
@@ -40,80 +49,90 @@ public class PlayerControlls : NetworkBehaviour
 
     void Awake()
     {
-        DefaultValues();
+        //DefaultValues();
     }
     public void DefaultValues()
     {
+        Interface = false;
         Jump1 = false;
         Jump2 = false;
         CanDash = true;
         Dashing = false;
         RegenerationShield = false;
-        
+
         dashForce = 24f;
         dashCooldown = 1f;
         dashingTime = 0.3f;
-        
+
         rb = GetComponent<Rigidbody>();
         weapon = GetComponent<PlayerWeapon>();
-        
-        if((!IsServer && IsOwner) || (IsServer && !IsOwner)) 
+        powerBullets = GetComponent<PowerBullets>();
+
+        if ((!IsServer && IsOwner) || (IsServer && !IsOwner))
             OwnInfo = Resources.Load<PlayerInfo>("Player/Client/ClientPlayerInformation");
-        else 
+        else
             OwnInfo = Resources.Load<PlayerInfo>("Player/Host/HostPlayerInformation");
-        
+
         OwnInfo.DefaultValues();
-        
-        foreach(Skills sk in OwnInfo.abilities)
+
+        foreach (Skills sk in OwnInfo.abilities)
         {
             sk.initValues();
         }
-        
+
         if (CameraTarget == null)
             CameraTarget = transform.GetChild(0).gameObject;
-        
+
 
         if (!IsOwner) return;
-        
-        Camera oldCamera = FindObjectOfType<Camera>();  
+
+        Camera oldCamera = FindObjectOfType<Camera>();
         oldCamera.gameObject.GetComponent<AudioListener>().enabled = false;
-        
+
         Camera = Instantiate(Resources.Load<GameObject>("Player/MainCamera"));
-        
+
         GameObject a = Resources.Load<GameObject>("Player/CameraCinemachine");
-        
+
         a.GetComponent<CinemachineVirtualCamera>().Follow = CameraTarget.transform;
-        
+
         VirtualCamera = Instantiate(a);
-        
-        if(oldCamera != null && oldCamera.enabled) 
+
+        if (oldCamera != null && oldCamera.enabled)
             oldCamera.enabled = false;
-        
-        
+
+
         weapon.camera = Camera.GetComponent<Camera>();
 
-        GameObject Interface = Instantiate(Resources.Load<GameObject>("Prefabs/Player/UI"));
-        UIPlayerControlls InterfaceComponent = Interface.GetComponent<UIPlayerControlls>();
-        Interface.GetComponent<Canvas>().worldCamera = Camera.GetComponent<Camera>();
-        InterfaceComponent.setValues(OwnInfo, weapon);
-        Debug.Log("AAA");
+
     }
 
     private void FixedUpdate()
     {
-        if(!IsOwner) return;
-        
+        if (!IsOwner) return;
+
         if (Dashing)
             rb.velocity = transform.forward * dashForce;
     }
+    public bool Fall()
+    {
+        return transform.position.y < -15;
+    }
     void LateUpdate()
     {
-        if(!IsOwner) return;
-        if(Input.GetKeyDown(KeyCode.Alpha1)) 
+        if (!IsOwner) return;
+        if (Fall())
+        {
+            if (SceneManager.GetActiveScene().name != "Lvl1")
+                OnPlayerDeath();
+            else
+                transform.position = new Vector3(0, 0, 0);
+            
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             ActivateSkill(0);
         }
-        else if(Input.GetKeyDown(KeyCode.Alpha2))
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             ActivateSkill(1);
         }
@@ -124,11 +143,12 @@ public class PlayerControlls : NetworkBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             ActivateSkill(3);
-        }else if (Input.GetKeyDown(KeyCode.P))
+        }
+        else if (Input.GetKeyDown(KeyCode.P))
         {
             EndLevelDelegator?.Invoke();
         }
-        
+
         // Velocity of the player
         PlayerMovement();
 
@@ -142,8 +162,21 @@ public class PlayerControlls : NetworkBehaviour
     {
         base.OnNetworkSpawn();
         DefaultValues();
-        if (!IsOwner) {
-            transform.GetChild(2).gameObject.SetActive(false);
+    }
+    /**
+    * ############################ INTERFACE ########################################### 
+    */
+    public void OnInterfaceDisplayer(InputAction.CallbackContext context)
+    {
+        if(!IsOwner || Dashing) return;
+        if (context.canceled)
+        {
+            displayInterfaceDelegator.Invoke();
+            if (Interface)
+            {
+                powerBullets.LoadPointsPowers();
+            }
+            Interface = Interface ? false : true;
         }
     }
     /**
@@ -151,7 +184,7 @@ public class PlayerControlls : NetworkBehaviour
      */
     public void OnClick(InputAction.CallbackContext context)
     {
-        if (Dashing || !IsOwner) return;
+        if (Dashing || !IsOwner || Interface) return;
 
         if (context.started)
         {
@@ -160,7 +193,7 @@ public class PlayerControlls : NetworkBehaviour
                 if (weapon.Regeneration)
                 {
                     StopCoroutine(RegenerationOfAmmunition);
-                    weapon.Regeneration = false;    
+                    weapon.Regeneration = false;
                 }
                 weapon.Shooting = true;
                 StartCoroutine(ShootFrequency());
@@ -209,7 +242,7 @@ public class PlayerControlls : NetworkBehaviour
 
         cameraRotation = Mathf.Clamp(cameraRotation, -90, 90);
 
-        CameraTarget.transform.eulerAngles = new Vector3(cameraRotation, CameraTarget.transform.eulerAngles.y, CameraTarget.transform.eulerAngles.z);   
+        CameraTarget.transform.eulerAngles = new Vector3(cameraRotation, CameraTarget.transform.eulerAngles.y, CameraTarget.transform.eulerAngles.z);
     }
     public void PlayerMovement()
     {
@@ -251,12 +284,12 @@ public class PlayerControlls : NetworkBehaviour
     }
     public void OnDashing(InputAction.CallbackContext context)
     {
-        if(CanDash || IsOwner)
+        if (CanDash && IsOwner && !Interface)
             StartCoroutine(Dash());
     }
     public void OnCameraRotate(InputAction.CallbackContext context)
     {
-        if (Dashing || !IsOwner) return;
+        if (Dashing || !IsOwner || Interface) return;
         try
         {
             Vector2 v2 = context.ReadValue<Vector2>();
@@ -269,7 +302,7 @@ public class PlayerControlls : NetworkBehaviour
     }
     public void OnPlayerMove(InputAction.CallbackContext context)
     {
-        if (Dashing || !IsOwner) return;
+        if (Dashing || !IsOwner || Interface) return;
         try
         {
             Vector2 v2 = context.ReadValue<Vector2>();
@@ -282,11 +315,11 @@ public class PlayerControlls : NetworkBehaviour
     }
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (Dashing || !IsOwner) return;
-        
+        if (Dashing || !IsOwner || Interface) return;
+
         if (context.performed)
         {
-            if(!Jump1 && !Jump2)
+            if (!Jump1 && !Jump2)
             {
                 Jump1 = true;
                 rb.AddForce(transform.up * 300f);
@@ -296,12 +329,12 @@ public class PlayerControlls : NetworkBehaviour
                 Jump2 = true;
                 rb.AddForce(transform.up * 300f);
             }
-            
+
         }
     }
     public void TouchFloor()
     {
-        Jump1 = false;   
+        Jump1 = false;
         Jump2 = false;
     }
 
@@ -312,42 +345,59 @@ public class PlayerControlls : NetworkBehaviour
     public void OnRightSlot(InputAction.CallbackContext context)
     {
         if (!IsOwner) return;
-        if(context.performed && !weapon.Regeneration)
+        if (!Interface)
         {
-            weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration + 1 == weapon.WeaponConfigurations.Count ? 0 : weapon.IndexCurrentConfiguration + 1;
-            weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
-            weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
-            weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
-        }else if(context.performed && weapon.Regeneration)
-        {
-            StopCoroutine(RegenerationOfAmmunition);
-            weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration + 1 == weapon.WeaponConfigurations.Count ? 0 : weapon.IndexCurrentConfiguration + 1;
-            weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
-            weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
-            weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
-            RegenerationOfAmmunition = StartCoroutine(RegenerateAmunition());
+            changeSlotDelegator?.Invoke();
+            if (context.performed && !weapon.Regeneration)
+            {
+                weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration + 1 == weapon.WeaponConfigurations.Count ? 0 : weapon.IndexCurrentConfiguration + 1;
+                weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
+                weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
+                weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
+            }
+            else if (context.performed && weapon.Regeneration)
+            {
+                StopCoroutine(RegenerationOfAmmunition);
+                weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration + 1 == weapon.WeaponConfigurations.Count ? 0 : weapon.IndexCurrentConfiguration + 1;
+                weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
+                weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
+                weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
+                RegenerationOfAmmunition = StartCoroutine(RegenerateAmunition());
+            }
         }
-
+        else
+        {
+            goToNextInterfaceDelegator?.Invoke(true);
+        }
     }
     public void OnLeftSlot(InputAction.CallbackContext context)
     {
         if (!IsOwner) return;
-        if (context.performed && !weapon.Regeneration)
+        if (!Interface)
         {
-            weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration - 1 < 0 ? weapon.WeaponConfigurations.Count - 1 : weapon.IndexCurrentConfiguration - 1;
-            weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
-            weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
-            weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
+            changeSlotDelegator?.Invoke();
+            if (context.performed && !weapon.Regeneration)
+            {
+                weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration - 1 < 0 ? weapon.WeaponConfigurations.Count - 1 : weapon.IndexCurrentConfiguration - 1;
+                weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
+                weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
+                weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
+            }
+            else if (context.performed && weapon.Regeneration)
+            {
+                StopCoroutine(RegenerationOfAmmunition);
+                weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration - 1 < 0 ? weapon.WeaponConfigurations.Count - 1 : weapon.IndexCurrentConfiguration - 1;
+                weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
+                weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
+                weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
+                RegenerationOfAmmunition = StartCoroutine(RegenerateAmunition());
+            }
         }
-        else if (context.performed && weapon.Regeneration)
+        else
         {
-            StopCoroutine(RegenerationOfAmmunition);
-            weapon.IndexCurrentConfiguration = weapon.IndexCurrentConfiguration - 1 < 0 ? weapon.WeaponConfigurations.Count - 1 : weapon.IndexCurrentConfiguration - 1;
-            weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration].CurrentAmmunition = weapon.CurrentConfiguration.CurrentAmmunition;
-            weapon.CurrentConfiguration = weapon.WeaponConfigurations[weapon.IndexCurrentConfiguration];
-            weapon.CurrentConfiguration.LoadConfigurationOfWeapon();
-            RegenerationOfAmmunition = StartCoroutine(RegenerateAmunition());
+            goToNextInterfaceDelegator?.Invoke(false);
         }
+        
 
     }
 
@@ -371,7 +421,7 @@ public class PlayerControlls : NetworkBehaviour
             {
                 StopCoroutine(RegenerationShieldCoroutine);
             }
-            OwnInfo.playersCurrentShield -= damage; 
+            OwnInfo.playersCurrentShield -= damage;
             RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
         }
         else
@@ -381,7 +431,37 @@ public class PlayerControlls : NetworkBehaviour
                 StopCoroutine(RegenerationShieldCoroutine);
             }
             OwnInfo.playersCurrentHealth -= damage;
-            if(OwnInfo.playersCurrentHealth <= 0)
+            if (OwnInfo.playersCurrentHealth <= 0)
+            {
+                OwnInfo.playersCurrentHealth = 0;
+                Debug.Log("Muelto");
+                //this.gameObject.SetActive(false);
+            }
+            RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
+        }
+        GetDamageClientRpc(damage);
+    }
+    [ClientRpc]
+    public void GetDamageClientRpc(float damage)
+    {
+        Debug.Log("AU! Damage:" + damage + ", HealthBeforeImpact: " + OwnInfo.playersCurrentHealth + ", Shield: " + OwnInfo.playersCurrentShield);
+        if (OwnInfo.playersCurrentShield > 0)
+        {
+            if (RegenerationShield)
+            {
+                StopCoroutine(RegenerationShieldCoroutine);
+            }
+            OwnInfo.playersCurrentShield -= damage;
+            RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
+        }
+        else
+        {
+            if (RegenerationShield)
+            {
+                StopCoroutine(RegenerationShieldCoroutine);
+            }
+            OwnInfo.playersCurrentHealth -= damage;
+            if (OwnInfo.playersCurrentHealth <= 0)
             {
                 OwnInfo.playersCurrentHealth = 0;
                 Debug.Log("Muelto");
@@ -390,7 +470,6 @@ public class PlayerControlls : NetworkBehaviour
             RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
         }
     }
-
     public IEnumerator RegenerationOfShield()
     {
         RegenerationShield = true;
@@ -415,13 +494,17 @@ public class PlayerControlls : NetworkBehaviour
         OwnInfo.playersCurrentShield += OwnInfo.RegenerationShieldValue;
         //Debug.Log("ShieldRegenerating: "+OwnInfo.playersCurrentShield);
     }
+    private void OnPlayerDeath()
+    {
 
+    }
     /**
      * ############################ Temporal Skills ########################################### 
      */
     public void ActivateSkill(int num)
     {
-        if(num<OwnInfo.abilities.Count && num>=0) {
+        if (num < OwnInfo.abilities.Count && num >= 0)
+        {
             Debug.Log(weapon.CurrentConfiguration.DamageBaseWeapon);
             StartCoroutine(OwnInfo.abilities[num].SkillCoroutine(OwnInfo, gameObject));
             OwnInfo.abilities.Remove(OwnInfo.abilities[num]);

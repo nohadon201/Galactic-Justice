@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05a11cb1819c3d44abab26c4bb8e0e7, type: 3}
   m_Name: Slot2
   m_EditorClassIdentifier: 
-  Power: 1
-  Accuracy: 1
-  Frequency: 1
-  MaxRange: 20
+  Power: 0.017097855
+  Accuracy: 0.98966545
+  Frequency: 0.63724136
+  MaxRange: 0
   MaxForce: 700
   MaxNumOfBulletsPerBurst: 20
   MaxCooldownBetweenBullets: 2

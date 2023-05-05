@@ -271,6 +271,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: dc0c981f-3dc2-4075-912c-3803241e2169
     m_ActionName: Player/Dash[/Keyboard/f]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2249009624763040518}
+        m_TargetAssemblyTypeName: PlayerControlls, Assembly-CSharp
+        m_MethodName: OnInterfaceDisplayer
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 12f8e8d3-a837-4732-a27a-aeecba152bef
+    m_ActionName: Player/Interface[/Keyboard/i]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

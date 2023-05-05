@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class SpawnerEnemiesBehaviour : NetworkBehaviour
 {
-    public SpawnerEnemies Info;
+    public List<SpawnerEnemies> InfoList;
     public GameObject Quiraxian;
     public GameObject Thraaxian;
     public GameObject Zorgonian;
@@ -52,35 +52,39 @@ public class SpawnerEnemiesBehaviour : NetworkBehaviour
     }
     private void Spawn()
     {
-        foreach (SpawnInfo info in Info.listPositionSpawn)
+
+        foreach(SpawnerEnemies Info in InfoList)
         {
-            switch (info.enemyType)
+            foreach (SpawnInfo info in Info.listPositionSpawn)
             {
-                case EnemyType.THRAAXIAN:
-                    GameObject t = Instantiate(Thraaxian);
-                    t.GetComponent<EnemyBehaviour>().randomPositions = Info.randomPositions;
-                    t.transform.position = info.spawnPosition;
-                    t.GetComponent<NetworkObject>().Spawn();
-                    break;
-                case EnemyType.QUIRAXIAN:
-                    GameObject q = Instantiate(Quiraxian);
-                    q.GetComponent<EnemyBehaviour>().randomPositions = Info.randomPositions;
-                    q.transform.position = info.spawnPosition;
-                    q.GetComponent<NetworkObject>().Spawn();
-                    break;
-                case EnemyType.ZORGONIAN:
-                    GameObject z = Instantiate(Zorgonian);
-                    z.GetComponent<EnemyBehaviour>().randomPositions = Info.randomPositions;
-                    z.transform.position = info.spawnPosition;
-                    z.GetComponent<NetworkObject>().Spawn();
-                    break;
-                case EnemyType.PYROGNATHIAN:
-                    GameObject p = Instantiate(Pyrognathian);
-                    p.GetComponent<EnemyBehaviour>().randomPositions = Info.randomPositions;
-                    p.transform.position = info.spawnPosition;
-                    p.GetComponent<NetworkObject>().Spawn();
-                    break;
-                default: break;
+                switch (info.enemyType)
+                {
+                    case EnemyType.THRAAXIAN:
+                        GameObject t = Instantiate(Thraaxian);
+                        t.GetComponent<EnemyBehaviour>().randomPositions = Info.randomPositions;
+                        t.transform.position = info.spawnPosition;
+                        t.GetComponent<NetworkObject>().Spawn();
+                        break;
+                    case EnemyType.QUIRAXIAN:
+                        GameObject q = Instantiate(Quiraxian);
+                        q.GetComponent<EnemyBehaviour>().randomPositions = Info.randomPositions;
+                        q.transform.position = info.spawnPosition;
+                        q.GetComponent<NetworkObject>().Spawn();
+                        break;
+                    case EnemyType.ZORGONIAN:
+                        GameObject z = Instantiate(Zorgonian);
+                        z.GetComponent<EnemyBehaviour>().randomPositions = Info.randomPositions;
+                        z.transform.position = info.spawnPosition;
+                        z.GetComponent<NetworkObject>().Spawn();
+                        break;
+                    case EnemyType.PYROGNATHIAN:
+                        GameObject p = Instantiate(Pyrognathian);
+                        p.GetComponent<EnemyBehaviour>().randomPositions = Info.randomPositions;
+                        p.transform.position = info.spawnPosition;
+                        p.GetComponent<NetworkObject>().Spawn();
+                        break;
+                    default: break;
+                }
             }
         }
     }

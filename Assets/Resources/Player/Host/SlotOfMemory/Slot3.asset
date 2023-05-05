@@ -15,7 +15,7 @@ MonoBehaviour:
   Power: 1
   Accuracy: 0.846
   Frequency: 0.741
-  MaxRange: 20
+  MaxRange: 0
   MaxForce: 700
   MaxNumOfBulletsPerBurst: 20
   MaxCooldownBetweenBullets: 2

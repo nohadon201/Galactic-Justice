@@ -22,8 +22,8 @@ public class Thraaxian : EnemyBehaviour
         filter.areaMask = 7;
         velocity = 10.0f;
         currentPath = new();
-        damagePerImpact = 7f;
-        maxHealth = 5;
+        damagePerImpact = 25f;
+        maxHealth = 70;
         currentHealth = maxHealth;
         RangeAttack = 12;
         CooldownAttack = 2f;

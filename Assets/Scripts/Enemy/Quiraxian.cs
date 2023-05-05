@@ -17,7 +17,7 @@ public class Quiraxian : EnemyBehaviour
         velocity = 10.0f;
         currentPath = new();
         damagePerImpact = 7f;
-        maxHealth = 5;
+        maxHealth = 95;
         currentHealth = maxHealth;
         RangeAttack = 5;
         CooldownAttack = 1f;

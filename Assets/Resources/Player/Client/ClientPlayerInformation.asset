@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1d2404901163124488167b6aef5a819, type: 3}
   m_Name: ClientPlayerInformation
   m_EditorClassIdentifier: 
+  Points: 50
   playerVelocity: 0
   playersMaxHealth: 0
   playersCurrentHealth: 0

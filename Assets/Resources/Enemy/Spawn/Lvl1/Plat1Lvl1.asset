@@ -10,13 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3eb3b774fa41e94ab2326b24a24bf15, type: 3}
-  m_Name: SpawnerEnemiesInformation
+  m_Name: Plat1Lvl1
   m_EditorClassIdentifier: 
   listPositionSpawn:
-  - spawnPosition: {x: 31.6, y: 1, z: -7.6}
+  - spawnPosition: {x: 4.51, y: 1, z: 96}
+    enemyType: 2
+  - spawnPosition: {x: -1.58, y: 1, z: 95.48}
+    enemyType: 1
+  - spawnPosition: {x: -3.47, y: 1, z: 105.15}
     enemyType: 2
   randomPositions:
-  - {x: 31.6, y: 1, z: -23.9}
-  - {x: -26.51, y: 1, z: -23.9}
-  - {x: -26.51, y: 1, z: 23.4}
-  - {x: 16.02, y: 1, z: 6.9}
+  - {x: -6.66, y: 1, z: 91}
+  - {x: -8.26, y: 1, z: 100.833}
+  - {x: 6.16, y: 1, z: 90.06}
+  - {x: 6.16, y: 1, z: 103.58}

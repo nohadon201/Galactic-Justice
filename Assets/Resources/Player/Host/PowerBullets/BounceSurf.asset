@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ScaleInvestment: 15
   Name: Surface's Boucilng Bullet
-  Description: This bullet bounces off surfaces
+  Description: 'This bullet bounces off surfaces '
   InvestmentValue: 0.25
   currentInvestmentValue: 0
   Points: 0

@@ -8,7 +8,7 @@ public class PlayerInfo : ScriptableObject
     //      Controls Variables
     [Header("Player Information")]
 
-    
+    public int Points;
     public float playerVelocity;
 
     public float playersMaxHealth;
