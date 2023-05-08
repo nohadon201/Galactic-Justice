@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Slot3
   m_EditorClassIdentifier: 
   Power: 1
-  Accuracy: 0.846
-  Frequency: 0.741
-  MaxRange: 0
+  Accuracy: 1
+  Frequency: 1
+  MaxRange: 50
   MaxForce: 700
   MaxNumOfBulletsPerBurst: 20
   MaxCooldownBetweenBullets: 2

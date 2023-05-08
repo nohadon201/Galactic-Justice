@@ -68,6 +68,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd1eb443ced0ec344b47f5bd7bcf9642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnPlayerJump: {fileID: 11400000, guid: 5d8a523964cba594e92ca0309f6a3d3c, type: 2}
+  OnPlayerMoveEvent: {fileID: 11400000, guid: cb7dc9d4f2885954caea3eaefaf165e9, type: 2}
+  WinPointsEvent: {fileID: 11400000, guid: 8e039758d2d3a3c418f0ab061e0bac31, type: 2}
   Sensibility: 0.11
   OwnInfo: {fileID: 11400000, guid: 7ea75af73ad17ad46b4fa2349ee79393, type: 2}
   Camera: {fileID: 0}
@@ -93,6 +96,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8bb706358a716b944a1d96870a20e58e, type: 2}
   - {fileID: 11400000, guid: ae0fa9f35a478be45a1cb0d7d9be7ca1, type: 2}
   IndexCurrentConfiguration: 0
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &2249009624763040517
 MonoBehaviour:
   m_ObjectHideFlags: 0

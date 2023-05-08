@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1d2404901163124488167b6aef5a819, type: 3}
   m_Name: HostPlayerInformation
   m_EditorClassIdentifier: 
-  Points: 50
+  Points: 0
   playerVelocity: 10
   playersMaxHealth: 100
   playersCurrentHealth: 100

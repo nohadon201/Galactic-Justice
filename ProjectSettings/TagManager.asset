@@ -8,6 +8,7 @@ TagManager:
   - Physics
   - Floor
   - Enemy
+  - Tutorialer
   layers:
   - Default
   - TransparentFX

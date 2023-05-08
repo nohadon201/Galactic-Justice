@@ -18,6 +18,6 @@ MonoBehaviour:
   Title: MATAR
   Description: "MATA!!! HAZ LA MORICI\xD3N!! DESTRUYE!!! QUEM... Espera acabo de
     poner 'morici\xF3n'? (mata 3 enemigos)"
-  Event: {fileID: 11400000, guid: 95893d5ddad72784481d5e8f5f5eb607, type: 2}
+  Event: {fileID: 11400000, guid: 0e589788c82c6de43868e95361b2bb64, type: 2}
   totalAmount: 3
   currentAmount: 0

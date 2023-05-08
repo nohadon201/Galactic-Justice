@@ -7,7 +7,16 @@ using UnityEngine.AI;
 
 public abstract class EnemyBehaviour : NetworkBehaviour
 {
-    //      StateMachine and Basic Stats
+    /**
+     * ###################################### EVENTS ################################ 
+     */
+    [SerializeField] private GameEvent OnEnemyDeathEvent;
+    [SerializeField] private GameEvent OnPlayerSeenEvent;
+    [SerializeField] private GameEvent<float> OnDamageReceivedEvent;
+
+    /**
+     * ###################################### State Machine ################################ 
+     */
     protected float damagePerImpact;
     protected float maxHealth;
     protected float currentHealth;
@@ -18,18 +27,25 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     public float velocity;
     protected bool PlayerForgive;
     public float CooldownAttack;
-    //      Pathfinding
-    
+
+    /**
+     * ###################################### Pathfinding ################################ 
+     */
     protected NavMeshQueryFilter filter;
     protected Rigidbody rb; 
     protected NavMeshPath currentPath;
     protected int navmeshIndexPosition;
 
-    // Piercing
+    /**
+      * ###################################### Piercing ################################ 
+      */
     [SerializeField]
     private Transform piercingPoint;
     public Transform PiercingPoint => piercingPoint;
-    //      Enemy vision
+
+    /**
+      * ###################################### Enemy Vision ################################ 
+      */
     [SerializeField]
     [Range(0f, 360f)]
     public float angle;
@@ -42,6 +58,7 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     protected LayerMask obstructionMask;
     private Coroutine checkPlayerCoroutine;
     protected Coroutine attack, findPlayer, forgivePlayer, RunAwayPlayer;
+
     protected virtual void Awake()
     {
         if (IsServer)
@@ -69,6 +86,7 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     private void FixedUpdate()
     {
         if (!IsServer) return;
+        OnEnemyFall();
         FixedUpdateState(currentState);
     }
 
@@ -100,6 +118,7 @@ public abstract class EnemyBehaviour : NetworkBehaviour
             yield return new WaitForSeconds(0.2f);
             if (FieldOfViewCheck(transformPlayer))
             {
+                if (playerRef == null) OnPlayerSeenEvent?.Raise();
                 OnPlayerSeen();
             }else 
             {
@@ -156,10 +175,12 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     }
     public void GetHit(float damage)
     {
+        OnDamageReceivedEvent?.Raise(damage);
         Debug.Log("DAMAGE! " + damage);
         currentHealth-= damage; 
         if(currentHealth <= 0)
         {
+            OnEnemyDeathEvent?.Raise();
             this.gameObject.SetActive(false);
             DieClientRpc();
         }
@@ -172,6 +193,14 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     /**
      * ###################################### State Machine ################################ 
      */
+    public void OnEnemyFall()
+    {
+        if(transform.position.y < -20)
+        {
+            gameObject.SetActive(false);
+            OnEnemyDeathEvent?.Raise(); 
+        }
+    }
     public bool IsInPatrol()
     {
         return currentState == StateOfEnemy.PATROL;
@@ -312,6 +341,9 @@ public abstract class EnemyBehaviour : NetworkBehaviour
         return playerRef.transform.position + (diff * 30);
 
     }
+    /**
+     * ###################################### Abstract Functions ################################ 
+     */
     protected abstract IEnumerator FindPlayer();
     protected abstract IEnumerator ForgivePlayer();
     protected abstract void OnPlayerSeen();

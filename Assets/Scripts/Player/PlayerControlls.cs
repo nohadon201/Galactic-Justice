@@ -8,7 +8,9 @@ using UnityEngine.SceneManagement;
 
 public class PlayerControlls : NetworkBehaviour
 {
-    //####################### Events and delegators ########################## 
+    /*
+     * ################################### Events And Delegators ##############################################
+     */
     public delegate void DisplayInterface();
     public DisplayInterface displayInterfaceDelegator;
 
@@ -18,23 +20,37 @@ public class PlayerControlls : NetworkBehaviour
     public delegate void GoToNextInterface(bool b);
     public GoToNextInterface goToNextInterfaceDelegator;
 
-    [Header("Configs")]
+    [SerializeField] private GameEvent OnPlayerJump, OnPlayerMoveEvent;
+    [SerializeField] private EventPoints WinPointsEvent;
 
+    [Header("Configs")]
+    /*
+     * ################################### Camera ##############################################
+     */
     [SerializeField] private float Sensibility;
 
     private GameObject CameraTarget;
 
     private Vector2 directionMovement, directionRotationOfCamera;
-
-    private Rigidbody rb;
-
+    
     private float cameraRotation;
 
-    private float dashForce, dashingTime, dashCooldown;
-
+    /*
+     * ################################### Components Of GameObject ##############################################
+     */
+   
+    private Rigidbody rb;
+    
     private PlayerWeapon weapon;
+    
     private PowerBullets powerBullets;
 
+    /*
+     * ################################### Dash ##############################################
+     */
+    private float dashForce, dashingTime, dashCooldown;
+
+    
     private Coroutine RegenerationOfAmmunition, RegenerationShieldCoroutine;
 
     private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield, Interface;
@@ -47,10 +63,6 @@ public class PlayerControlls : NetworkBehaviour
     private GameObject VirtualCamera;
     public GameObject Camera;
 
-    void Awake()
-    {
-        //DefaultValues();
-    }
     public void DefaultValues()
     {
         Interface = false;
@@ -100,9 +112,7 @@ public class PlayerControlls : NetworkBehaviour
         if (oldCamera != null && oldCamera.enabled)
             oldCamera.enabled = false;
 
-
         weapon.camera = Camera.GetComponent<Camera>();
-
 
     }
 
@@ -172,10 +182,10 @@ public class PlayerControlls : NetworkBehaviour
         if (context.canceled)
         {
             displayInterfaceDelegator.Invoke();
+            
             if (Interface)
-            {
                 powerBullets.LoadPointsPowers();
-            }
+            
             Interface = Interface ? false : true;
         }
     }
@@ -397,8 +407,6 @@ public class PlayerControlls : NetworkBehaviour
         {
             goToNextInterfaceDelegator?.Invoke(false);
         }
-        
-
     }
 
 
@@ -492,7 +500,6 @@ public class PlayerControlls : NetworkBehaviour
     public void RegenerationShieldSum()
     {
         OwnInfo.playersCurrentShield += OwnInfo.RegenerationShieldValue;
-        //Debug.Log("ShieldRegenerating: "+OwnInfo.playersCurrentShield);
     }
     private void OnPlayerDeath()
     {
@@ -510,6 +517,24 @@ public class PlayerControlls : NetworkBehaviour
             OwnInfo.abilities.Remove(OwnInfo.abilities[num]);
             Debug.Log(weapon.CurrentConfiguration.DamageBaseWeapon);
         }
+    }
+    /**
+     * ############################ Points ########################################### 
+     */
+    public void WinPoints(int points)
+    {
+        if(IsClient) Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        if (IsOwner)
+        {
+            OwnInfo.Points += points;
+            if(IsServer) WinPointsClientRpc(points);
+        }
+    }
+    [ClientRpc]
+    private void WinPointsClientRpc(int points)
+    {
+        if (IsServer) return;
+        WinPointsEvent?.Raise(points);
     }
 }
 

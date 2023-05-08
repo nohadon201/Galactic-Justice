@@ -140,6 +140,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9c33befcbab9f34fb5b7ddd6c3225c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnemyDeathEvent: {fileID: 11400000, guid: 0e589788c82c6de43868e95361b2bb64, type: 2}
+  OnPlayerSeenEvent: {fileID: 11400000, guid: 340bc4a727c11c740924c739271ebd81, type: 2}
+  OnDamageReceivedEvent: {fileID: 11400000, guid: 7ceb1a4e7c72cc7459924f106bd4de5a,
+    type: 2}
   currentState: 0
   randomPositions: []
   velocity: 0

@@ -22,12 +22,13 @@ public class UIPlayerControlls : MonoBehaviour
     [SerializeField]
     private List<ConfigurationUI> configurationUI = new List<ConfigurationUI>();
     private int MenuDisplayed;
+    private TextMeshProUGUI points;
     void Awake()
     {
 
         //Set active for default the UI objects
         MenuDisplayed = 1;
-        
+        points = transform.GetChild(4).GetChild(2).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>();   
         GameObject crosshair = transform.GetChild(0).gameObject;
         GameObject Ammunition = transform.GetChild(1).gameObject;
         GameObject ShieldBar = transform.GetChild(2).GetChild(0).GetChild(1).gameObject;
@@ -65,6 +66,7 @@ public class UIPlayerControlls : MonoBehaviour
         pc.goToNextInterfaceDelegator += GoToNextInterface;
         int ver = 0;
         int hor = 0;
+        GetComponent<WinPointsListener>().Response.AddListener(pc.WinPoints);
         foreach (PowerBulletSO powerBullet in pc.GetComponent<PowerBullets>().powerBullets)
         {
             GameObject pbi = Instantiate(powerBulletPrefab);
@@ -135,6 +137,7 @@ public class UIPlayerControlls : MonoBehaviour
                 transform.GetChild(4).GetChild(1).GetChild(0).GetChild(3).gameObject.GetComponent<TextMeshProUGUI>().text = MathF.Truncate(playerWeapon.CurrentConfiguration.Power * 100f) + "%";
                 transform.GetChild(4).GetChild(1).GetChild(1).GetChild(3).gameObject.GetComponent<TextMeshProUGUI>().text = MathF.Truncate(playerWeapon.CurrentConfiguration.Accuracy * 100f)  + "%";
                 transform.GetChild(4).GetChild(1).GetChild(2).GetChild(3).gameObject.GetComponent<TextMeshProUGUI>().text = MathF.Truncate(playerWeapon.CurrentConfiguration.Frequency * 100f) + "%";
+                points.text = "Current points: "+playerInformation.Points;
             }
             yield return new WaitForSeconds(0.1f);
         }

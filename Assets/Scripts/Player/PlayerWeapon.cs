@@ -138,6 +138,9 @@ public class PlayerWeapon : NetworkBehaviour
                     eb.ChangeState(StateOfEnemy.FOLLOWING);
                     eb.GetHit(CurrentConfiguration.CurrentDamageWeapon);
                 }
+            }else if(hit.transform.tag == "Tutorialer")
+            {
+                hit.transform.gameObject.GetComponent<Tutorialer>()?.OnDisparar();
             }
             if (!byPowerBullet) powerBullets.execute(hit, byPowerBullet);
         }
