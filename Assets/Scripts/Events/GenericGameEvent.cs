@@ -6,6 +6,7 @@
 // ----------------------------------------------------------------------------
 // Modifying for generic parameter use
 
+using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -14,23 +15,41 @@ public abstract class GameEvent<T> : ScriptableObject
     /// <summary>
     /// The list of listeners that this event will notify if it is raised.
     /// </summary>
-    private readonly List<GameEventListener<T>> eventListeners =
-        new List<GameEventListener<T>>();
+    private readonly List<IEventListener> eventListeners =
+        new List<IEventListener>();
 
     public void Raise(T parameter)
     {
         for (int i = eventListeners.Count - 1; i >= 0; i--)
-            eventListeners[i].OnEventRaised(parameter);
-
+        {
+            if (eventListeners[i].GetType() == typeof(GameEventListener<T>))
+            {
+                GameEventListener<T> ey = (GameEventListener<T>)eventListeners[i];
+                ey.OnEventRaised(parameter);
+            }else if(eventListeners[i].GetType() == typeof(Tutorialer))
+            {
+                Tutorialer ey = (Tutorialer)eventListeners[i];
+                ey.eventEncerrar1.Invoke(false);
+                EnemyType a = (EnemyType) Convert.ToInt32(parameter);
+                if(a == EnemyType.THRAAXIAN)
+                {
+                    ey.ChangeState(TutorialerState.State8, null);
+                }else if(a == EnemyType.QUIRAXIAN)
+                {
+                    ey.ChangeState(TutorialerState.State8, null);
+                }
+            }
+            
+        }
     }
 
-    public void RegisterListener(GameEventListener<T> listener)
+    public void RegisterListener(IEventListener listener)
     {
         if (!eventListeners.Contains(listener))
             eventListeners.Add(listener);
     }
 
-    public void UnregisterListener(GameEventListener<T> listener)
+    public void UnregisterListener(IEventListener listener)
     {
         if (eventListeners.Contains(listener))
             eventListeners.Remove(listener);

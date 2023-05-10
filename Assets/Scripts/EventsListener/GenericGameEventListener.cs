@@ -8,7 +8,7 @@
 
 using UnityEngine.Events;
 using UnityEngine;
-public abstract class GameEventListener<T> : MonoBehaviour
+public abstract class GameEventListener<T> : MonoBehaviour, IEventListener
 {
     [Tooltip("Event to register with.")]
     public GameEvent<T> Event;
@@ -33,7 +33,7 @@ public abstract class GameEventListener<T> : MonoBehaviour
     }
 }
 
-public abstract class GameEventListener<T0, T1> : MonoBehaviour
+public abstract class GameEventListener<T0, T1> : MonoBehaviour, IEventListener
 {
     [Tooltip("Event to register with.")]
     public GameEvent<T0, T1> Event;
@@ -57,7 +57,7 @@ public abstract class GameEventListener<T0, T1> : MonoBehaviour
     }
 }
 
-public abstract class GameEventListener<T0, T1, T2> : MonoBehaviour
+public abstract class GameEventListener<T0, T1, T2> : MonoBehaviour, IEventListener
 {
     [Tooltip("Event to register with.")]
     public GameEvent<T0, T1, T2> Event;

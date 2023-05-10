@@ -1,36 +1,41 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class Zorgonian : EnemyBehaviour
 {
-    void Awake()
-    {
-        if (!IsServer) return;
-        base.Awake();
-        //  Pyrognathian unique values
-        filter.agentTypeID = 0;
-        filter.areaMask = 7;
-        velocity = 4f;
-        currentPath = new();
-        damagePerImpact = 11.5f;
-        maxHealth = 30;
-        currentHealth = maxHealth;
-        RangeAttack = 3;
-        CooldownAttack = 3f;
-        //  Generic Enemy default values
-        SetLayers();
-        navmeshIndexPosition = 0;
-        rb = GetComponent<Rigidbody>();
-    }
-
+    private bool iker;
+    public float forceApliedToPlayer;
+    private bool iker2;
+    private float ycomponent;
     private void Start()
     {
         if (!IsServer) return;
-        indexCurrentPointAlert = Random.Range(0, randomPositions.Count);
+        // Zorgonian custom values
+        forceApliedToPlayer = 5;
+        ycomponent = Mathf.Sin(45 * Mathf.PI / 180);
+        //  Zorgonian unique values
+        filter.agentTypeID = 0;
+        filter.areaMask = 7;
+        velocity = 10.0f;
+        currentPath = new();
+        damagePerImpact = 12f;
+        maxHealth = 200;
+        currentHealth = maxHealth;
+        RangeAttack = 2f;
+        CooldownAttack = 1f;
+        //  Generic Enemy default values+
+        SetLayers();
+        navmeshIndexPosition = 0;
+        rb = GetComponent<Rigidbody>();
+        PlayerForgive = false;
+        iker2 = false;
+        indexCurrentPointAlert = UnityEngine.Random.Range(0, randomPositions.Count);
         CalculatePath(randomPositions[indexCurrentPointAlert]);
         ChangeState(StateOfEnemy.PATROL);
     }
@@ -40,14 +45,13 @@ public class Zorgonian : EnemyBehaviour
     private bool CheckIfItsClosePlayer()
     {
         Vector3 v = (playerRef.transform.position - transform.position);
-        return (v.x < RangeAttack && v.x > -RangeAttack) && (v.z < RangeAttack && v.z > -RangeAttack);
+        return (Mathf.Abs(v.x) <= RangeAttack) && (Mathf.Abs(v.z) <= RangeAttack);
 
     }
     private bool CheckIfItsFarAwayPlayer()
     {
-        Vector3 v = (playerRef.position - transform.position);
-        Debug.Log((Mathf.Abs(v.x) > RangeAttack || Mathf.Abs(v.z) > RangeAttack));
-        return (Mathf.Abs(v.x) > RangeAttack || Mathf.Abs(v.z) > RangeAttack);
+        Vector3 v = (playerRef.transform.position - transform.position);
+        return (Mathf.Abs(v.x) > RangeAttack) || (Mathf.Abs(v.z) > RangeAttack);
     }
 
     /*
@@ -55,21 +59,16 @@ public class Zorgonian : EnemyBehaviour
      */
     private void RotationWithTheTarget(Vector3 target)
     {
-        Vector3 forward = target - transform.position;
         float x = target.x - transform.position.x;
         float z = target.z - transform.position.z;
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(new Vector3(x, transform.position.y, z)), 1.5f);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(new Vector3(x, 0, z)), 1.5f);
     }
     private void CalculatePath(Vector3 position)
     {
         currentPath.ClearCorners();
-        if (!NavMesh.CalculatePath(transform.position, position, filter, currentPath))
-        {
-            Debug.Log("No Path finded");
-        }
+        NavMesh.CalculatePath(transform.position, position, filter, currentPath);
         navmeshIndexPosition = 0;
     }
-
 
     /*
      * ################################### Attack ##############################################
@@ -78,35 +77,59 @@ public class Zorgonian : EnemyBehaviour
     {
         while (true)
         {
-            Attack();
             yield return new WaitForSeconds(CooldownAttack);
+            Attack();
         }
-
     }
-    public void Attack()
+    private void Attack()
     {
+        
+        Vector3 direction = playerRef.transform.position - transform.position;
+        direction.Normalize();
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, (transform.forward + new Vector3(0, 0.1f, 0)), out hit, 7, obstructionMask))
+        if(Physics.Raycast(transform.position + (transform.forward*0.5f), direction, out hit, 10f, obstructionMask))
         {
-            Debug.DrawLine(transform.position, hit.point, Color.red, 2f);  
-            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Target"))
+            if(hit.transform.gameObject.layer == LayerMask.NameToLayer("Target"))
             {
-                hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * 1000, hit.point);
+                Vector3 dir = playerRef.position-transform.position;
+                
+                dir.y = ycomponent; 
+                hit.transform.gameObject.GetComponent<Rigidbody>().AddForce(dir * forceApliedToPlayer, ForceMode.Impulse);
+                hit.transform.gameObject.GetComponent<PlayerControlls>().pushed = true;    
+                hit.transform.gameObject.GetComponent<PlayerControlls>().Damage(damagePerImpact);
             }
+        }
+    }
+    /*
+    * ################################### DeathCase ##############################################
+    */
+    public override void OnEnemyFall()
+    {
+        base.OnEnemyFall();
+        if (transform.position.y < -20)
+        {
+            OnEnemyDeathWich?.Raise((int)EnemyType.QUIRAXIAN);
+        }
+    }
+    public override void GetHit(float damage)
+    {
+        base.GetHit(damage);
+        if (currentHealth <= 0)
+        {
+            OnEnemyDeathWich.Raise((int)EnemyType.QUIRAXIAN);
         }
     }
     /*
      * ################################### State Machine ##############################################
      */
     //          PATROL
-    protected override void OnPlayerSeen()
-    {
-        ChangeState(StateOfEnemy.FOLLOWING);
-    }
-
     protected override void InitStatePatrol()
     {
-        Debug.Log("Patrol");
+        if (findPlayer != null)
+        {
+            StopCoroutine(findPlayer);
+        }
+        CalculatePath(randomPositions[indexCurrentPointAlert]);
     }
 
     protected override void UpdateStatePatrol()
@@ -132,7 +155,6 @@ public class Zorgonian : EnemyBehaviour
 
     protected override void InitStateFollowing()
     {
-        Debug.Log("Following");
         findPlayer = StartCoroutine(FindPlayer());
     }
 
@@ -143,9 +165,7 @@ public class Zorgonian : EnemyBehaviour
 
     protected override void FixedUpdateStateFollowing()
     {
-        Debug.Log("Following");
         setTheVelocity();
-        Debug.Log(rb.velocity);
         if (CheckIfItsClosePlayer())
         {
             ChangeState(StateOfEnemy.ATTACK);
@@ -161,17 +181,23 @@ public class Zorgonian : EnemyBehaviour
 
     protected override void InitStateAttack()
     {
-        Debug.Log("Attack");
         rb.velocity = new Vector3(0, rb.velocity.y, 0);
         attack = StartCoroutine(AttackingCoroutine());
+        if (forgivePlayer != null)
+        {
+            StopCoroutine(forgivePlayer);
+        }
+        iker2 = false;
+
     }
 
     protected override void UpdateStateAttack()
     {
-        if (CheckIfItsFarAwayPlayer())
+        if (CheckIfItsFarAwayPlayer() && !iker2)
         {
-            ChangeState(StateOfEnemy.FOLLOWING);
+            StartCoroutine(StartFollowing());
         }
+        RotationWithTheTarget(playerRef.position);
     }
 
     protected override void FixedUpdateStateAttack()
@@ -183,28 +209,89 @@ public class Zorgonian : EnemyBehaviour
     {
         StopCoroutine(attack);
     }
-
+    //      COROUTINES
     protected override IEnumerator FindPlayer()
     {
         while (true)
         {
-            CalculatePath(playerRef.position);
+            if (currentState != StateOfEnemy.PATROL) CalculatePath(playerRef.position);
             yield return new WaitForSeconds(1);
         }
     }
+    private IEnumerator StartFollowing()
+    {
+        iker2 = true;
+        StopCoroutine(attack);
+        yield return new WaitForSeconds(5f);
+        ChangeState(StateOfEnemy.FOLLOWING);
+
+    }
     protected override IEnumerator ForgivePlayer()
     {
-        yield return new WaitForSeconds(7);
+        PlayerForgive = true;
+        iker = true;
+        yield return new WaitForSeconds(0.2f);
+        iker = false;
+        yield return new WaitForSeconds(3);
         ChangeState(StateOfEnemy.PATROL);
+        PlayerForgive = false;
     }
-    protected override void OnPlayerAway()
+    //      OnPlayerVision Functions
+    protected override void OnPlayerSeen()
     {
-        forgivePlayer = StartCoroutine(ForgivePlayer());
+        Debug.Log("OnPlayerSeen");
+        switch (currentState)
+        {
+            case StateOfEnemy.PATROL:
+                ChangeState(StateOfEnemy.FOLLOWING);
+                break;
+            case StateOfEnemy.FOLLOWING:
+                if (forgivePlayer != null)
+                {
+                    if (!iker)
+                    {
+                        StopCoroutine(forgivePlayer);
+                        if (PlayerForgive) PlayerForgive = false;
+                    }
+                }
+                break;
+            case StateOfEnemy.ATTACK:
+            default:
+                break;
+        }
     }
 
+    protected override void OnPlayerAway()
+    {
+        Debug.Log("OnPlayerAway");
+        switch (currentState)
+        {
+            case StateOfEnemy.PATROL:
+                break;
+            case StateOfEnemy.ATTACK:
+                if (!PlayerForgive)
+                {
+                    forgivePlayer = StartCoroutine(ForgivePlayer());
+                }
+                if (!iker2)
+                {
+                    StartCoroutine(StartFollowing());
+                }
+                break;
+            case StateOfEnemy.FOLLOWING:
+                if (!PlayerForgive)
+                {
+                    forgivePlayer = StartCoroutine(ForgivePlayer());
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    //      OTHER STATES
     protected override void InitStateCrazy()
     {
-        throw new System.NotImplementedException();
+
     }
 
     protected override void UpdateStateCrazy()
@@ -224,21 +311,25 @@ public class Zorgonian : EnemyBehaviour
 
     protected override void InitStateTerrified()
     {
-        throw new System.NotImplementedException();
+        if (findPlayer != null)
+        {
+            StopCoroutine(findPlayer);
+        }
+        RunAwayPlayer = StartCoroutine(RunAwayFromPlayer());
     }
 
     protected override void UpdateStateTerrified()
     {
-        throw new System.NotImplementedException();
+
     }
 
     protected override void FixedUpdateStateTerrified()
     {
-        throw new System.NotImplementedException();
+        setTheVelocity();
     }
 
     protected override void ExitStateTerrified()
     {
-        throw new System.NotImplementedException();
+        StopCoroutine(RunAwayPlayer);
     }
 }

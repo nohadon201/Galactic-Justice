@@ -140,7 +140,7 @@ public class PlayerWeapon : NetworkBehaviour
                 }
             }else if(hit.transform.tag == "Tutorialer")
             {
-                hit.transform.gameObject.GetComponent<Tutorialer>()?.OnDisparar();
+                hit.transform.parent.gameObject.GetComponent<Tutorialer>()?.OnDisparar();
             }
             if (!byPowerBullet) powerBullets.execute(hit, byPowerBullet);
         }

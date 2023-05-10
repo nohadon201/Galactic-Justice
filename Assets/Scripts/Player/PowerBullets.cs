@@ -71,12 +71,11 @@ public class PowerBullets : NetworkBehaviour
         
         if (IsServer)
         {
-            Debug.Log("aaaaaa");
             int a = 0;
             foreach (PowerBulletSO powerB in powerBullets)
             {
                 powerBulletsValues.Add(new PowerBulletNetworkInfo(powerB.id, powerB.currentInvestmentValue));
-                Debug.Log(powerBulletsValues[a].id + " " + powerBulletsValues[a].InvestValue);
+                //Debug.Log(powerBulletsValues[a].id + " " + powerBulletsValues[a].InvestValue);
                 a++;
             }
             

@@ -50,10 +50,9 @@ public class Quiraxian : EnemyBehaviour
      */
     private void RotationWithTheTarget(Vector3 target)
     {
-        Vector3 forward = target - transform.position;
         float x = target.x - transform.position.x;
         float z = target.z - transform.position.z;
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(new Vector3(x, transform.position.y, z)), 1.5f);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(new Vector3(x, 0, z)), 1.5f);
     }
     private void CalculatePath(Vector3 position)
     {
@@ -81,6 +80,25 @@ public class Quiraxian : EnemyBehaviour
         projectile.GetComponent<Light>().color = ColorProjectile;
         projectile.GetComponent<Projectile>().ShootBullet(position, diff, 7, damagePerImpact, 20);
         projectile.GetComponent<NetworkObject>().Spawn();
+    }
+    /*
+    * ################################### DeathCase ##############################################
+    */
+    public override void OnEnemyFall()
+    {
+        base.OnEnemyFall();
+        if(transform.position.y < -20)
+        {
+            OnEnemyDeathWich?.Raise((int)EnemyType.QUIRAXIAN);
+        }
+    }
+    public override void GetHit(float damage)
+    {
+        base.GetHit(damage);
+        if (currentHealth <= 0)
+        {
+            OnEnemyDeathWich.Raise((int)EnemyType.QUIRAXIAN);
+        }
     }
     /*
      * ################################### State Machine ##############################################

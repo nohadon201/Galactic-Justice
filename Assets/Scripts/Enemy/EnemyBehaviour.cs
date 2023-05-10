@@ -10,13 +10,17 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     /**
      * ###################################### EVENTS ################################ 
      */
+    [Header("Enemy Events")]
     [SerializeField] private GameEvent OnEnemyDeathEvent;
     [SerializeField] private GameEvent OnPlayerSeenEvent;
     [SerializeField] private GameEvent<float> OnDamageReceivedEvent;
-
+    [Header("Only in case of Tutorial")]
+    [SerializeField] protected GameEvent<int> OnEnemyDeathWich;
+    [Header("")]
     /**
      * ###################################### State Machine ################################ 
      */
+    [Header("StateMachine")]
     protected float damagePerImpact;
     protected float maxHealth;
     protected float currentHealth;
@@ -27,7 +31,7 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     public float velocity;
     protected bool PlayerForgive;
     public float CooldownAttack;
-
+    [Header("")]
     /**
      * ###################################### Pathfinding ################################ 
      */
@@ -39,13 +43,15 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     /**
       * ###################################### Piercing ################################ 
       */
+    [Header("Piercing Point")]
     [SerializeField]
     private Transform piercingPoint;
     public Transform PiercingPoint => piercingPoint;
-
+    [Header("")]
     /**
       * ###################################### Enemy Vision ################################ 
       */
+    [Header("Enemy Vision")]
     [SerializeField]
     [Range(0f, 360f)]
     public float angle;
@@ -58,7 +64,7 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     protected LayerMask obstructionMask;
     private Coroutine checkPlayerCoroutine;
     protected Coroutine attack, findPlayer, forgivePlayer, RunAwayPlayer;
-
+    
     protected virtual void Awake()
     {
         if (IsServer)
@@ -173,7 +179,7 @@ public abstract class EnemyBehaviour : NetworkBehaviour
             }
         }
     }
-    public void GetHit(float damage)
+    public virtual void GetHit(float damage)
     {
         OnDamageReceivedEvent?.Raise(damage);
         Debug.Log("DAMAGE! " + damage);
@@ -193,7 +199,7 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     /**
      * ###################################### State Machine ################################ 
      */
-    public void OnEnemyFall()
+    public virtual void OnEnemyFall()
     {
         if(transform.position.y < -20)
         {

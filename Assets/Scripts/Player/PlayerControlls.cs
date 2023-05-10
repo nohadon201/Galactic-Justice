@@ -54,6 +54,7 @@ public class PlayerControlls : NetworkBehaviour
     private Coroutine RegenerationOfAmmunition, RegenerationShieldCoroutine;
 
     private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield, Interface;
+    public bool pushed;
 
     [SerializeField] public PlayerInfo OwnInfo;
 
@@ -65,6 +66,7 @@ public class PlayerControlls : NetworkBehaviour
 
     public void DefaultValues()
     {
+        pushed= false;
         Interface = false;
         Jump1 = false;
         Jump2 = false;
@@ -158,7 +160,7 @@ public class PlayerControlls : NetworkBehaviour
         {
             EndLevelDelegator?.Invoke();
         }
-
+        if (pushed) return;
         // Velocity of the player
         PlayerMovement();
 
@@ -416,6 +418,7 @@ public class PlayerControlls : NetworkBehaviour
 
     public void OnCollisionEnter(Collision collision)
     {
+        if(pushed) pushed= false;   
         if (collision.transform.tag == "Floor")
             TouchFloor();
     }
@@ -523,7 +526,6 @@ public class PlayerControlls : NetworkBehaviour
      */
     public void WinPoints(int points)
     {
-        if(IsClient) Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         if (IsOwner)
         {
             OwnInfo.Points += points;
