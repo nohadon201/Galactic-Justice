@@ -17,14 +17,14 @@ public class Zorgonian : EnemyBehaviour
     {
         if (!IsServer) return;
         // Zorgonian custom values
-        forceApliedToPlayer = 5;
+        forceApliedToPlayer = 9;
         ycomponent = Mathf.Sin(45 * Mathf.PI / 180);
         //  Zorgonian unique values
         filter.agentTypeID = 0;
         filter.areaMask = 7;
         velocity = 10.0f;
         currentPath = new();
-        damagePerImpact = 12f;
+        damagePerImpact = 100f;
         maxHealth = 200;
         currentHealth = maxHealth;
         RangeAttack = 2f;
@@ -92,11 +92,10 @@ public class Zorgonian : EnemyBehaviour
             if(hit.transform.gameObject.layer == LayerMask.NameToLayer("Target"))
             {
                 Vector3 dir = playerRef.position-transform.position;
-                
-                dir.y = ycomponent; 
-                hit.transform.gameObject.GetComponent<Rigidbody>().AddForce(dir * forceApliedToPlayer, ForceMode.Impulse);
-                hit.transform.gameObject.GetComponent<PlayerControlls>().pushed = true;    
-                hit.transform.gameObject.GetComponent<PlayerControlls>().Damage(damagePerImpact);
+                PlayerControlls pc = hit.transform.gameObject.GetComponent<PlayerControlls>();  
+                dir.y = ycomponent;
+                pc.GetPushedClientRpc(dir * forceApliedToPlayer, pc.IsOwner);    
+                pc.GetDamageClientRpc(damagePerImpact, pc.IsOwner);
             }
         }
     }
@@ -108,7 +107,7 @@ public class Zorgonian : EnemyBehaviour
         base.OnEnemyFall();
         if (transform.position.y < -20)
         {
-            OnEnemyDeathWich?.Raise((int)EnemyType.QUIRAXIAN);
+            OnEnemyDeathWich?.Raise((int)EnemyType.ZORGONIAN);
         }
     }
     public override void GetHit(float damage)
@@ -116,7 +115,7 @@ public class Zorgonian : EnemyBehaviour
         base.GetHit(damage);
         if (currentHealth <= 0)
         {
-            OnEnemyDeathWich.Raise((int)EnemyType.QUIRAXIAN);
+            OnEnemyDeathWich.Raise((int)EnemyType.ZORGONIAN);
         }
     }
     /*
@@ -222,7 +221,7 @@ public class Zorgonian : EnemyBehaviour
     {
         iker2 = true;
         StopCoroutine(attack);
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(2f);
         ChangeState(StateOfEnemy.FOLLOWING);
 
     }

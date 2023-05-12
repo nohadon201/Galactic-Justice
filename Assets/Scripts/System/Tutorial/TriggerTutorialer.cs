@@ -6,9 +6,9 @@ using UnityEngine.Events;
 public class TriggerTutorialer : MonoBehaviour
 {
     [SerializeField]
-    private TutorialerState m_Estado;
+    private StateScene m_Estado;
     [SerializeField]
-    private UnityEvent<TutorialerState, GameObject> m_Accion;
+    private UnityEvent<StateScene, GameObject> m_Accion;
     public bool Closed;
     BoxCollider bc;
     private void Awake()

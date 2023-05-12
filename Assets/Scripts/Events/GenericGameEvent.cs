@@ -33,10 +33,13 @@ public abstract class GameEvent<T> : ScriptableObject
                 EnemyType a = (EnemyType) Convert.ToInt32(parameter);
                 if(a == EnemyType.THRAAXIAN)
                 {
-                    ey.ChangeState(TutorialerState.State8, null);
+                    ey.ChangeState(StateScene.State8, null);
                 }else if(a == EnemyType.QUIRAXIAN)
                 {
-                    ey.ChangeState(TutorialerState.State8, null);
+                    ey.ChangeState(StateScene.State11, null);
+                }else if(a == EnemyType.ZORGONIAN)
+                {
+                    ey.ChangeState(StateScene.State14, null);
                 }
             }
             

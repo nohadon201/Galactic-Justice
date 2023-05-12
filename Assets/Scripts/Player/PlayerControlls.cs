@@ -450,11 +450,19 @@ public class PlayerControlls : NetworkBehaviour
             }
             RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
         }
-        GetDamageClientRpc(damage);
+        //GetDamageClientRpc(damage);
     }
     [ClientRpc]
-    public void GetDamageClientRpc(float damage)
+    public void GetPushedClientRpc(Vector3 force, bool host)
     {
+        if ((host && !IsServer) || (!host && IsServer)) return;
+        pushed= true;   
+        rb.AddForce(force, ForceMode.Impulse);
+    }
+    [ClientRpc]
+    public void GetDamageClientRpc(float damage, bool host)
+    {
+        if ((host && !IsServer) || (!host && IsServer)) return;
         Debug.Log("AU! Damage:" + damage + ", HealthBeforeImpact: " + OwnInfo.playersCurrentHealth + ", Shield: " + OwnInfo.playersCurrentShield);
         if (OwnInfo.playersCurrentShield > 0)
         {

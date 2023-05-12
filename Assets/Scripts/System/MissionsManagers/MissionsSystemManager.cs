@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 public class MissionsSystemManager : MonoBehaviour
 {
     public int lvl;
@@ -53,7 +55,8 @@ public class MissionsSystemManager : MonoBehaviour
                 missionsInitialValues[mission.idMission] = mission.Done;
             }
         }
-        GetComponent<BoxCollider>().enabled = false; 
+        GetComponent<BoxCollider>().enabled = false;
+        NetworkManager.Singleton.SceneManager.LoadScene("LevelMenu", LoadSceneMode.Single);
     }
 
     public void RaisedEvent(GameEvent gameEvent)

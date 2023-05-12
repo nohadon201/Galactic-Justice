@@ -29,7 +29,11 @@ public class UserSession : NetworkBehaviour
         if (SceneManager.GetSceneByBuildIndex(level).name != "Menu" && SceneManager.GetSceneByBuildIndex(level).name != "LevelMenu")
         {
             Cursor.lockState = CursorLockMode.Locked;
-            SpawnPlayerServerRpc(this.GetComponent<NetworkBehaviour>().OwnerClientId);    
+            SpawnPlayerServerRpc(this.GetComponent<NetworkBehaviour>().OwnerClientId);
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
         }
     }
     [ServerRpc]

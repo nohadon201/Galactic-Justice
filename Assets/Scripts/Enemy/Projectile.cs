@@ -32,9 +32,10 @@ public class Projectile : NetworkBehaviour
         
         if(other.transform.tag == "Player") {
             PlayerControlls pc = other.transform.GetComponentInParent<PlayerControlls>();
+            
             if (pc != null) 
             {
-                pc.Damage(this.damage); 
+                pc.GetDamageClientRpc(this.damage, pc.IsOwner); 
             }
         }
 
