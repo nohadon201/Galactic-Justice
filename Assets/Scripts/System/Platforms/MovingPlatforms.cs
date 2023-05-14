@@ -8,6 +8,7 @@ public class MovingPlatforms : MonoBehaviour
     [SerializeField] private TypeMovement type;
     private float level, positionToGo;
     Rigidbody rb;
+    public float Diff = 5;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>(); 
@@ -20,9 +21,9 @@ public class MovingPlatforms : MonoBehaviour
             level = transform.position.x;
         }
         if (initPositive)
-            positionToGo = level + 5;
+            positionToGo = level + Diff;
         else
-            positionToGo = level - 5;
+            positionToGo = level - Diff;
         StartCoroutine(changePosition());
     }
     void Update()
@@ -37,7 +38,7 @@ public class MovingPlatforms : MonoBehaviour
         while(true)
         {
             yield return new WaitForSeconds(3f);
-            positionToGo = positionToGo > level ? level - 10 : level + 10;
+            positionToGo = positionToGo > level ? level - Diff : level + Diff;
         }
     }
 }

@@ -41,6 +41,7 @@ public class UserSession : NetworkBehaviour
     {
         GameObject go = Instantiate(Resources.Load<GameObject>("Prefabs/Player/Player"));
         //go.transform.position = new Vector3(61.3f, 8.5f, 165.9f);
+        //go.transform.position = new Vector3(0.08f, 2f, 298.19f);
         go.transform.position = new Vector3(0f, 0f, 0f);
         go.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId, true) ;
     } 
