@@ -10,11 +10,9 @@ public class SaveGame : ScriptableObject
     public List<PowerBulletSO> powerBulletHost;
     [Header("")]
     [Header("Client Variables")]
-    public List<SlotOfMemory> slotsHost;
     public PlayerInfo playerClient;
-    public List<SlotOfMemory> slotsClient;
     public List<PowerBulletSO> powerBulletClient;
     [Header("Missions Completed")]
     public List<Mission> missions;
-
+    public List<Mission<int>> missionIntParam;
 }

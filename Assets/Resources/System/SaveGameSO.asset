@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b4dfe04df29869408fa674e0550a80a, type: 3}
+  m_Name: SaveGameSO
+  m_EditorClassIdentifier: 
+  LevelsCompleted: 0
+  playerHost: {fileID: 11400000, guid: 7ea75af73ad17ad46b4fa2349ee79393, type: 2}
+  powerBulletHost:
+  - {fileID: 11400000, guid: dd40ef0fa2412a945868a2f747d0b731, type: 2}
+  - {fileID: 11400000, guid: 6dfec1726e7765843bffbd95b01b5167, type: 2}
+  - {fileID: 11400000, guid: 59ddda67db5f53f42b46cdf5834055a6, type: 2}
+  - {fileID: 11400000, guid: e834dfd007525144087cb8f85937ec2f, type: 2}
+  - {fileID: 11400000, guid: 7193427c9a2c4d74d9c93d1290c72e45, type: 2}
+  - {fileID: 11400000, guid: 8b1f999373b669d46a452a230062d565, type: 2}
+  - {fileID: 11400000, guid: 044cd82c6ddbd0c40951abf43ab87cd3, type: 2}
+  - {fileID: 11400000, guid: abedb99fba5767447b15ab9753b9bcdd, type: 2}
+  - {fileID: 11400000, guid: a84061a7b1936f74f8cdabeccbf37706, type: 2}
+  - {fileID: 11400000, guid: 82c786457c4d6e944994abb09e80e077, type: 2}
+  - {fileID: 11400000, guid: 1477ef7efa13d884490e802506d17d71, type: 2}
+  - {fileID: 11400000, guid: 4fb0fb03a6ca6c046a1af47155bb44a9, type: 2}
+  - {fileID: 11400000, guid: cc6680f4876f12345a6ccd26f90a8247, type: 2}
+  - {fileID: 11400000, guid: c96d3071acf009448ab7073946227f8e, type: 2}
+  playerClient: {fileID: 11400000, guid: 3c337a7acc257864bb34f689bc7d4383, type: 2}
+  powerBulletClient:
+  - {fileID: 11400000, guid: 57efe433a69d5654e9e0f4a271f04420, type: 2}
+  - {fileID: 11400000, guid: 03d972f1ccf022f4589234716ab89de3, type: 2}
+  - {fileID: 11400000, guid: b5ff7b1c508cb024eac57950608005e4, type: 2}
+  - {fileID: 11400000, guid: ac8dab2a28fb88a45a65122b6c2e3b65, type: 2}
+  - {fileID: 11400000, guid: ae157842a928b934f8df2c1646d3729c, type: 2}
+  - {fileID: 11400000, guid: 11fb5a2dee2498b47b4b97dd9ed10775, type: 2}
+  - {fileID: 11400000, guid: fc6433d836a1e3149a34b5d76b0babfd, type: 2}
+  - {fileID: 11400000, guid: e8c8734f02b2fd543b607f9642d905cd, type: 2}
+  - {fileID: 11400000, guid: 51943df478edd6843b2eacf487f6495b, type: 2}
+  - {fileID: 11400000, guid: e454389a2283b9d4a95c50238446aed2, type: 2}
+  - {fileID: 11400000, guid: 46094c97cbd548b4589baab903419c50, type: 2}
+  - {fileID: 11400000, guid: 0193519690a0a5c40a3676e518f0a7d7, type: 2}
+  - {fileID: 11400000, guid: 00468e049bbb61b43858f486e02ef806, type: 2}
+  - {fileID: 11400000, guid: c45162f7bb959c14d9aacf29e9c00ae0, type: 2}
+  missions: []

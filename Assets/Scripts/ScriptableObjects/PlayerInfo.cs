@@ -25,7 +25,7 @@ public class PlayerInfo : ScriptableObject
 
     public List<Skills> abilities;
 
-    public void DefaultValues()
+    public void DefaultValues(bool Host)
     {
         if (abilities.Count == 0)
         {
@@ -34,10 +34,18 @@ public class PlayerInfo : ScriptableObject
             abilities.Add(Resources.Load<Skills>("Abilities/Skill3"));
             abilities.Add(Resources.Load<Skills>("Abilities/Skill4"));
         }
-        playerVelocity = playerVelocity == 0 ? 10f : playerVelocity;
+        if (MemorySlots.Count == 0 && Host)
+        {
+            MemorySlots.AddRange(Resources.LoadAll<SlotOfMemory>("Player/Host/SlotOfMemory/"));
+        }
+        else if (MemorySlots.Count == 0)
+        {
+            MemorySlots.AddRange(Resources.LoadAll<SlotOfMemory>("Player/Client/SlotOfMemory/"));
+        }
+        playerVelocity = playerVelocity == 0 ? 7f : playerVelocity;
 
         playersMaxHealth = playersMaxHealth == 0 ? 100 : playersMaxHealth;
-        playersMaxShield = playersMaxShield == 0 ? 300 : playersMaxShield;  
+        playersMaxShield = playersMaxShield == 0 ? 300 : playersMaxShield;
 
         Sensibility = Sensibility == 0 ? 0.3f : Sensibility;
 
@@ -45,6 +53,6 @@ public class PlayerInfo : ScriptableObject
         playersCurrentShield = playersMaxShield;
 
         RegenerationShieldValue = RegenerationShieldValue == 0 ? 0.3f : RegenerationShieldValue;
-
+        Points = 0;
     }
 }

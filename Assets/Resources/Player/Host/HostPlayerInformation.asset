@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: HostPlayerInformation
   m_EditorClassIdentifier: 
   Points: 0
-  playerVelocity: 12.5
+  playerVelocity: 9
   playersMaxHealth: 100
   playersCurrentHealth: 100
   playersMaxShield: 300
   playersCurrentShield: 300
   RegenerationShieldValue: 0.3
   Sensibility: 0.3
-  MemorySlots: []
-  abilities:
-  - {fileID: 11400000, guid: ef2b86ab3199b5c4ba3832206e89c8fa, type: 2}
-  - {fileID: 11400000, guid: 91b3d3f03e7597649a0b8e98f9aea631, type: 2}
-  - {fileID: 11400000, guid: 7554b301d65dd2b438491a75656b70bd, type: 2}
+  MemorySlots:
+  - {fileID: 11400000, guid: c866fe4b7ae87d84b88cded547398cb6, type: 2}
+  - {fileID: 11400000, guid: 8bb706358a716b944a1d96870a20e58e, type: 2}
+  - {fileID: 11400000, guid: ae0fa9f35a478be45a1cb0d7d9be7ca1, type: 2}
+  abilities: []

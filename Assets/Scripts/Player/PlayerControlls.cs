@@ -53,7 +53,7 @@ public class PlayerControlls : NetworkBehaviour
     
     private Coroutine RegenerationOfAmmunition, RegenerationShieldCoroutine;
 
-    private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield, Interface;
+    private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield, Interface, Step;
     public bool pushed;
 
     [SerializeField] public PlayerInfo OwnInfo;
@@ -63,9 +63,18 @@ public class PlayerControlls : NetworkBehaviour
 
     private GameObject VirtualCamera;
     public GameObject Camera;
+    [SerializeField]
+    private Transform StepDetectorTransformForward;
+    [SerializeField]
+    private Transform StepDetectorTransformRight;
+    [SerializeField]
+    private Transform StepDetectorTransformLeft;
+    [SerializeField]
+    private Transform StepDetectorTransformBehind;
 
     public void DefaultValues()
     {
+        Step = false;
         pushed= false;
         Interface = false;
         Jump1 = false;
@@ -87,7 +96,7 @@ public class PlayerControlls : NetworkBehaviour
         else
             OwnInfo = Resources.Load<PlayerInfo>("Player/Host/HostPlayerInformation");
 
-        OwnInfo.DefaultValues();
+        OwnInfo.DefaultValues(IsServer);
 
         foreach (Skills sk in OwnInfo.abilities)
         {
@@ -259,14 +268,15 @@ public class PlayerControlls : NetworkBehaviour
     public void PlayerMovement()
     {
         //      X 
-        Vector3 velocity;
         if (directionMovement.x > 0)
         {
             rb.velocity = new Vector3(transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, transform.right.z * OwnInfo.playerVelocity);
+            RaycastStep(StepDetectorTransformRight.position, StepDetectorTransformRight.right, 100f);
         }
         else if (directionMovement.x < 0)
         {
             rb.velocity = new Vector3(-transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, -transform.right.z * OwnInfo.playerVelocity);
+            RaycastStep(StepDetectorTransformLeft.position, -StepDetectorTransformLeft.right, 100f);
         }
         else
         {
@@ -277,11 +287,15 @@ public class PlayerControlls : NetworkBehaviour
         if (directionMovement.y > 0)
         {
             rb.velocity += new Vector3(transform.forward.x, 0, transform.forward.z) * OwnInfo.playerVelocity;
+            RaycastStep(StepDetectorTransformForward.position, StepDetectorTransformForward.forward, 100f);
         }
         else if (directionMovement.y < 0)
         {
             rb.velocity += new Vector3(-transform.forward.x, 0, -transform.forward.z) * OwnInfo.playerVelocity;
+            RaycastStep(StepDetectorTransformBehind.position, -StepDetectorTransformBehind.forward, 100f);
         }
+        if (Step)
+            StartCoroutine(StepForceCooldown(0.4f));
     }
     public IEnumerator Dash()
     {
@@ -312,6 +326,21 @@ public class PlayerControlls : NetworkBehaviour
 
         }
     }
+    private void RaycastStep(Vector3 position, Vector3 direction, float force)
+    {
+        if(Physics.Raycast(position, direction, 0.5f, 7) && !Step)
+        {
+            Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAA");
+            Step = true;
+            rb.AddForce(transform.up * force,  ForceMode.Force);
+        }
+        Debug.DrawLine(position, position +( direction ), Color.red, 0.5f);
+    }
+    private IEnumerator StepForceCooldown(float time)
+    {
+        yield return new WaitForSeconds(time);
+        Step = false;
+    }
     public void OnPlayerMove(InputAction.CallbackContext context)
     {
         if (Dashing || !IsOwner || Interface) return;
@@ -334,12 +363,12 @@ public class PlayerControlls : NetworkBehaviour
             if (!Jump1 && !Jump2)
             {
                 Jump1 = true;
-                rb.AddForce(transform.up * 300f);
+                rb.AddForce(transform.up * 200f);
             }
             else if (!Jump2)
             {
                 Jump2 = true;
-                rb.AddForce(transform.up * 300f);
+                rb.AddForce(transform.up * 200f);
             }
 
         }
@@ -419,8 +448,7 @@ public class PlayerControlls : NetworkBehaviour
     public void OnCollisionEnter(Collision collision)
     {
         if(pushed) pushed= false;   
-        if (collision.transform.tag == "Floor")
-            TouchFloor();
+        TouchFloor();
     }
 
     public void Damage(float damage)

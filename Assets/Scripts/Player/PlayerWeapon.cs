@@ -81,6 +81,7 @@ public class PlayerWeapon : NetworkBehaviour
     public void RegenerateAmmunition(float RegenerationValue)
     {
         //Debug.Log("Regenerating: " + CurrentConfiguration.CurrentAmmunition);
+        if(CurrentConfiguration.CurrentAmmunition< 0) {  CurrentConfiguration.CurrentAmmunition = 0;}
         CurrentConfiguration.CurrentAmmunition += RegenerationValue;
     }
     public bool AmmunitionEmpty()
