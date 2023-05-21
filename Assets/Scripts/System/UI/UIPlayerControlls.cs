@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using static PlayerControlls;
@@ -10,19 +11,24 @@ using static PlayerControlls;
 public class UIPlayerControlls : MonoBehaviour
 {
     private GameObject prefabConfiguration, player, powerBulletPrefab;
-    [SerializeField]
-    private PlayerWeapon playerWeapon;
-    [SerializeField]
-    private PlayerInfo playerInformation;
+    
+    [SerializeField] private PlayerWeapon playerWeapon;
+    [SerializeField] private PlayerInfo playerInformation;
+
     private Texture slotSelected;
     private Texture slotNotSelected;
+    
+    private int MenuDisplayed;
+    private bool withoutInterface;
+    
+   
+    [SerializeField] private List<ConfigurationUI> configurationUI = new List<ConfigurationUI>(); 
     Image sliderOfAmmunition;
     Image sliderOfShield;
     Image sliderOfHealth;
-    [SerializeField]
-    private List<ConfigurationUI> configurationUI = new List<ConfigurationUI>();
-    private int MenuDisplayed;
     private TextMeshProUGUI points;
+    private Button ExitGame, SaveGame, GoToChooseLevel, Disconnect;
+    
     void Awake()
     {
 
@@ -53,6 +59,24 @@ public class UIPlayerControlls : MonoBehaviour
         slotNotSelected = Resources.Load<Texture>("UI/Menu/NotSelected");
         slotSelected = Resources.Load<Texture>("UI/Menu/Selected");
 
+        if (NetworkManager.Singleton.IsServer)
+        {
+            transform.GetChild(5).GetChild(1).gameObject.SetActive(true);
+            transform.GetChild(5).GetChild(2).gameObject.SetActive(false);
+        }
+        else
+        {
+            transform.GetChild(5).GetChild(1).gameObject.SetActive(false);
+            transform.GetChild(5).GetChild(2).gameObject.SetActive(true);
+        }
+
+        SaveGame = transform.GetChild(5).GetChild(1).GetChild(0).gameObject.GetComponent<Button>();
+        GoToChooseLevel = transform.GetChild(5).GetChild(1).GetChild(1).gameObject.GetComponent<Button>();
+        ExitGame = transform.GetChild(5).GetChild(1).GetChild(2).gameObject.GetComponent<Button>();
+        Disconnect = transform.GetChild(5).GetChild(2).GetChild(0).gameObject.GetComponent<Button>();
+        
+        transform.GetChild(5).gameObject.SetActive(false);
+
     }
 
     public void setValues(GameObject Player)
@@ -64,6 +88,7 @@ public class UIPlayerControlls : MonoBehaviour
         pc.displayInterfaceDelegator += displayMenu;
         pc.changeSlotDelegator += ChangeSlotInRealTime;
         pc.goToNextInterfaceDelegator += GoToNextInterface;
+        pc.displayPauseDelegator += DisplayConfigs;
         int ver = 0;
         int hor = 0;
         GetComponent<WinPointsListener>().Response.AddListener(pc.WinPoints);
@@ -119,6 +144,10 @@ public class UIPlayerControlls : MonoBehaviour
             cUI.Freq.text = MathF.Truncate(cUI.slotOfMemory.Frequency * 100) + "%";
             e++;
         }
+        SaveGame.onClick.AddListener(()=>pc.SaveGame());
+        GoToChooseLevel.onClick.AddListener(() => pc.GoToLevelMenu());
+        ExitGame.onClick.AddListener(() => pc.BackToMenu());
+        Disconnect.onClick.AddListener(()=>pc.DisconnectClient());  
         StartCoroutine(UpdateValues());
     }
 
@@ -176,6 +205,44 @@ public class UIPlayerControlls : MonoBehaviour
             transform.GetChild(4).gameObject.SetActive(false);
         }
         
+    }
+    public void DisplayConfigs()
+    {
+        if (!transform.GetChild(5).gameObject.activeSelf)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            withoutInterface = transform.GetChild(0).gameObject.activeSelf;
+            transform.GetChild(0).gameObject.SetActive(false);
+            transform.GetChild(1).gameObject.SetActive(false);
+            transform.GetChild(2).gameObject.SetActive(false);
+            transform.GetChild(3).gameObject.SetActive(false);
+            transform.GetChild(4).gameObject.SetActive(false);
+            transform.GetChild(5).gameObject.SetActive(true);
+        }
+        else
+        {
+            if (withoutInterface)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                transform.GetChild(0).gameObject.SetActive(true);
+                transform.GetChild(1).gameObject.SetActive(true);
+                transform.GetChild(2).gameObject.SetActive(true);
+                transform.GetChild(3).gameObject.SetActive(true);
+                transform.GetChild(4).gameObject.SetActive(false);
+                transform.GetChild(5).gameObject.SetActive(false);
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+                transform.GetChild(0).gameObject.SetActive(false);
+                transform.GetChild(1).gameObject.SetActive(false);
+                transform.GetChild(2).gameObject.SetActive(false);
+                transform.GetChild(3).gameObject.SetActive(false);
+                transform.GetChild(4).gameObject.SetActive(true);
+                transform.GetChild(5).gameObject.SetActive(false);
+            }
+            
+        }
     }
     private void ChangeSlotInRealTime()
     {

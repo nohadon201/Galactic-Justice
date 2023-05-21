@@ -14,6 +14,9 @@ public class PlayerControlls : NetworkBehaviour
     public delegate void DisplayInterface();
     public DisplayInterface displayInterfaceDelegator;
 
+    public delegate void DisplayPause();
+    public DisplayPause displayPauseDelegator;
+
     public delegate void ChangeSlot();
     public DisplayInterface changeSlotDelegator;
 
@@ -32,17 +35,17 @@ public class PlayerControlls : NetworkBehaviour
     private GameObject CameraTarget;
 
     private Vector2 directionMovement, directionRotationOfCamera;
-    
+
     private float cameraRotation;
 
     /*
      * ################################### Components Of GameObject ##############################################
      */
-   
+
     private Rigidbody rb;
-    
+
     private PlayerWeapon weapon;
-    
+
     private PowerBullets powerBullets;
 
     /*
@@ -50,10 +53,10 @@ public class PlayerControlls : NetworkBehaviour
      */
     private float dashForce, dashingTime, dashCooldown;
 
-    
+
     private Coroutine RegenerationOfAmmunition, RegenerationShieldCoroutine;
 
-    private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield, Interface, Step;
+    private bool Jump1, Jump2, CanDash, Dashing, RegenerationShield, Interface, Pause, Step;
     public bool pushed;
 
     [SerializeField] public PlayerInfo OwnInfo;
@@ -75,7 +78,7 @@ public class PlayerControlls : NetworkBehaviour
     public void DefaultValues()
     {
         Step = false;
-        pushed= false;
+        pushed = false;
         Interface = false;
         Jump1 = false;
         Jump2 = false;
@@ -147,7 +150,7 @@ public class PlayerControlls : NetworkBehaviour
                 OnPlayerDeath();
             else
                 transform.position = new Vector3(0, 0, 0);
-            
+
         }
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
@@ -189,15 +192,24 @@ public class PlayerControlls : NetworkBehaviour
     */
     public void OnInterfaceDisplayer(InputAction.CallbackContext context)
     {
-        if(!IsOwner || Dashing) return;
+        if (!IsOwner || Dashing || Pause) return;
         if (context.canceled)
         {
             displayInterfaceDelegator.Invoke();
-            
+
             if (Interface)
                 powerBullets.LoadPointsPowers();
-            
+
             Interface = Interface ? false : true;
+        }
+    }
+    public void OnPauseGame(InputAction.CallbackContext context)
+    {
+        if (!IsOwner || Dashing) return;
+        if (context.canceled)
+        {
+            displayPauseDelegator?.Invoke();
+            Pause = Pause ? false : true;
         }
     }
     /**
@@ -205,7 +217,7 @@ public class PlayerControlls : NetworkBehaviour
      */
     public void OnClick(InputAction.CallbackContext context)
     {
-        if (Dashing || !IsOwner || Interface) return;
+        if (Dashing || !IsOwner || Interface || Pause) return;
 
         if (context.started)
         {
@@ -271,12 +283,12 @@ public class PlayerControlls : NetworkBehaviour
         if (directionMovement.x > 0)
         {
             rb.velocity = new Vector3(transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, transform.right.z * OwnInfo.playerVelocity);
-            RaycastStep(StepDetectorTransformRight.position, StepDetectorTransformRight.right, 100f);
+            //RaycastStep(StepDetectorTransformRight.position, StepDetectorTransformRight.right, 100f);
         }
         else if (directionMovement.x < 0)
         {
             rb.velocity = new Vector3(-transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, -transform.right.z * OwnInfo.playerVelocity);
-            RaycastStep(StepDetectorTransformLeft.position, -StepDetectorTransformLeft.right, 100f);
+            //RaycastStep(StepDetectorTransformLeft.position, -StepDetectorTransformLeft.right, 100f);
         }
         else
         {
@@ -287,15 +299,15 @@ public class PlayerControlls : NetworkBehaviour
         if (directionMovement.y > 0)
         {
             rb.velocity += new Vector3(transform.forward.x, 0, transform.forward.z) * OwnInfo.playerVelocity;
-            RaycastStep(StepDetectorTransformForward.position, StepDetectorTransformForward.forward, 100f);
+            //RaycastStep(StepDetectorTransformForward.position, StepDetectorTransformForward.forward, 100f);
         }
         else if (directionMovement.y < 0)
         {
             rb.velocity += new Vector3(-transform.forward.x, 0, -transform.forward.z) * OwnInfo.playerVelocity;
-            RaycastStep(StepDetectorTransformBehind.position, -StepDetectorTransformBehind.forward, 100f);
+            //RaycastStep(StepDetectorTransformBehind.position, -StepDetectorTransformBehind.forward, 100f);
         }
-        if (Step)
-            StartCoroutine(StepForceCooldown(0.4f));
+        //if (Step)
+        //    StartCoroutine(StepForceCooldown(0.4f));
     }
     public IEnumerator Dash()
     {
@@ -310,12 +322,12 @@ public class PlayerControlls : NetworkBehaviour
     }
     public void OnDashing(InputAction.CallbackContext context)
     {
-        if (CanDash && IsOwner && !Interface)
+        if (CanDash && IsOwner && !Interface && !Pause)
             StartCoroutine(Dash());
     }
     public void OnCameraRotate(InputAction.CallbackContext context)
     {
-        if (Dashing || !IsOwner || Interface) return;
+        if (Dashing || !IsOwner || Interface || Pause) return;
         try
         {
             Vector2 v2 = context.ReadValue<Vector2>();
@@ -328,13 +340,12 @@ public class PlayerControlls : NetworkBehaviour
     }
     private void RaycastStep(Vector3 position, Vector3 direction, float force)
     {
-        if(Physics.Raycast(position, direction, 0.5f, 7) && !Step)
+        if (Physics.Raycast(position, direction, 0.5f, 7) && !Step)
         {
-            Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAA");
             Step = true;
-            rb.AddForce(transform.up * force,  ForceMode.Force);
+            rb.AddForce(transform.up * force, ForceMode.Force);
         }
-        Debug.DrawLine(position, position +( direction ), Color.red, 0.5f);
+        Debug.DrawLine(position, position + (direction), Color.red, 0.5f);
     }
     private IEnumerator StepForceCooldown(float time)
     {
@@ -343,7 +354,7 @@ public class PlayerControlls : NetworkBehaviour
     }
     public void OnPlayerMove(InputAction.CallbackContext context)
     {
-        if (Dashing || !IsOwner || Interface) return;
+        if (Dashing || !IsOwner || Interface || Pause) return;
         try
         {
             Vector2 v2 = context.ReadValue<Vector2>();
@@ -356,19 +367,19 @@ public class PlayerControlls : NetworkBehaviour
     }
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (Dashing || !IsOwner || Interface) return;
+        if (Dashing || !IsOwner || Interface || Pause) return;
 
         if (context.performed)
         {
             if (!Jump1 && !Jump2)
             {
                 Jump1 = true;
-                rb.AddForce(transform.up * 200f);
+                rb.AddForce(transform.up * 200);
             }
             else if (!Jump2)
             {
                 Jump2 = true;
-                rb.AddForce(transform.up * 200f);
+                rb.AddForce(transform.up * 200);
             }
 
         }
@@ -385,7 +396,7 @@ public class PlayerControlls : NetworkBehaviour
 
     public void OnRightSlot(InputAction.CallbackContext context)
     {
-        if (!IsOwner) return;
+        if (!IsOwner || Pause) return;
         if (!Interface)
         {
             changeSlotDelegator?.Invoke();
@@ -413,7 +424,7 @@ public class PlayerControlls : NetworkBehaviour
     }
     public void OnLeftSlot(InputAction.CallbackContext context)
     {
-        if (!IsOwner) return;
+        if (!IsOwner || Pause) return;
         if (!Interface)
         {
             changeSlotDelegator?.Invoke();
@@ -447,7 +458,7 @@ public class PlayerControlls : NetworkBehaviour
 
     public void OnCollisionEnter(Collision collision)
     {
-        if(pushed) pushed= false;   
+        if (pushed) pushed = false;
         TouchFloor();
     }
 
@@ -484,7 +495,7 @@ public class PlayerControlls : NetworkBehaviour
     public void GetPushedClientRpc(Vector3 force, bool host)
     {
         if ((host && !IsServer) || (!host && IsServer)) return;
-        pushed= true;   
+        pushed = true;
         rb.AddForce(force, ForceMode.Impulse);
     }
     [ClientRpc]
@@ -543,7 +554,7 @@ public class PlayerControlls : NetworkBehaviour
     private void OnPlayerDeath()
     {
 
-    }
+    } 
     /**
      * ############################ Temporal Skills ########################################### 
      */
@@ -564,8 +575,9 @@ public class PlayerControlls : NetworkBehaviour
     {
         if (IsOwner)
         {
+            OwnInfo.TotalPoints += points;
             OwnInfo.Points += points;
-            if(IsServer) WinPointsClientRpc(points);
+            if (IsServer) WinPointsClientRpc(points);
         }
     }
     [ClientRpc]
@@ -573,6 +585,32 @@ public class PlayerControlls : NetworkBehaviour
     {
         if (IsServer) return;
         WinPointsEvent?.Raise(points);
+    }
+    /**
+     * ############################ PauseActions ########################################### 
+     */
+
+    //      CLIENT
+    public void DisconnectClient()
+    {
+        NetworkManager.Singleton.DisconnectClient(GetComponent<NetworkObject>().OwnerClientId);
+        NetworkManager.Singleton.Shutdown();
+        SceneManager.LoadScene("Menu");
+    }
+
+    //      HOST
+    public void GoToLevelMenu()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("LevelMenu", LoadSceneMode.Single);
+    }
+    public void BackToMenu()
+    {
+        NetworkManager.Singleton.Shutdown();
+        SceneManager.LoadScene("Menu");
+    }
+    public void SaveGame()
+    {
+        SaveGameManager.Singleton.SaveClientRpc();
     }
 }
 

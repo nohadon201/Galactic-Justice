@@ -28,12 +28,13 @@ public class PlayerWeapon : NetworkBehaviour
     [SerializeField]
     private LayerMask obstructionMask;
 
+    NetworkObject no;
     //      Functions that executes only at Start
     private void Start()
     {
         obstructionMask |= (1 << LayerMask.NameToLayer("Enemy"));
         obstructionMask |= (1 << LayerMask.NameToLayer("Obstruction"));
-
+        no = GetComponent<NetworkObject>(); 
         powerBullets = GetComponent<PowerBullets>();
         if (IsServer && IsOwner)
             WeaponConfigurations = Resources.LoadAll<SlotOfMemory>("Player/Host/SlotOfMemory").ToList();
@@ -99,7 +100,7 @@ public class PlayerWeapon : NetworkBehaviour
     {
         if (CurrentConfiguration.Accuracy == 1)
         {
-            RayCastToServerRpc(transform.position, camera.transform.forward, false);
+            RayCastToServerRpc(transform.position, camera.transform.forward, false, CurrentConfiguration.MaxRange * CurrentConfiguration.Power, CurrentConfiguration.CurrentDamageWeapon, CurrentConfiguration.CurrentForce, no.OwnerClientId);
         }
         else
         {
@@ -108,48 +109,48 @@ public class PlayerWeapon : NetworkBehaviour
                 Vector3 shootDirection = camera.transform.forward
                                         + camera.transform.right * CurrentConfiguration.CurrentDispersion[a].x
                                         + camera.transform.up * CurrentConfiguration.CurrentDispersion[a].y;
-                RayCastToServerRpc(transform.position, shootDirection.normalized, false);
+                RayCastToServerRpc(transform.position, shootDirection.normalized, false, CurrentConfiguration.MaxRange * CurrentConfiguration.Power, CurrentConfiguration.CurrentDamageWeapon, CurrentConfiguration.CurrentForce, no.OwnerClientId);
             }
         }
     }
     [ServerRpc]
-    public void RayCastToServerRpc(Vector3 origin, Vector3 v, bool byPowerBullet)
+    public void RayCastToServerRpc(Vector3 origin, Vector3 v, bool byPowerBullet, float currentRange, float currentDamage, float currentForce, ulong clientId)
     {
         if (!byPowerBullet)
         {
-            RestAmmunitionClientRpc();
+            RestAmmunitionClientRpc(clientId);
         }
 
         RaycastHit hit;
 
-        if (Physics.Raycast(origin, v, out hit, CurrentConfiguration.MaxRange * CurrentConfiguration.Power, obstructionMask))
+        if (Physics.Raycast(origin, v, out hit,currentRange, obstructionMask))
         {
             Debug.DrawLine(origin, hit.point, Color.red, 3f);
             if (hit.transform.tag.Contains("Physics"))
             {
-                hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * CurrentConfiguration.CurrentForce, hit.point);
+                hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * currentForce, hit.point);
             }
             else if (hit.transform.tag.Contains("Enemy"))
             {
-                hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * CurrentConfiguration.CurrentForce * 10, hit.point);
+                hit.transform.gameObject.GetComponent<Rigidbody>().AddForceAtPosition(-hit.normal * currentForce * 10, hit.point);
                 EnemyBehaviour eb = hit.transform.gameObject.GetComponent<EnemyBehaviour>();
                 if (eb != null)
                 {
                     eb.playerRef = transform;
                     eb.ChangeState(StateOfEnemy.FOLLOWING);
-                    eb.GetHit(CurrentConfiguration.CurrentDamageWeapon);
+                    eb.GetHit(currentDamage);
                 }
             }else if(hit.transform.tag == "Tutorialer")
             {
                 hit.transform.parent.gameObject.GetComponent<Tutorialer>()?.OnDisparar();
             }
-            if (!byPowerBullet) powerBullets.execute(hit, byPowerBullet);
+            if (!byPowerBullet) powerBullets.execute(hit, byPowerBullet, currentRange, currentDamage, currentForce);
         }
     }
     [ClientRpc]
-    private void RestAmmunitionClientRpc()
+    private void RestAmmunitionClientRpc(ulong clientId)
     {
-        if (!IsOwner) return;
+        if (!IsOwner || no.OwnerClientId != clientId) return;
         CurrentConfiguration.CurrentAmmunition -= CurrentConfiguration.CurrentWasteOfAmmunitionPerBullet;
     }
 }

@@ -7,7 +7,7 @@ public class PlayerInfo : ScriptableObject
 {
     //      Controls Variables
     [Header("Player Information")]
-
+    public int TotalPoints;
     public int Points;
     public float playerVelocity;
 
@@ -37,11 +37,13 @@ public class PlayerInfo : ScriptableObject
         if (MemorySlots.Count == 0 && Host)
         {
             MemorySlots.AddRange(Resources.LoadAll<SlotOfMemory>("Player/Host/SlotOfMemory/"));
+            
         }
         else if (MemorySlots.Count == 0)
         {
             MemorySlots.AddRange(Resources.LoadAll<SlotOfMemory>("Player/Client/SlotOfMemory/"));
         }
+
         playerVelocity = playerVelocity == 0 ? 7f : playerVelocity;
 
         playersMaxHealth = playersMaxHealth == 0 ? 100 : playersMaxHealth;

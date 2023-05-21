@@ -45,4 +45,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0193519690a0a5c40a3676e518f0a7d7, type: 2}
   - {fileID: 11400000, guid: 00468e049bbb61b43858f486e02ef806, type: 2}
   - {fileID: 11400000, guid: c45162f7bb959c14d9aacf29e9c00ae0, type: 2}
-  missions: []
+  missions:
+  - {fileID: 11400000, guid: f0b8f0f6d8c68e744b5b041dae0201a4, type: 2}
+  missionIntParam:
+  - {fileID: 11400000, guid: e436e8943d76c0a4490a4e10c5ce8b68, type: 2}

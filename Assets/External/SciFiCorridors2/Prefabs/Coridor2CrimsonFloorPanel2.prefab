@@ -9,10 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1030974699}
-  - component: {fileID: 6351999897547512413}
-  m_Layer: 0
+  - component: {fileID: 7968473113220310252}
+  m_Layer: 7
   m_Name: Coridor2CrimsonFloorPanel2
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -33,8 +33,8 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &6351999897547512413
-MeshCollider:
+--- !u!65 &7968473113220310252
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -43,10 +43,9 @@ MeshCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
+  serializedVersion: 2
+  m_Size: {x: 2.0136292, y: 0.02, z: 2.0116482}
+  m_Center: {x: 0.0031853914, y: 0.01, z: 0.004491329}
 --- !u!1 &1030974700
 GameObject:
   m_ObjectHideFlags: 0
@@ -58,8 +57,7 @@ GameObject:
   - component: {fileID: 1030974701}
   - component: {fileID: 1030974702}
   - component: {fileID: 1030974703}
-  - component: {fileID: 3554525943595981053}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SM_Coridor2CrimsonFloorPanel2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -130,18 +128,4 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1030974700}
-  m_Mesh: {fileID: 4300002, guid: abc00000000011939733491365526540, type: 3}
---- !u!64 &3554525943595981053
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1030974700}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
   m_Mesh: {fileID: 4300002, guid: abc00000000011939733491365526540, type: 3}

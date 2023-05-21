@@ -134,7 +134,7 @@ public class PowerBullets : NetworkBehaviour
     /**
      * ################################ PRINCIPAL FUNCTION ################################
      */
-    public void execute(RaycastHit hit, bool byPowerBullet)
+    public void execute(RaycastHit hit, bool byPowerBullet, float currentRange, float currentDamage, float currentForce)
     {
         foreach(PowerBulletNetworkInfo powerBulletInfo in powerBulletsValues) {
             if (powerBulletInfo.InvestValue > 0)
@@ -152,16 +152,16 @@ public class PowerBullets : NetworkBehaviour
                         DoubleForceBullet(hit, powerBulletInfo.InvestValue);
                         break;
                     case PowerBulletID.PIERCING:
-                        PiercingBullet(hit, powerBulletInfo.InvestValue);
+                        PiercingBullet(hit, powerBulletInfo.InvestValue, currentRange, currentDamage, currentForce);
                         break;
                     case PowerBulletID.MULTIPLIER:
-                        MultiplierBullet(hit, powerBulletInfo.InvestValue);
+                        MultiplierBullet(hit, powerBulletInfo.InvestValue, currentRange, currentDamage, currentForce);
                         break;
                     case PowerBulletID.BOUNCING:
-                        BouncingBullet(hit, powerBulletInfo.InvestValue);
+                        BouncingBullet(hit, powerBulletInfo.InvestValue, currentRange, currentDamage, currentForce);
                         break;
                     case PowerBulletID.BOUCING_SURFACE:
-                        BouncingSurfaceBullet(hit, powerBulletInfo.InvestValue, byPowerBullet);
+                        BouncingSurfaceBullet(hit, powerBulletInfo.InvestValue, currentRange, currentDamage, currentForce, byPowerBullet);
                         break;
                     case PowerBulletID.FLAME:
                         FlameBullet(hit, powerBulletInfo.InvestValue);
@@ -293,7 +293,7 @@ public class PowerBullets : NetworkBehaviour
     /**
      * ################################ PIERCING BULLET FUNCTIONS ################################
      */
-    private void PiercingBullet(RaycastHit hit, float powerBulletData)
+    private void PiercingBullet(RaycastHit hit, float powerBulletData, float currentRange, float currentDamage, float currentForce)
     {
         Debug.Log("################################# PIERCING BULLET #################################");
         float rand = Random.Range(0f, 1f);
@@ -302,7 +302,7 @@ public class PowerBullets : NetworkBehaviour
             if (hit.transform.tag == "Enemy")
             {
                 Vector3 v = hit.transform.GetChild(2).transform.position;
-                playerWeapon.RayCastToServerRpc(v, -hit.normal, true);
+                playerWeapon.RayCastToServerRpc(v, -hit.normal, true, currentRange, currentDamage, currentForce, 0);
                 Debug.DrawLine(v, v + (-hit.normal * 10), Color.green, 3f);
             }
         }
@@ -310,7 +310,7 @@ public class PowerBullets : NetworkBehaviour
     /**
      * ################################ MULTIPLIER BULLET FUNCTIONS ################################
      */
-    private void MultiplierBullet(RaycastHit hit, float powerBulletData)
+    private void MultiplierBullet(RaycastHit hit, float powerBulletData, float currentRange, float currentDamage, float currentForce)
     {
         Debug.Log("################################# MULTIPLIER BULLET #################################");
         float rand = Random.Range(0f, 1f);
@@ -321,15 +321,15 @@ public class PowerBullets : NetworkBehaviour
                 Vector3 dir = -hit.transform.forward + hit.transform.right * 0.5f;
                 Vector3 dir2 = -hit.transform.forward + hit.transform.right * -0.5f;
                 Vector3 piercingPoint = hit.transform.GetComponent<EnemyBehaviour>().PiercingPoint.position;
-                playerWeapon.RayCastToServerRpc(piercingPoint, dir.normalized, true);
-                playerWeapon.RayCastToServerRpc(piercingPoint, dir2.normalized, true);
+                playerWeapon.RayCastToServerRpc(piercingPoint, dir.normalized, true, currentRange, currentDamage, currentForce, 0);
+                playerWeapon.RayCastToServerRpc(piercingPoint, dir2.normalized, true, currentRange, currentDamage, currentForce, 0);
             }
         }
     }
     /**
      * ################################ BOUNCING BULLET FUNCTIONS ################################
      */
-    private void BouncingBullet(RaycastHit hit, float powerBulletData)
+    private void BouncingBullet(RaycastHit hit, float powerBulletData, float currentRange, float currentDamage, float currentForce)
     {
         Debug.Log("################################# BOUNCING BULLET #################################");
         float rand = Random.Range(0f, 1f);
@@ -339,7 +339,7 @@ public class PowerBullets : NetworkBehaviour
             {
                 Vector3 direction = (hit.transform.position - transform.position).normalized;
                 Vector3 reflection = Vector3.Reflect(direction, hit.normal);
-                playerWeapon.RayCastToServerRpc(hit.point, reflection, true);
+                playerWeapon.RayCastToServerRpc(hit.point, reflection, true, currentRange, currentDamage, currentForce, 0);
                 Debug.DrawLine(hit.point, hit.point + (reflection * 10), Color.green, 3f);
             }
         }
@@ -347,7 +347,7 @@ public class PowerBullets : NetworkBehaviour
     /**
      * ################################ BOUNCING SURFACE BULLET FUNCTIONS ################################
      */
-    private void BouncingSurfaceBullet(RaycastHit hit, float powerBulletData, bool byPowerBullet)
+    private void BouncingSurfaceBullet(RaycastHit hit, float powerBulletData, float currentRange, float currentDamage, float currentForce, bool byPowerBullet)
     {
         Debug.Log("################################# BOUNCING SURFACE BULLET #################################");
         float rand = Random.Range(0f, 1f);
@@ -358,7 +358,7 @@ public class PowerBullets : NetworkBehaviour
                 Vector3 direction = (hit.point - transform.position).normalized;
                 Vector3 reflection = Vector3.Reflect(direction, hit.normal);
                 Debug.DrawLine(hit.point, hit.point + (reflection * 5), Color.red, 3f);
-                playerWeapon.RayCastToServerRpc(hit.point, reflection, true);
+                playerWeapon.RayCastToServerRpc(hit.point, reflection, true, currentRange, currentDamage, currentForce, 0);
             }
         }
     }

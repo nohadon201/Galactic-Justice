@@ -5,7 +5,7 @@ using TMPro;
 using Unity.Netcode.Transports.UTP;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UI;   
 using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
@@ -63,10 +63,6 @@ public class LevelMenuScript : MonoBehaviour
             IpField.SetActive(false);
             NetworkManager.Singleton.StartHost();
         }
-    }
-    public void BackToMenu(InputAction.CallbackContext callbackContext)
-    {
-        
     }
     public void setIp()
     {

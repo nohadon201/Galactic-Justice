@@ -55,6 +55,8 @@ public class MissionsSystemManager : MonoBehaviour
                 missionsInitialValues[mission.idMission] = mission.Done;
             }
         }
+        SaveGameManager.Singleton.saveGame.LevelsCompleted++;
+        SaveGameManager.Singleton.SaveClientRpc();
         GetComponent<BoxCollider>().enabled = false;
         NetworkManager.Singleton.SceneManager.LoadScene("LevelMenu", LoadSceneMode.Single);
     }
