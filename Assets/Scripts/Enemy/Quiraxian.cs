@@ -57,7 +57,31 @@ public class Quiraxian : EnemyBehaviour
     private void CalculatePath(Vector3 position)
     {
         currentPath.ClearCorners();
-        NavMesh.CalculatePath(transform.position, position, filter, currentPath);
+        if (!NavMesh.CalculatePath(transform.position, position, filter, currentPath))
+        {
+            switch (currentState)
+            {
+                case StateOfEnemy.PATROL:
+                    int e = indexCurrentPointAlert;
+                    while (e == indexCurrentPointAlert)
+                    {
+                        e = UnityEngine.Random.Range(0, randomPositions.Count);
+                    }
+                    indexCurrentPointAlert = e;
+                    CalculatePath(randomPositions[e]);
+                    break;
+                default: break;
+            }
+            Debug.Log("NO ENCUENTRO AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            int a = indexCurrentPointAlert;
+            while (a == indexCurrentPointAlert)
+            {
+                a = UnityEngine.Random.Range(0, randomPositions.Count);
+            }
+            indexCurrentPointAlert = a;
+            
+
+        }
         navmeshIndexPosition = 0;
     }
 

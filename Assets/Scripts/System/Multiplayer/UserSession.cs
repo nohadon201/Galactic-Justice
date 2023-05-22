@@ -19,9 +19,15 @@ public class UserSession : NetworkBehaviour
     }
     public override void OnNetworkDespawn()
     {
+        
         MultiplayerInfo info = Resources.Load<MultiplayerInfo>("Multiplayer/MultiplayerInfo");
         info.NumberOfPlayers--;
         info.connected = false;
+        if (!IsServer)
+        {
+            NetworkManager.Singleton.Shutdown();
+            SceneManager.LoadScene("Menu");
+        }
     }
     private void OnLevelWasLoaded(int level)
     {

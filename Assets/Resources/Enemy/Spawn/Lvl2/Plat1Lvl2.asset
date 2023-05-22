@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3eb3b774fa41e94ab2326b24a24bf15, type: 3}
+  m_Name: Plat1Lvl2
+  m_EditorClassIdentifier: 
+  listPositionSpawn:
+  - spawnPosition: {x: -4.953, y: -0.54, z: 41.12}
+    enemyType: 1
+  - spawnPosition: {x: 3.26, y: -0.54, z: 41.12}
+    enemyType: 1
+  randomPositions:
+  - {x: 0, y: 0.8, z: 17.05}
+  - {x: 0, y: 0.8, z: 0}
+  - {x: -8.156, y: 0.8, z: 57.677}
+  - {x: -8.156, y: 0.8, z: 49.47}
+  - {x: 6.164, y: 0.8, z: 57.32}

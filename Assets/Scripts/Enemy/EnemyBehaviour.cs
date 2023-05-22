@@ -151,7 +151,7 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     protected bool KeepGoingPatrolPoint()
     {
         Vector3 v = (randomPositions[indexCurrentPointAlert] - transform.position);
-        if (Mathf.Abs(v.x) <= .1 && Mathf.Abs(v.z) <= .1)
+        if (Mathf.Abs(v.x) <= .2 && Mathf.Abs(v.z) <= .2)
         {
             int a = indexCurrentPointAlert;
             while (a == indexCurrentPointAlert)

@@ -152,26 +152,11 @@ public class PlayerControlls : NetworkBehaviour
                 transform.position = new Vector3(0, 0, 0);
 
         }
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            ActivateSkill(0);
+
+        if(Input.GetKeyDown(KeyCode.Alpha0)) {
+            WinPoints(500);
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            ActivateSkill(1);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            ActivateSkill(2);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            ActivateSkill(3);
-        }
-        else if (Input.GetKeyDown(KeyCode.P))
-        {
-            EndLevelDelegator?.Invoke();
-        }
+        
         if (pushed) return;
         // Velocity of the player
         PlayerMovement();
@@ -209,7 +194,10 @@ public class PlayerControlls : NetworkBehaviour
         if (context.canceled)
         {
             displayPauseDelegator?.Invoke();
+            if (!Pause)
+                directionRotationOfCamera = new Vector2(0, 0);
             Pause = Pause ? false : true;
+
         }
     }
     /**
@@ -238,7 +226,6 @@ public class PlayerControlls : NetworkBehaviour
         }
         else if (context.canceled && !weapon.Regeneration)
         {
-            //      NOTA PARAR CORRUTINA DE DISPARAR
             weapon.Shooting = false;
             RegenerationOfAmmunition = StartCoroutine(RegenerateAmunition());
         }
@@ -283,12 +270,10 @@ public class PlayerControlls : NetworkBehaviour
         if (directionMovement.x > 0)
         {
             rb.velocity = new Vector3(transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, transform.right.z * OwnInfo.playerVelocity);
-            //RaycastStep(StepDetectorTransformRight.position, StepDetectorTransformRight.right, 100f);
         }
         else if (directionMovement.x < 0)
         {
             rb.velocity = new Vector3(-transform.right.x * OwnInfo.playerVelocity, rb.velocity.y, -transform.right.z * OwnInfo.playerVelocity);
-            //RaycastStep(StepDetectorTransformLeft.position, -StepDetectorTransformLeft.right, 100f);
         }
         else
         {
@@ -299,15 +284,11 @@ public class PlayerControlls : NetworkBehaviour
         if (directionMovement.y > 0)
         {
             rb.velocity += new Vector3(transform.forward.x, 0, transform.forward.z) * OwnInfo.playerVelocity;
-            //RaycastStep(StepDetectorTransformForward.position, StepDetectorTransformForward.forward, 100f);
         }
         else if (directionMovement.y < 0)
         {
             rb.velocity += new Vector3(-transform.forward.x, 0, -transform.forward.z) * OwnInfo.playerVelocity;
-            //RaycastStep(StepDetectorTransformBehind.position, -StepDetectorTransformBehind.forward, 100f);
         }
-        //if (Step)
-        //    StartCoroutine(StepForceCooldown(0.4f));
     }
     public IEnumerator Dash()
     {
@@ -337,20 +318,6 @@ public class PlayerControlls : NetworkBehaviour
         {
 
         }
-    }
-    private void RaycastStep(Vector3 position, Vector3 direction, float force)
-    {
-        if (Physics.Raycast(position, direction, 0.5f, 7) && !Step)
-        {
-            Step = true;
-            rb.AddForce(transform.up * force, ForceMode.Force);
-        }
-        Debug.DrawLine(position, position + (direction), Color.red, 0.5f);
-    }
-    private IEnumerator StepForceCooldown(float time)
-    {
-        yield return new WaitForSeconds(time);
-        Step = false;
     }
     public void OnPlayerMove(InputAction.CallbackContext context)
     {
@@ -593,7 +560,7 @@ public class PlayerControlls : NetworkBehaviour
     //      CLIENT
     public void DisconnectClient()
     {
-        NetworkManager.Singleton.DisconnectClient(GetComponent<NetworkObject>().OwnerClientId);
+        //NetworkManager.Singleton.DisconnectClient(GetComponent<NetworkObject>().OwnerClientId);
         NetworkManager.Singleton.Shutdown();
         SceneManager.LoadScene("Menu");
     }

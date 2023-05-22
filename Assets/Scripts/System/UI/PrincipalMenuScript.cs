@@ -11,6 +11,7 @@ public class PrincipalMenuScript : MonoBehaviour
     private void Awake()
     {
         MultiplayerInfo = Resources.Load<MultiplayerInfo>("Multiplayer/MultiplayerInfo");
+        MultiplayerInfo.NumberOfPlayers = 0;
         if (SaveGameManager.Singleton.ExistOneSavedGame())
         {
             for (int a = 1; a < 6; a++)
