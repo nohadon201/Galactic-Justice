@@ -4,15 +4,18 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MissionsSystemManager : MonoBehaviour
+public class MissionsSystemManager : MonoBehaviour, IEventListener, IMissionManager
 {
     public int lvl;
     [SerializeField]
     private List<Mission> missions;
     private Dictionary<int, bool> missionsInitialValues = new Dictionary<int, bool>();
     private bool iker;
+    private GameEvent SetTextForFirstTime;
     protected virtual void Awake()
     {
+        SetTextForFirstTime = Resources.Load<GameEvent>("Events/DisplayMissionEvent");
+        SetTextForFirstTime.RegisterListener(this);
         if (!NetworkManager.Singleton.IsServer) { 
             Destroy(gameObject); 
             return;
@@ -67,16 +70,27 @@ public class MissionsSystemManager : MonoBehaviour
             mission.execute(gameEvent);
     }
 
+    public void SetText()
+    {
+        foreach (Mission mission in missions)
+        {
+            mission.initValues();
+        }
+    }
 }
 
-public class MissionsSystemManager<T> : MonoBehaviour
+public class MissionsSystemManager<T> : MonoBehaviour, IMissionManager, IEventListener
 {
     public int lvl;
     [SerializeField]
     private List<Mission<T>> missions;
     private Dictionary<int, bool> missionsInitialValues = new Dictionary<int, bool>();
+    private GameEvent SetTextForFirstTime;
     protected virtual void Awake()
     {
+
+        SetTextForFirstTime = Resources.Load<GameEvent>("Events/DisplayMissionEvent");
+        SetTextForFirstTime.RegisterListener(this);
         if (!NetworkManager.Singleton.IsServer)
         {
             Destroy(gameObject);
@@ -114,15 +128,26 @@ public class MissionsSystemManager<T> : MonoBehaviour
         foreach (Mission<T> mission in missions)
             mission.execute(gameEvent, parameter1); 
     }
+    public void SetText()
+    {
+        foreach (Mission<T> mission in missions)
+        {
+           mission.updateText();    
+        }
+    }
 }
-public class MissionsSystemManager<T1, T2> : MonoBehaviour
+public class MissionsSystemManager<T1, T2> : MonoBehaviour, IMissionManager, IEventListener
 {
+    private GameEvent SetTextForFirstTime;
     public int lvl;
     [SerializeField]
     private List<Mission<T1, T2>> missions;
     private Dictionary<int, bool> missionsInitialValues = new Dictionary<int, bool>();
     protected virtual void Awake()
     {
+
+        SetTextForFirstTime = Resources.Load<GameEvent>("Events/DisplayMissionEvent");
+        SetTextForFirstTime.RegisterListener(this);
         if (!NetworkManager.Singleton.IsServer)
         {
             Destroy(gameObject);
@@ -159,10 +184,17 @@ public class MissionsSystemManager<T1, T2> : MonoBehaviour
         foreach (Mission<T1, T2> mission in missions)
             mission.execute(gameEvent, parameter1, parameter2);
     }
+    public void SetText()
+    {
+        foreach (Mission<T1,T2> mission in missions)
+        {
+            mission.updateText();
+        }
+    }
 }
-public class MissionsSystemManager<T1, T2, T3> : MonoBehaviour
+public class MissionsSystemManager<T1, T2, T3> : MonoBehaviour, IMissionManager, IEventListener
 {
-
+    private GameEvent SetTextForFirstTime;
     public int lvl;
 
     [SerializeField]
@@ -171,6 +203,9 @@ public class MissionsSystemManager<T1, T2, T3> : MonoBehaviour
 
     protected virtual void Awake()
     {
+
+        SetTextForFirstTime = Resources.Load<GameEvent>("Events/DisplayMissionEvent");
+        SetTextForFirstTime.RegisterListener(this);
         if (!NetworkManager.Singleton.IsServer)
         {
             Destroy(gameObject);
@@ -207,4 +242,15 @@ public class MissionsSystemManager<T1, T2, T3> : MonoBehaviour
         foreach (Mission<T1, T2, T3> mission in missions)
             mission.execute(gameEvent, parameter1, parameter2, parameter3);
     }
+    public void SetText()
+    {
+        foreach (Mission<T1, T2, T3> mission in missions)
+        {
+            mission.updateText();
+        }
+    }
+}
+public interface IMissionManager
+{
+    void SetText();
 }

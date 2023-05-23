@@ -2,13 +2,14 @@ using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using static PlayerControlls;
 
-public class UIPlayerControlls : MonoBehaviour
+public class UIPlayerControlls : MonoBehaviour, IEventListener
 {
     private GameObject prefabConfiguration, player, powerBulletPrefab;
     
@@ -20,19 +21,21 @@ public class UIPlayerControlls : MonoBehaviour
     
     private int MenuDisplayed;
     private bool withoutInterface;
-    
-   
+    private Dictionary<int, TextMeshProUGUI> dictionaryMissions_Text = new Dictionary<int, TextMeshProUGUI>();
+    [SerializeField] private GameEvent<int, string, Color> textMissions;
     [SerializeField] private List<ConfigurationUI> configurationUI = new List<ConfigurationUI>(); 
     Image sliderOfAmmunition;
     Image sliderOfShield;
     Image sliderOfHealth;
     private TextMeshProUGUI points;
     private Button ExitGame, SaveGame, GoToChooseLevel, Disconnect;
+    GameObject MissionPrefab;
     
     void Awake()
     {
-
+        MissionPrefab = Resources.Load<GameObject>("Prefabs/Player/MissionPrefab");
         //Set active for default the UI objects
+        textMissions.RegisterListener(this);
         MenuDisplayed = 1;
         points = transform.GetChild(4).GetChild(2).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>();   
         GameObject crosshair = transform.GetChild(0).gameObject;
@@ -78,7 +81,25 @@ public class UIPlayerControlls : MonoBehaviour
         transform.GetChild(5).gameObject.SetActive(false);
 
     }
-
+    public void UpdateMissions(int id, string text, Color color)
+    {
+        if (dictionaryMissions_Text.Keys.Contains(id))
+        {
+            dictionaryMissions_Text.GetValueOrDefault(id).text = text;
+            dictionaryMissions_Text.GetValueOrDefault(id).color = color;
+        }
+        else
+        {
+            GameObject newTextMission = Instantiate(MissionPrefab);
+            newTextMission.transform.parent = transform.GetChild(6);
+            TextMeshProUGUI textMesh = newTextMission.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>();
+            dictionaryMissions_Text.Add(id, textMesh);
+            textMesh.text = text;
+            textMesh.color = color;
+            textMesh.fontSize = 12;
+            newTextMission.transform.localPosition = new Vector3(-50, 85 -  (50 * (  dictionaryMissions_Text.Count - 1)), 3);
+        }
+    }
     public void setValues(GameObject Player)
     {
         playerWeapon = Player.GetComponent<PlayerWeapon>();

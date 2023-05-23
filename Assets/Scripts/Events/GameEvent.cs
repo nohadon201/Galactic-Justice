@@ -17,11 +17,15 @@ public  class GameEvent : ScriptableObject
             {
                 GameEventListener mel = (GameEventListener)eventListeners[i];
                 mel.OnEventRaised();
-            }
-            else
+            }else if(eventListeners[i].GetType() == typeof(Tutorialer))
             {
                 Tutorialer tut = (Tutorialer)eventListeners[i];
                 tut.eventEncerrar1.Invoke(false);
+            }
+            else
+            {
+                IMissionManager mission = (IMissionManager)eventListeners[i];
+                mission.SetText();
             }
     }
 

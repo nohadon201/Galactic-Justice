@@ -2,9 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PlayerWeapon : NetworkBehaviour
 {
+    //######################## Events ########################
+    [SerializeField] private GameEvent SetTextFirst;
     //######################## PowerBullets ########################
     PowerBullets powerBullets;
     //######################## STATES ########################
@@ -59,6 +62,8 @@ public class PlayerWeapon : NetworkBehaviour
         UIPlayerControlls InterfaceComponent = Interface.GetComponent<UIPlayerControlls>();
         Interface.GetComponent<Canvas>().worldCamera = GetComponent<PlayerControlls>().Camera.GetComponent<Camera>();
         InterfaceComponent.setValues(this.gameObject);
+        SetTextFirst?.Raise();
+
     }
     public void Shoot()
     {

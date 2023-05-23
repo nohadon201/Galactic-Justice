@@ -560,7 +560,7 @@ public class PlayerControlls : NetworkBehaviour
     //      CLIENT
     public void DisconnectClient()
     {
-        //NetworkManager.Singleton.DisconnectClient(GetComponent<NetworkObject>().OwnerClientId);
+        
         NetworkManager.Singleton.Shutdown();
         SceneManager.LoadScene("Menu");
     }

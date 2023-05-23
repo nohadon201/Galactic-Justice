@@ -12,7 +12,16 @@ public class MissionCountToTarget : Mission
 
     public override void initValues()
     {
-        if(!Done)
+        changeStatus = Resources.Load<EventChangeTextMissions>("Events/EventChangeTextMissions");
+        if (Done)
+        {
+            changeStatus?.Raise(idMission, Description, Color.green);
+        }
+        else
+        {
+            changeStatus?.Raise(idMission, Description + " Progression(" + currentAmount + " / " + totalAmount + ")", new Color(0, 255, 255));
+        }
+        if (!Done)
         {
             currentAmount = 0;
         }
@@ -23,5 +32,25 @@ public class MissionCountToTarget : Mission
             currentAmount++;
             Done = currentAmount >= totalAmount;
         }
-    }     
+        if(Done)
+        {
+            changeStatus?.Raise(idMission, Description, Color.green);
+        }
+        else
+        {
+            changeStatus?.Raise(idMission, Description+" Progression("+currentAmount+" / "+totalAmount+")", new Color(0, 255, 255));
+        }
+    }
+
+    public override void updateText()
+    {
+        if (Done)
+        {
+            changeStatus?.Raise(idMission, Description, Color.green);
+        }
+        else
+        {
+            changeStatus?.Raise(idMission, Description + " Progression(" + currentAmount + " / " + totalAmount + ")", new Color(0, 255, 255));
+        }
+    }
 }
