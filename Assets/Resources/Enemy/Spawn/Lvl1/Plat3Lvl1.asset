@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Plat3Lvl1
   m_EditorClassIdentifier: 
   listPositionSpawn:
-  - spawnPosition: {x: 61.3, y: 8.5, z: 127}
+  - spawnPosition: {x: 60.7, y: 8.5, z: 157.5}
     enemyType: 3
   randomPositions:
-  - {x: 68.2, y: 8.5, z: 118.5}
-  - {x: 63.85, y: 8.5, z: 125.73}
-  - {x: 67.74, y: 8.5, z: 134.24}
-  - {x: 58, y: 8.5, z: 137.36}
+  - {x: 50.8, y: 8.5, z: 165}
+  - {x: 68.1, y: 8.5, z: 161.1}
+  - {x: 53.7, y: 8.5, z: 153.8}
+  - {x: 68.4, y: 8.5, z: 149.2}

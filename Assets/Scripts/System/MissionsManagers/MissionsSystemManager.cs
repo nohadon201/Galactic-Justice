@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MissionsSystemManager : MonoBehaviour, IEventListener, IMissionManager
+public class MissionsSystemManager : LevelMenuLoader, IEventListener, IMissionManager
 {
     public int lvl;
     [SerializeField]
@@ -58,9 +58,12 @@ public class MissionsSystemManager : MonoBehaviour, IEventListener, IMissionMana
                 missionsInitialValues[mission.idMission] = mission.Done;
             }
         }
+        SaveGameManager.Singleton.SaveClientRpc();
+        if (triggered) return;
+        triggered = true;
         SaveGameManager.Singleton.saveGame.LevelsCompleted++;
         SaveGameManager.Singleton.SaveClientRpc();
-        GetComponent<BoxCollider>().enabled = false;
+        GetComponent<BoxCollider>().enabled = false; 
         NetworkManager.Singleton.SceneManager.LoadScene("LevelMenu", LoadSceneMode.Single);
     }
 
@@ -79,7 +82,7 @@ public class MissionsSystemManager : MonoBehaviour, IEventListener, IMissionMana
     }
 }
 
-public class MissionsSystemManager<T> : MonoBehaviour, IMissionManager, IEventListener
+public class MissionsSystemManager<T> : LevelMenuLoader, IMissionManager, IEventListener
 {
     public int lvl;
     [SerializeField]
@@ -100,8 +103,10 @@ public class MissionsSystemManager<T> : MonoBehaviour, IMissionManager, IEventLi
 
         foreach (Mission<T> mission in missions)
         {
+            Debug.Log("hola"); 
             mission.initValues(this.gameObject).Response.AddListener(this.RaisedEvent);
         }
+        
 
         foreach (Mission<T> mission in missions)
         {
@@ -110,6 +115,7 @@ public class MissionsSystemManager<T> : MonoBehaviour, IMissionManager, IEventLi
     }
     private void OnTriggerEnter(Collider other)
     {
+        if (triggered) return;
         PlayerControlls PC = other.gameObject.GetComponent<PlayerControlls>();
         if (PC == null) return;
 
@@ -125,6 +131,7 @@ public class MissionsSystemManager<T> : MonoBehaviour, IMissionManager, IEventLi
 
     public void RaisedEvent(GameEvent<T> gameEvent, T parameter1)
     {
+        Debug.Log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa FINAL");
         foreach (Mission<T> mission in missions)
             mission.execute(gameEvent, parameter1); 
     }
@@ -136,7 +143,7 @@ public class MissionsSystemManager<T> : MonoBehaviour, IMissionManager, IEventLi
         }
     }
 }
-public class MissionsSystemManager<T1, T2> : MonoBehaviour, IMissionManager, IEventListener
+public class MissionsSystemManager<T1, T2> : LevelMenuLoader, IMissionManager, IEventListener
 {
     private GameEvent SetTextForFirstTime;
     public int lvl;
@@ -167,6 +174,7 @@ public class MissionsSystemManager<T1, T2> : MonoBehaviour, IMissionManager, IEv
     }
     private void OnTriggerEnter(Collider other)
     {
+        if (triggered) return;
         PlayerControlls PC = other.gameObject.GetComponent<PlayerControlls>();
         if (PC == null) return;
 
@@ -192,7 +200,7 @@ public class MissionsSystemManager<T1, T2> : MonoBehaviour, IMissionManager, IEv
         }
     }
 }
-public class MissionsSystemManager<T1, T2, T3> : MonoBehaviour, IMissionManager, IEventListener
+public class MissionsSystemManager<T1, T2, T3> : LevelMenuLoader, IMissionManager, IEventListener
 {
     private GameEvent SetTextForFirstTime;
     public int lvl;
@@ -225,6 +233,7 @@ public class MissionsSystemManager<T1, T2, T3> : MonoBehaviour, IMissionManager,
     }
     private void OnTriggerEnter(Collider other)
     {
+        if (triggered) return;
         PlayerControlls PC = other.gameObject.GetComponent<PlayerControlls>();
         if (PC == null) return;
 

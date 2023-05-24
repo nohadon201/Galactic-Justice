@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Data.Common;
 using UnityEngine;
 [CreateAssetMenu(fileName = "missionAccumulativeToTarget", menuName = "Mission/OneParam/missionAccumulativeToTarget")]
-public class MissionAccumulativeToTarget : Mission<int>
+public class MissionAccumulativeToTarget : Mission<float>
 {
     [SerializeField]
-    private int totalAmount;
+    private float totalAmount;
     [SerializeField]
-    private int currentAmount;
-    public override void execute(GameEvent<int> gameEvent, int parameter)
+    private float currentAmount;
+    public override void execute(GameEvent<float> gameEvent, float parameter)
     {
-        if(gameEvent.GetType() == typeof(MissionOneParamIntEvent)) {
+        Debug.Log("Uno");
+        if (gameEvent == this.Event)
+        {
             currentAmount += parameter;
-            Done = totalAmount > currentAmount;
+            Done = totalAmount <= currentAmount;
         }
+
         if (Done)
         {
             changeStatus?.Raise(idMission, Description, Color.green);
@@ -25,13 +28,13 @@ public class MissionAccumulativeToTarget : Mission<int>
         }
     }
 
-    public override GameEventListener<int> initValues(GameObject gameObject)
+    public override GameEventListener<float> initValues(GameObject gameObject)
     {
         changeStatus = Resources.Load<EventChangeTextMissions>("Events/EventChangeTextMissions");
         currentAmount = 0;
-        MissionOneParamIntListener listener = gameObject.AddComponent<MissionOneParamIntListener>();
+        MissionOneParamFloatListener listener = gameObject.AddComponent<MissionOneParamFloatListener>();
         listener.Event = this.Event;
-        listener.Response = new UnityEngine.Events.UnityEvent<GameEvent<int>, int>();
+        listener.Response = new UnityEngine.Events.UnityEvent<GameEvent<float>, float>();
         return listener;
     }
 

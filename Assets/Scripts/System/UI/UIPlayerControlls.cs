@@ -83,6 +83,7 @@ public class UIPlayerControlls : MonoBehaviour, IEventListener
     }
     public void UpdateMissions(int id, string text, Color color)
     {
+        Debug.Log("UPDATE MISSION");
         if (dictionaryMissions_Text.Keys.Contains(id))
         {
             dictionaryMissions_Text.GetValueOrDefault(id).text = text;

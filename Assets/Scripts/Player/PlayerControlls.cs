@@ -23,6 +23,7 @@ public class PlayerControlls : NetworkBehaviour
     public delegate void GoToNextInterface(bool b);
     public GoToNextInterface goToNextInterfaceDelegator;
 
+
     [SerializeField] private GameEvent OnPlayerJump, OnPlayerMoveEvent;
     [SerializeField] private EventPoints WinPointsEvent;
 

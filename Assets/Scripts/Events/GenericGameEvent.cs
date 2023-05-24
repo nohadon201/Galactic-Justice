@@ -20,10 +20,12 @@ public abstract class GameEvent<T> : ScriptableObject
 
     public void Raise(T parameter)
     {
+        Debug.Log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "+eventListeners.Count);
         for (int i = eventListeners.Count - 1; i >= 0; i--)
         {
-            if (eventListeners[i].GetType() == typeof(GameEventListener<T>))
+            if (eventListeners[i].GetType() == typeof(MissionOneParamFloatListener))
             {
+                Debug.Log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa añsldkfjañsdlkfajsdñlfkajsdfñlkdas");
                 GameEventListener<T> ey = (GameEventListener<T>)eventListeners[i];
                 ey.OnEventRaised(parameter);
             }else if(eventListeners[i].GetType() == typeof(Tutorialer))

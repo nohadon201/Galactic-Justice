@@ -18,7 +18,7 @@ MonoBehaviour:
   Title: Alcanzame Si Puedes
   Description: "Llega  a lo largo del nivel a una cantidad total de da\xF1o de 300
     o mayor"
-  Event: {fileID: 11400000, guid: 106841b9c11fe8c43b0b9a4faa1fedd1, type: 2}
+  Event: {fileID: 11400000, guid: 7ceb1a4e7c72cc7459924f106bd4de5a, type: 2}
   changeStatus: {fileID: 11400000, guid: 02f3ff1eb281bc241b17a554d8513a6e, type: 2}
   totalAmount: 300
   currentAmount: 0

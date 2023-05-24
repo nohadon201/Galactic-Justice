@@ -46,6 +46,22 @@ public class LevelMenuScript : MonoBehaviour
         
         NumbOfPlayersCount = transform.GetChild(5).gameObject.GetComponent<TextMeshProUGUI>();
 
+        SaveGame saveStatus = Resources.Load<SaveGame>("System/SaveGameSO");
+        if(saveStatus.LevelsCompleted < transform.GetChild(4).childCount)
+        {
+            for(int y = 1; y <= saveStatus.LevelsCompleted; y++)
+            {
+                transform.GetChild(4).GetChild(y).gameObject.SetActive(true);   
+            }
+        }
+        else
+        {
+            for (int y = 1; y < transform.GetChild(4).childCount; y++)
+            {
+                transform.GetChild(4).GetChild(y).gameObject.SetActive(true);
+            }
+        }
+
         StartCoroutine(CheckPlayerNumb());
     }
     void Start()
@@ -95,6 +111,10 @@ public class LevelMenuScript : MonoBehaviour
     }
 
     public void LoadLevel1()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("Lvl2", LoadSceneMode.Single);
+    }
+    public void LoadLevel2()
     {
         NetworkManager.Singleton.SceneManager.LoadScene("Lvl2", LoadSceneMode.Single);
     }

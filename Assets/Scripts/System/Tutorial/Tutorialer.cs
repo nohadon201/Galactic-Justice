@@ -70,7 +70,7 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.color = Color.white;
                 text2.color = Color.white;
                 text3.color = Color.white;
-                transform.position = new Vector3(4.14f, 8.26f, 30.98f);
+                transform.position = new Vector3(0.48f, 6.49f, 62.81f);
                 transform.eulerAngles = new Vector3(0, 0, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
@@ -83,7 +83,7 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.color = Color.white;
                 text2.color = Color.white;
                 text3.color = Color.white;
-                transform.position = new Vector3(0.39f, 5f, 240f);
+                transform.position = new Vector3(0.48f, 3.16f, 275.79f);
                 transform.eulerAngles = new Vector3(0, 0, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
@@ -92,7 +92,7 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.text = "Prueba con estos maniquís las diferentes configuraciones";
                 text2.text = "Vamos a ver como te mueves!";
                 text3.text = "Cuando creas que ya estás listo pasa a la siguiente plataforma!";
-                transform.position = new Vector3(-4.4f, 5f, 270f);
+                transform.position = new Vector3(0.48f, 5f, 286.57f);
                 transform.eulerAngles = new Vector3(0, 0, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
@@ -104,7 +104,7 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.text = "";
                 text2.text = "Bien! Avancemos!";
                 text3.text = "";
-                transform.position = new Vector3(-4.4f, 1.32f, 290f);
+                transform.position = new Vector3(0.48f, 0.78f, 310f);
                 transform.eulerAngles = new Vector3(0, 0, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
@@ -121,9 +121,8 @@ public class Tutorialer : MonoBehaviour, IEventListener
                         text3.text = "";
                         text1.text = "Verás que te acabo de dar 10 puntos de energia.";
                         text2.text = "Prueba a configurar tu arma con los PowerBullets entrando en el menu con I.";
-                        transform.position = new Vector3(12.41126f, 1.32f, 295f);
+                        transform.position = new Vector3(12.46f, 1.32f, 327.2f);
                         transform.eulerAngles = new Vector3(0, 90, 0);
-                        
                         currentY = transform.position.y;
                         goToY = currentY + 1;
                         text1.color = Color.white;
@@ -147,7 +146,7 @@ public class Tutorialer : MonoBehaviour, IEventListener
                         text1.text = "";
                         text2.text = "Te felicito has llegado antes que tu compañero y encima tienes lag! Por lo visto está de moda ser lento";
                         text3.text = "Dile a tu compañero que un cubo rosa kawaii espacial te acaba de dar permiso para insultarle! > : ) ";
-                        transform.position = new Vector3(-4.4f, 1.32f, 307f);
+                        transform.position = new Vector3(-0.85f, 1.32f, 323.62f);
                         currentY = transform.position.y;
                         goToY = currentY + 1;
                         text1.color = Color.white;
@@ -159,7 +158,7 @@ public class Tutorialer : MonoBehaviour, IEventListener
                         text1.text = "";
                         text2.text = "Os he dado a ti y a tu compañero 10 puntos de energía.";
                         text3.text = "Probad algunos powerBullets a vuestro gusto!";
-                        transform.position = new Vector3(12.41126f, 1.32f, 295f);
+                        transform.position = new Vector3(12.46f, 1.32f, 327.2f);
                         transform.eulerAngles = new Vector3(0, 90, 0);
                         currentY = transform.position.y;
                         goToY = currentY + 1;
@@ -173,7 +172,7 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.text = "Cuidado! Hay un enemigo ahí delante! Ahora con lo que sabes puedes intentar enfrentarte a el.";
                 text3.text = "Este alienigena se le llama Thraaxiano, los Thraaxianos son lentos pero suelen haber muchos y hacen mucho daño!";
                 text2.text = "Ten cuidado por que suelen intentar rodear a su presa.";
-                transform.position = new Vector3(40f, 8.5f, 299f);
+                transform.position = new Vector3(40f, 8.5f, 338.5f);
                 transform.eulerAngles = new Vector3(-10f, 90, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
@@ -185,11 +184,11 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.text = "VAMOS JUGADOR! PEGALE UNA PALIZA! ASI ES, AHORA CON LA DERECHA";
                 text3.text = "Y AHORA ESO Y LO OTRO ESO TAMBIEN. MATA DESTROZA";
                 text2.text = "MUTILA";
-                StartCoroutine(checkIfPlayers(new Vector3(60.7f, 6.35f, 298.19f), StateScene.State7));
+                StartCoroutine(checkIfPlayers(new Vector3(60.7f, 6.35f, 328.39f), StateScene.State7));
                 text1.color = Color.red;
                 text2.color = Color.red;
                 text3.color = Color.red;
-                transform.position = new Vector3(80f, 15f, 299f);
+                transform.position = new Vector3(80f, 15f, 328.5f);
                 transform.eulerAngles = new Vector3(-20f, 90, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
@@ -201,7 +200,7 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.color = Color.white;
                 text2.color = Color.white;
                 text3.color = Color.white;
-                transform.position = new Vector3(75f, 10f, 299f);
+                transform.position = new Vector3(75f, 10f, 328.5f);
                 transform.eulerAngles = new Vector3(0, 90, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
@@ -213,7 +212,7 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.color = Color.white;
                 text2.color = Color.white;
                 text3.color = Color.white;
-                transform.position = new Vector3(65f, 10f, 245.8f);
+                transform.position = new Vector3(65f, 10f, 282f);
                 transform.eulerAngles = new Vector3(0, 180, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
@@ -225,8 +224,8 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.color = Color.red;
                 text2.color = Color.white;
                 text3.color = Color.red;
-                StartCoroutine(checkIfPlayers(new Vector3(60.7f, 6.35f, 212.69f), StateScene.State10));
-                transform.position = new Vector3(75f, 20f, 210f);
+                StartCoroutine(checkIfPlayers(new Vector3(60.7f, 6.35f, 242.89f), StateScene.State10));
+                transform.position = new Vector3(75f, 12f, 235f);
                 transform.eulerAngles = new Vector3(-20, 90, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
@@ -238,7 +237,7 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.color = Color.white;
                 text2.color = Color.white;
                 text3.color = Color.white;
-                transform.position = new Vector3(70f, 10f, 210.8f);
+                transform.position = new Vector3(70f, 10f, 235f);
                 transform.eulerAngles = new Vector3(0, 90, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
@@ -250,7 +249,7 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.color = Color.white;
                 text2.color = Color.white;
                 text3.color = Color.white;
-                transform.position = new Vector3(65f, 10f, 150f);
+                transform.position = new Vector3(65f, 10f, 190f);
                 transform.eulerAngles = new Vector3(0, 180, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
@@ -262,9 +261,9 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.color = Color.red;
                 text2.color = Color.white;
                 text3.color = Color.red;
-                StartCoroutine(checkIfPlayers(new Vector3(60.7f, 6.35f, 127.3f), StateScene.State13));
-                transform.position = new Vector3(75f, 20f, 135f);
-                transform.eulerAngles = new Vector3(-20, 90, 0);
+                StartCoroutine(checkIfPlayers(new Vector3(60.7f, 6.35f, 157.5f), StateScene.State13));
+                transform.position = new Vector3(75f, 10f, 145f);
+                transform.eulerAngles = new Vector3(0, 110, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
                 break;
@@ -275,8 +274,8 @@ public class Tutorialer : MonoBehaviour, IEventListener
                 text1.color = Color.white;
                 text2.color = Color.white;
                 text3.color = Color.white;
-                transform.position = new Vector3(65f, 10f, 100f);
-                transform.eulerAngles = new Vector3(0, 180, 0);
+                transform.position = new Vector3(75f, 10f, 145f);
+                transform.eulerAngles = new Vector3(0, 110, 0);
                 currentY = transform.position.y;
                 goToY = currentY + 1;
                 break;
