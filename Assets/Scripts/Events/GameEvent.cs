@@ -22,6 +22,27 @@ public  class GameEvent : ScriptableObject
                 Tutorialer tut = (Tutorialer)eventListeners[i];
                 tut.eventEncerrar1.Invoke(false);
             }
+            else if (eventListeners[i].GetType() == typeof(Quiraxian))
+            {
+                Debug.Log("Hola");
+                Quiraxian eb = (Quiraxian)eventListeners[i];
+                eb.DestroySelf();
+
+            }
+            else if (eventListeners[i].GetType() == typeof(Thraaxian))
+            {
+                Debug.Log("Hola");
+                Thraaxian eb = (Thraaxian)eventListeners[i];
+                eb.DestroySelf();
+
+            }
+            else if (eventListeners[i].GetType() == typeof(Zorgonian))
+            {
+                Debug.Log("Hola");
+                Zorgonian eb = (Zorgonian)eventListeners[i];
+                eb.DestroySelf();
+
+            }
             else
             {
                 IMissionManager mission = (IMissionManager)eventListeners[i];

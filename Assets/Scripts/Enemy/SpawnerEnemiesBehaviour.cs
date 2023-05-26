@@ -95,18 +95,20 @@ public class SpawnerEnemiesBehaviour : NetworkBehaviour
     public void SpawnByTutorialer(StateScene state)
     {
         if (type != TypeSpawn.ON_EVENT) return;
-        SpawnState(state);
+        SpawnStateServerRpc((int)state);
     }
     public void SpawnByTrigger(StateScene state)
     {
         if(type!= TypeSpawn.ON_TRIGGER) return;
-        SpawnState(state);  
+        SpawnStateServerRpc((int)state);  
     }
-    public void SpawnState(StateScene state)
+    [ServerRpc]
+    public void SpawnStateServerRpc(int state)
     {
+        Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA SERVIDOR");
         foreach(SpawnerTrigger spwnTrigger in InfoTrigger)
         {
-            if(spwnTrigger.id == (int)state)
+            if(spwnTrigger.id == state)
             {
                 foreach (SpawnInfo info in spwnTrigger.spawner.listPositionSpawn)
                 {

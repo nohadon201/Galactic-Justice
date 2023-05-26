@@ -26,6 +26,7 @@ public class PlayerControlls : NetworkBehaviour
 
     [SerializeField] private GameEvent OnPlayerJump, OnPlayerMoveEvent;
     [SerializeField] private EventPoints WinPointsEvent;
+    [SerializeField] private GameEvent OnPlayerDeath;
 
     [Header("Configs")]
     /*
@@ -148,7 +149,7 @@ public class PlayerControlls : NetworkBehaviour
         if (Fall())
         {
             if (SceneManager.GetActiveScene().name != "Lvl1")
-                OnPlayerDeath();
+                OnPlayerDeathServerRpc();
             else
                 transform.position = new Vector3(0, 0, 0);
 
@@ -452,8 +453,7 @@ public class PlayerControlls : NetworkBehaviour
             if (OwnInfo.playersCurrentHealth <= 0)
             {
                 OwnInfo.playersCurrentHealth = 0;
-                Debug.Log("Muelto");
-                //this.gameObject.SetActive(false);
+                OnPlayerDeathServerRpc();
             }
             RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
         }
@@ -490,7 +490,8 @@ public class PlayerControlls : NetworkBehaviour
             if (OwnInfo.playersCurrentHealth <= 0)
             {
                 OwnInfo.playersCurrentHealth = 0;
-                Debug.Log("Muelto");
+
+                OnPlayerDeathServerRpc();
                 //this.gameObject.SetActive(false);
             }
             RegenerationShieldCoroutine = StartCoroutine(RegenerationOfShield());
@@ -519,9 +520,11 @@ public class PlayerControlls : NetworkBehaviour
     {
         OwnInfo.playersCurrentShield += OwnInfo.RegenerationShieldValue;
     }
-    private void OnPlayerDeath()
+    [ServerRpc]
+    private void OnPlayerDeathServerRpc()
     {
-
+        OnPlayerDeath?.Raise();
+        NetworkManager.SceneManager.LoadScene("LevelMenu", LoadSceneMode.Single);
     } 
     /**
      * ############################ Temporal Skills ########################################### 

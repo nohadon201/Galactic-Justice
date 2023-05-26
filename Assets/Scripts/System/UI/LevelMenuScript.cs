@@ -112,7 +112,7 @@ public class LevelMenuScript : MonoBehaviour
 
     public void LoadLevel1()
     {
-        NetworkManager.Singleton.SceneManager.LoadScene("Lvl2", LoadSceneMode.Single);
+        NetworkManager.Singleton.SceneManager.LoadScene("Lvl1", LoadSceneMode.Single);
     }
     public void LoadLevel2()
     {

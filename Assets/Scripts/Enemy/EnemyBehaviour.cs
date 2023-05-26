@@ -5,7 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 
-public abstract class EnemyBehaviour : NetworkBehaviour
+public abstract class EnemyBehaviour : NetworkBehaviour,IEventListener
 {
     /**
      * ###################################### EVENTS ################################ 
@@ -16,6 +16,7 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     [SerializeField] private GameEvent<float> OnDamageReceivedEvent;
     [Header("Only in case of Tutorial")]
     [SerializeField] protected GameEvent<int> OnEnemyDeathWich;
+    private GameEvent OnPlayerDeath;
     [Header("")]
     /**
      * ###################################### State Machine ################################ 
@@ -67,6 +68,8 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     
     protected virtual void Awake()
     {
+        OnPlayerDeath = Resources.Load<GameEvent>("Events/OnPlayerDeath");
+        OnPlayerDeath.RegisterListener(this);
         if (IsServer)
         {
             GetComponent<NetworkObject>().Spawn();
@@ -112,8 +115,18 @@ public abstract class EnemyBehaviour : NetworkBehaviour
         {
             StopCoroutine(checkPlayerCoroutine);
             OnPlayerAway();
+       
         }
     }
+
+    /**
+     * ###################################### OnPlayerDeath ################################ 
+     */
+    public void DestroySelf()
+    {
+        Destroy(gameObject);    
+    }
+
     /**
      * ###################################### Patrol Of Enemy ################################ 
      */

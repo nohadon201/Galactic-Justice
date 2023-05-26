@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -24,7 +25,7 @@ public class TriggerTutorialer : MonoBehaviour
         if(Closed) return;
         if (other.transform.tag != "Player") return;
         m_Accion.Invoke(m_Estado, other.gameObject);
-        if (!spawned)
+        if (!spawned && NetworkManager.Singleton.IsServer)
         {
             spawnEvent.Invoke(m_Estado);
             spawned= true;  
