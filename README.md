@@ -1,3 +1,5 @@
+<image src = "GalacticJustice.png">
+
 # README - Final Project DAMvi: Unity Multiplayer Shooter
 
 ## Introduction
@@ -8,7 +10,7 @@ Welcome to the repository of the final course project developed by Pol Gonzalo i
 
 * **Name:** Pol Gonzalo
 * **Contact:** [Email](mailto:nohadon201@gmail.com)
-* **GitHub Profile:** [pgonzalo](https://github.com/nohadon201)
+* **GitHub Profile:** [nohadon201](https://github.com/nohadon201)
 
 ## Project Description
 
@@ -57,7 +59,7 @@ If you have any questions or comments, feel free to contact me via the email pro
 
 * **Nombre:** Pol Gonzalo
 * **Contacto:** [Correo Electrónico](mailto:nohadon201@gmail.com)
-* **Perfil GitHub:** [pgonzalo](https://github.com/nohadon201)
+* **Perfil GitHub:** [nohadon201](https://github.com/nohadon201)
 
 ## Descripción del Proyecto
 
@@ -106,7 +108,7 @@ Benvingut al repositori del projecte final de curs desenvolupat per Pol Gonzalo 
 
 * **Nom:** Pol Gonzalo
 * **Contacte:** [Correu Electrònic](mailto:nohadon201@gmail.com)
-* **Perfil GitHub:** [pgonzalo](https://github.com/nohadon201)
+* **Perfil GitHub:** [nohadon201](https://github.com/nohadon201)
 
 ## Descripció del Projecte
 
